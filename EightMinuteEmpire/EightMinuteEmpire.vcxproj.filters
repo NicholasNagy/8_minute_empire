@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Resource Files\Maps">
+      <UniqueIdentifier>{4fd06d31-ec5f-4247-b5c9-6483c8f6d069}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="driver.cpp">
@@ -56,5 +59,10 @@
     <ClInclude Include="Cards.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Maps\Old_Europe.map">
+      <Filter>Resource Files\Maps</Filter>
+    </None>
   </ItemGroup>
 </Project>
