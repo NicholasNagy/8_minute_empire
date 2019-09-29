@@ -1,4 +1,3 @@
-#include <windows.h>
 #include "MapLoader.h"
 #include <iostream>
 #include <filesystem>

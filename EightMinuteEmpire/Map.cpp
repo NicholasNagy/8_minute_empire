@@ -10,3 +10,12 @@ Map::Map()
 Map::~Map()
 {
 }
+
+Country::Country()
+{
+}
+
+Country::~Country()
+{
+}
+

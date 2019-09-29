@@ -16,6 +16,9 @@
     <Filter Include="Resource Files\Maps">
       <UniqueIdentifier>{4fd06d31-ec5f-4247-b5c9-6483c8f6d069}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Maps\Images">
+      <UniqueIdentifier>{a087ab83-615d-4cd4-8c53-fa8ad9a48f4d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="driver.cpp">
@@ -64,5 +67,19 @@
     <None Include="Maps\Old_Europe.map">
       <Filter>Resource Files\Maps</Filter>
     </None>
+    <None Include="Maps\map2.map">
+      <Filter>Resource Files\Maps</Filter>
+    </None>
+    <None Include="Maps\map3.map">
+      <Filter>Resource Files\Maps</Filter>
+    </None>
+    <None Include="Maps\map1.map">
+      <Filter>Resource Files\Maps</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Maps\Images\Old_Europe_Image.jpg">
+      <Filter>Resource Files\Maps\Images</Filter>
+    </Image>
   </ItemGroup>
 </Project>
