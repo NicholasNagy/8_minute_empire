@@ -2,6 +2,7 @@
 #include <iostream>
 #include <filesystem>
 
+/*
 int main()
 
 {
@@ -14,6 +15,6 @@ int main()
 	return 0;
 
 }
-
+*/
 
 
