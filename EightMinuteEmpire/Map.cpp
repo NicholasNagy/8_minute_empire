@@ -40,6 +40,28 @@ namespace GraphWorld
 		return s1 + s2 + s3;
 	}
 
+	Node::Node(Country* country)
+	{
+		this->country = country;
+	}
+
+	Node::Node(Country* country, Node* next, Node* previous)
+	{
+		this->country = country;
+		this->next = next;
+		this->previous = previous;
+	}
+
+	Node::~Node()
+	{
+		delete country;
+	}
+
+	string Node::displayNode()
+	{
+		return "Country: " + country->displayCountry();
+	}
+
 	/*
 	LinkedList::LinkedList()
 	{
@@ -47,16 +69,6 @@ namespace GraphWorld
 	}
 
 	LinkedList::~LinkedList()
-	{
-
-	}
-
-	Node::Node(Country* country)
-	{
-		this->country = country;
-	}
-
-	Node::~Node()
 	{
 
 	}

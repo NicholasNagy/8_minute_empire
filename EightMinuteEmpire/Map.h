@@ -31,16 +31,17 @@ namespace GraphWorld
 		private:
 			int* country_ID;
 			bool* isStartCountry;
-			string continent; // string is already pointer can't have ptr --> ptr --> char[]
+			string continent;
 			list<Country*> adjacentCountries;
 	};
 
-	/*
 	class Node
 	{
 		public:
 			Node(Country* country);
+			Node(Country* country, Node* next, Node* previous);
 			~Node();
+			string displayNode();
 
 		private:
 			Country* country;
@@ -48,6 +49,7 @@ namespace GraphWorld
 			Node* previous;
 	};
 
+	/*
 	class LinkedList
 	{
 		public:
