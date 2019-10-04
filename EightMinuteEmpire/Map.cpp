@@ -16,22 +16,13 @@ namespace GraphWorld
 	{
 	}
 
-	Country::Country(int country_ID, bool startCountry, string* continent) // list<Country*> adjacentCountries
+	Country::Country(int country_ID, bool startCountry, string* continent)
 	{
 		this->country_ID = new int();
 		*this->country_ID = country_ID;
 		this->isStartCountry = new bool();
 		*this->isStartCountry = startCountry;
 		this->continent = string(*continent);
-		//this->adjacentCountries = adjacentCountries;
-	}
-
-	Country::~Country()
-	{
-		delete country_ID;
-		delete isStartCountry;
-		continent.clear();
-		//adjacentCountries.clear();
 	}
 
 	string Country::displayCountry()
@@ -41,61 +32,78 @@ namespace GraphWorld
 		if (*isStartCountry == 1)
 			countryBool = "true";
 		string s2 = "StartingCountry: " + countryBool + "\n";
-		string s3 = "Continent: " + continent;
+		string s3 = "Continent: " + continent + "\n";
+		string s4 = "AdjacentCountries: ";
 		return s1 + s2 + s3;
 	}
 
-	Node::Node(Country* country)
+	Country::~Country()
 	{
-		if (country == NULL)
-			this->country = NULL;
-		else
-			this->country = country;
-		next = NULL;
-		previous = NULL;
+		delete country_ID;
+		delete isStartCountry;
+		continent.clear();
+		//delete adjacentCountries;
 	}
 
-	Node::Node(Country* country, Node* next, Node* previous)
+	class LinkedList::Node
 	{
-		this->country = country;
-		this->next = next;
-		this->previous = previous;
-	}
+		Country* country;
+		Node* next;
+		Node* previous;
 
-	Node* Node::getNext()
-	{
-		return next;
-	}
+		public:
+			Node(Country* country)
+			{
+				if (country == NULL)
+					this->country = NULL;
+				else
+					this->country = country;
+				next = NULL;
+				previous = NULL;
+			}
 
-	Node* Node::getPrev()
-	{
-		return previous;
-	}
+			Node(Country* country, Node* next, Node* previous)
+			{
+				this->country = country;
+				this->next = next;
+				this->previous = previous;
+			}
 
-	void Node::setNext(Node* addMe)
-	{
-		next = addMe;
-	}
+			Node* getNext()
+			{
+				return next;
+			}
 
-	void Node::setPrev(Node* addMe)
-	{
-		previous = addMe;
-	}
+			Node* getPrev()
+			{
+				return previous;
+			}
 
-	Country* Node::getCountry()
-	{
-		return country;
-	}
+			void setNext(Node* addMe)
+			{
+				next = addMe;
+			}
 
-	Node::~Node()
-	{
-		delete country;
-	}
+			void setPrev(Node* addMe)
+			{
+				previous = addMe;
+			}
 
-	void Node::displayNode()
-	{
-		cout << "Country:\n" + country->displayCountry() + "\n";
-	}
+			Country* getCountry()
+			{
+				return country;
+			}
+
+			void displayNode()
+			{
+				cout << "Country:\n" + country->displayCountry() + "\n";
+			}
+
+			~Node()
+			{
+				delete country;
+			}
+	};
 
 	LinkedList::LinkedList(Country* country)
 	{
@@ -103,6 +111,7 @@ namespace GraphWorld
 		{
 			head = NULL;
 			tail = NULL;
+			size = 0;
 		}
 		else
 		{
@@ -112,12 +121,12 @@ namespace GraphWorld
 		}
 	}
 
-	Node* LinkedList::getNext(Node* current)
+	LinkedList::Node* LinkedList::getNext(Node* current)
 	{
 		return current->getNext();
 	}
 
-	Node* LinkedList::getPrev(Node* current)
+	LinkedList::Node* LinkedList::getPrev(Node* current)
 	{
 		return current->getPrev();
 	}

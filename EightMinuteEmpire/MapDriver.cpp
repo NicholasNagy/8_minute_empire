@@ -17,7 +17,7 @@ int main()
 	ll->add(2, c3);
 	ll->add(2, c4);
 	ll->displayLinkedList();
-	cout << "\nRemoving Tail\n";
+	cout << "\nRemoving Two Items\n";
 	ll->remove(0);
 	ll->remove(3);
 	ll->displayLinkedList();
