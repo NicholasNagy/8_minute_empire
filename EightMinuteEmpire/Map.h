@@ -16,23 +16,36 @@ namespace GraphWorld
 			~Map();
 
 		private:
-			string* mapName;
-			int numberOfCountries;
-			int numberOfContinents;
+			string mapName;
+			int* numberOfCountries;
+			int* numberOfContinents;
 	};
 
 	class Country
 	{
 		public:
-			Country(int country_ID, bool startCountry, char* continent, list<Country*> adjacentCountries);
+			Country(int country_ID, bool startCountry, string* continent);// list<Country*> adjacentCountries
 			~Country();
 			string displayCountry();
 
 		private:
-			int country_ID;
-			bool isStartCountry;
-			char continent;
+			int* country_ID;
+			bool* isStartCountry;
+			string continent; // string is already pointer can't have ptr --> ptr --> char[]
 			list<Country*> adjacentCountries;
+	};
+
+	/*
+	class Node
+	{
+		public:
+			Node(Country* country);
+			~Node();
+
+		private:
+			Country* country;
+			Node* next;
+			Node* previous;
 	};
 
 	class LinkedList
@@ -45,18 +58,7 @@ namespace GraphWorld
 			int size;
 			Node* head;
 	};
-
-	class Node
-	{
-		public:
-			Node(Country *country);
-			~Node();
-
-		private:
-			Country* country;
-			Node* next;
-			Node* previous;
-	};
+	*/
 }
 
 #endif

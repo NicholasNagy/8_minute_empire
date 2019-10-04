@@ -2,6 +2,7 @@
 #include <string>
 
 using std::string;
+using std::to_string;
 
 namespace GraphWorld
 {
@@ -13,26 +14,33 @@ namespace GraphWorld
 	{
 	}
 
-	Country::Country(int country_ID, bool startCountry, char* continent, list<Country*> adjacentCountries)
+	Country::Country(int country_ID, bool startCountry, string* continent) // list<Country*> adjacentCountries
 	{
-		this->country_ID = country_ID;
-		this->isStartCountry = startCountry;
-		//this->continent = malloc(1 + strlen(continent));
-		//strcpy(this->continent, continent);
-		this->adjacentCountries = adjacentCountries;
+		this->country_ID = new int();
+		*this->country_ID = country_ID;
+		this->isStartCountry = new bool();
+		*this->isStartCountry = startCountry;
+		this->continent = string(*continent);
+		//this->adjacentCountries = adjacentCountries;
 	}
 
 	Country::~Country()
 	{
-		//delete continent;
-		adjacentCountries.clear();
+		delete country_ID;
+		delete isStartCountry;
+		continent.clear();
+		//adjacentCountries.clear();
 	}
 
 	string Country::displayCountry()
 	{
-
+		string s1 = "countryID: " + to_string(*country_ID) + "\n";
+		string s2 = "StartingCountry: " + to_string(*isStartCountry) + "\n";
+		string s3 = "Continent: " + continent;
+		return s1 + s2 + s3;
 	}
 
+	/*
 	LinkedList::LinkedList()
 	{
 
@@ -43,7 +51,7 @@ namespace GraphWorld
 
 	}
 
-	Node::Node(Country *country)
+	Node::Node(Country* country)
 	{
 		this->country = country;
 	}
@@ -52,5 +60,6 @@ namespace GraphWorld
 	{
 
 	}
+	*/
 }
 
