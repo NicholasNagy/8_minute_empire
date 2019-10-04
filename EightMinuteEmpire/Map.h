@@ -13,12 +13,17 @@ namespace GraphWorld
 
 	class Map
 	{
+		class Node;
 		string mapName;
-		int* numberOfCountries;
-		int* numberOfContinents;
+		int* numCountries;
+		int* numContinents;
+		Country* listOfCountries;
 
 		public:
-			Map();
+			Map(string* mapName, int numCountries, int numContinents);
+			void addNode(Country*);
+			void addEdge(Country* c1, Country* c2);
+			void printMap();
 			~Map();
 	};
 
@@ -27,10 +32,16 @@ namespace GraphWorld
 		int* country_ID;
 		bool* isStartCountry;
 		string continent;
-		//LinkedList* adjacentCountries;
 
 		public:
+			Country();
 			Country(int country_ID, bool startCountry, string* continent);
+			int getID();
+			bool getStartCountry();
+			string getContinent();
+			bool setID(int id);
+			bool setStartCountry(bool maybe);
+			bool setContinent(string* continent);
 			string displayCountry();
 			~Country();
 	};

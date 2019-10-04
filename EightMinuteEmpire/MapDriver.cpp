@@ -10,6 +10,7 @@ int main()
 	Country* c1 = new Country(1, true, &s1);
 	string s2 = "MakramLand";
 	Country* c2 = new Country(2, false, &s2);
+	cout << c2->getContinent() + "\n\n";
 	Country* c3 = new Country(3, false, &s2);
 	Country* c4 = new Country(4, false, &s2);
 	LinkedList* ll = new LinkedList(c1);

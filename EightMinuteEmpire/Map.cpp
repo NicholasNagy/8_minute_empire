@@ -8,12 +8,35 @@ using std::to_string;
 
 namespace GraphWorld
 {
-	Map::Map()
+	class Map::Node
 	{
+
+	};
+
+	Map::Map(string* mapName, int numCountries, int numContinents)
+	{
+		this->mapName = string(*mapName);
+		this->numCountries = new int();
+		*this->numCountries = numCountries;
+		this->numContinents = new int();
+		*this->numContinents = numContinents;
+		listOfCountries = new Country[numCountries];
 	}
 
 	Map::~Map()
 	{
+		mapName.clear();
+		delete numContinents;
+		delete numCountries;
+	}
+
+	Country::Country()
+	{
+		country_ID = new int();
+		*country_ID = 0;
+		isStartCountry = new bool();
+		*isStartCountry = false;
+		continent = string("");
 	}
 
 	Country::Country(int country_ID, bool startCountry, string* continent)
@@ -25,6 +48,37 @@ namespace GraphWorld
 		this->continent = string(*continent);
 	}
 
+	int Country::getID()
+	{
+		return *country_ID;
+	}
+
+	bool Country::getStartCountry()
+	{
+		return *isStartCountry;
+	}
+
+	string Country::getContinent()
+	{
+		return continent;
+	}
+
+	bool Country::setID(int id)
+	{
+		*country_ID = id;
+	}
+
+	bool Country::setStartCountry(bool maybe)
+	{
+		*isStartCountry = maybe;
+	}
+
+	bool Country::setContinent(string* continent)
+	{
+		this->continent.clear();
+		this->continent = *continent;
+	}
+
 	string Country::displayCountry()
 	{
 		string s1 = "countryID: " + to_string(*country_ID) + "\n";
@@ -33,7 +87,6 @@ namespace GraphWorld
 			countryBool = "true";
 		string s2 = "StartingCountry: " + countryBool + "\n";
 		string s3 = "Continent: " + continent + "\n";
-		string s4 = "AdjacentCountries: ";
 		return s1 + s2 + s3;
 	}
 
@@ -42,7 +95,6 @@ namespace GraphWorld
 		delete country_ID;
 		delete isStartCountry;
 		continent.clear();
-		//delete adjacentCountries;
 	}
 
 	class LinkedList::Node
