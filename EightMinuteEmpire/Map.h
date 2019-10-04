@@ -44,6 +44,7 @@ namespace GraphWorld
 			Node* getPrev();
 			void setNext(Node* addMe);
 			void setPrev(Node* addMe);
+			Country* getCountry();
 			~Node();
 			void displayNode();
 
@@ -58,12 +59,8 @@ namespace GraphWorld
 		public:
 			LinkedList(Country* country);
 			int sizeOf();
-			bool addToHead(Country* country);
-			bool addToTail(Country* country);
 			bool add(int where, Country* country);
 			Country* remove(int where);
-			Country* removeHead();
-			Country* removeTail();
 			void displayLinkedList();
 			~LinkedList();
 
@@ -73,6 +70,10 @@ namespace GraphWorld
 			Node* tail;
 			Node* getNext(Node* current);
 			Node* getPrev(Node* current);
+			Country* removeHead();
+			Country* removeTail();
+			bool addToHead(Country* country);
+			bool addToTail(Country* country);
 	};
 }
 

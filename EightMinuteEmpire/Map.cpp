@@ -82,6 +82,11 @@ namespace GraphWorld
 		previous = addMe;
 	}
 
+	Country* Node::getCountry()
+	{
+		return country;
+	}
+
 	Node::~Node()
 	{
 		delete country;
@@ -174,28 +179,84 @@ namespace GraphWorld
 		return returnMe;
 	}
 
-	// Continue working Here
 	bool LinkedList::add(int where, Country* country)
 	{
 		bool returnMe = false;
 		if (country != NULL)
 		{
 			if (where == 0)
-				addToHead(country);
+				returnMe = addToHead(country);
 			else if (where >= size)
-				addToTail(country);
+				returnMe = addToTail(country);
 			else
 			{
-				
+				Node* current = head;
 				for (int i = 0; i < where; i++)
 				{
-
+					current = current->getNext();
 				}
+				Node* prev = current->getPrev();
+				Node* n1 = new Node(country, current, prev);
+				prev->setNext(n1);
+				current->setPrev(n1);
+				size++;
+				returnMe = true;
 			}
 		}
 		else
 		{
 			cout << "You tried to add nothing";
+		}
+		return returnMe;
+	}
+
+	Country* LinkedList::removeHead()
+	{
+		if (size == 0)
+			return NULL;
+		else
+		{
+			Node* returnMe = head;
+			head = head->getNext();
+			head->setPrev(NULL);
+			size--;
+			return returnMe->getCountry();
+		}
+	}
+
+	Country* LinkedList::removeTail()
+	{
+		if (size == 0)
+			return NULL;
+		else
+		{
+			Node* returnMe = tail;
+			tail = tail->getPrev();
+			tail->setNext(NULL);
+			size--;
+			return returnMe->getCountry();
+		}
+	}
+
+	Country* LinkedList::remove(int where)
+	{
+		if (where == 0)
+			return removeHead();
+		else if (where >= size)
+			return removeTail();
+		else
+		{
+			Node* current = head;
+			for (int i = 0; i < where; i++)
+			{
+				current = current->getNext();
+			}
+			Node* prev = current->getPrev();
+			Node* next = current->getNext();
+			prev->setNext(next);
+			next->setPrev(prev);
+			size--;
+			return current->getCountry();
 		}
 	}
 
