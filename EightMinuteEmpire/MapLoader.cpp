@@ -5,7 +5,9 @@
 #include <iostream>
 #include <string>
 #include<vector>
+#include <regex>
 
+bool MapLoader::isStartingCountrySet = false;
 
 MapLoader::MapLoader()
 {
@@ -77,6 +79,8 @@ MapLoader::~MapLoader()
 		cout << "INVALID";
 
 	inputMapFile.close();
+	if ( MapLoader::isStartingCountrySet )
+		MapLoader::isStartingCountrySet = false;
  }
 
 
@@ -149,18 +153,37 @@ MapLoader::~MapLoader()
  {
 	 using namespace std;
 	 string line;
+	 string p1;
+
+	 const std::regex countryLineIdentifier{"\\[\\d+!?-\\D\\w*\\]"};
+	 const std::regex adjacencyIdentifier{"\\{(\\s*\\d+\\~?\\s*\\,?)+\\}"};
+
+	 std::smatch countryAttributes;
+	 std::smatch adjacentCountires; 
 
 	 while ( getline(inputMapFile, line) )
 	 {
 		 if (line.compare("<eme_countries>") == 0)
 		 {
-			 // Get Countries here
-			 while (getline(inputMapFile, line))
+			 //Start processing country lines
+			 while ( getline(inputMapFile, line) )
 			 {
-				 if (line.compare("</eme_countries>") == 0)
+	
+				 // Process country attributes
+				 if (std::regex_search(line, countryAttributes, countryLineIdentifier))
+				 {
+					 cout << " Reading: " << countryAttributes[0].str() << endl;
+					 initializeCountry(countryAttributes);
+				 }
+				 //Process adjacent countries
+				 if (std::regex_search(line, adjacentCountires, adjacencyIdentifier))
+				 {
+					 initializeAdjacencyList(adjacentCountires);
+				 }
+				 else if (line.compare("</eme_countries>") == 0)
 					 break;
-
-				 cout << line << endl;
+				 else
+					 cout << "Error reading country list." << endl;
 			 }
 
 		break;
@@ -177,4 +200,50 @@ MapLoader::~MapLoader()
 	 inputMapFile.seekg(0, std::ios::beg);
  }
 
+ void MapLoader::Parser::initializeCountry(std::smatch &countryAttributes)
+ {
+	 using namespace std;
 
+	 std::smatch country;
+	 std::smatch continent;
+
+	 const std::regex countryID{ "\\d+" };
+	 const std::regex continentID{ "-\\D\\w*" };
+
+	string s = countryAttributes[0].str();
+
+	 // Getting country ID
+	 std::regex_search(s, country, countryID);
+	 cout << "Country: " << country[0];
+
+	 // Getting continent of the country 
+	 std::regex_search(s, continent, continentID);
+	 cout << " - Continent: " << continent[0].str().substr(1) << endl;
+
+	// Setting the starting country if it has not already been set 
+	 if (s.find('!') != string::npos && !MapLoader::isStartingCountrySet)
+	 {
+		 MapLoader::isStartingCountrySet = true;
+		 cout << " Is the starting country." << endl;
+
+	 }
+	 else if (s.find('!') != string::npos && MapLoader::isStartingCountrySet)
+	 {
+		 cout << "Invalid Map File. More than one starting country specified.";
+	 
+	 }
+
+
+ }
+
+ void MapLoader::Parser::initializeAdjacencyList(std::smatch& adjacentCountires)
+ {
+	 using namespace std;
+
+	 string s = adjacentCountires.str();
+
+	 cout << "List of adjacent countries: " << s << endl;
+
+ }
+
+ 
