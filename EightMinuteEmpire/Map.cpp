@@ -10,7 +10,8 @@ namespace GraphWorld
 {
 	class Map::Node
 	{
-
+		Country* country;
+		LinkedList* adjacencyList;
 	};
 
 	Map::Map(string* mapName, int numCountries, int numContinents)
@@ -20,7 +21,7 @@ namespace GraphWorld
 		*this->numCountries = numCountries;
 		this->numContinents = new int();
 		*this->numContinents = numContinents;
-		listOfCountries = new Country[numCountries];
+		listOfCountries = new Node[numCountries];
 	}
 
 	Map::~Map()
@@ -28,6 +29,7 @@ namespace GraphWorld
 		mapName.clear();
 		delete numContinents;
 		delete numCountries;
+		delete listOfCountries;
 	}
 
 	Country::Country()
@@ -63,17 +65,17 @@ namespace GraphWorld
 		return continent;
 	}
 
-	bool Country::setID(int id)
+	void Country::setID(int id)
 	{
 		*country_ID = id;
 	}
 
-	bool Country::setStartCountry(bool maybe)
+	void Country::setStartCountry(bool maybe)
 	{
 		*isStartCountry = maybe;
 	}
 
-	bool Country::setContinent(string* continent)
+	void Country::setContinent(string* continent)
 	{
 		this->continent.clear();
 		this->continent = *continent;
