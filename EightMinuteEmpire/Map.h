@@ -2,60 +2,70 @@
 #define MAP_H
 
 #include <string>
-#include <list>
 
 using std::string;
-using std::list;
 
 namespace GraphWorld
 {
+	class Map;
+	class LinkedList;
+	class Country;
+
 	class Map
 	{
-		public:
-			Map();
-			~Map();
+		class Node;
+		string mapName;
+		int* numCountries;
+		int* numContinents;
+		Country* listOfCountries;
 
-		private:
-			string* mapName;
-			int numberOfCountries;
-			int numberOfContinents;
+		public:
+			Map(string* mapName, int numCountries, int numContinents);
+			void addNode(Country*);
+			void addEdge(Country* c1, Country* c2);
+			void printMap();
+			~Map();
 	};
 
 	class Country
 	{
-		public:
-			Country(int country_ID, bool startCountry, char* continent, list<Country*> adjacentCountries);
-			~Country();
-			string displayCountry();
+		int* country_ID;
+		bool* isStartCountry;
+		string continent;
 
-		private:
-			int country_ID;
-			bool isStartCountry;
-			char continent;
-			list<Country*> adjacentCountries;
+		public:
+			Country();
+			Country(int country_ID, bool startCountry, string* continent);
+			int getID();
+			bool getStartCountry();
+			string getContinent();
+			bool setID(int id);
+			bool setStartCountry(bool maybe);
+			bool setContinent(string* continent);
+			string displayCountry();
+			~Country();
 	};
 
 	class LinkedList
 	{
+		class Node;
+		int size;
+		Node* head;
+		Node* tail;
+		Node* getNext(Node* current);
+		Node* getPrev(Node* current);
+		Country* removeHead();
+		Country* removeTail();
+		bool addToHead(Country* country);
+		bool addToTail(Country* country);
+
 		public:
-			LinkedList();
+			LinkedList(Country* country);
+			int sizeOf();
+			bool add(int where, Country* country);
+			Country* remove(int where);
+			void displayLinkedList();
 			~LinkedList();
-
-		private:
-			int size;
-			Node* head;
-	};
-
-	class Node
-	{
-		public:
-			Node(Country *country);
-			~Node();
-
-		private:
-			Country* country;
-			Node* next;
-			Node* previous;
 	};
 }
 

@@ -31,12 +31,13 @@ MapLoader::~MapLoader()
  {
 	 std::vector<std::string> maps;
 
+	 /*
 	 for (const auto& map : std::filesystem::directory_iterator( getMapsDir() ) )
 	 { 
 		maps.push_back(map.path().filename().string());
 		// log: std::cout << map.path().filename().string() << std::endl;
 	 }
-
+	 */
 	 return maps;
  }
 
