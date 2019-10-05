@@ -12,6 +12,52 @@ namespace GraphWorld
 	{
 		Country* country;
 		LinkedList* adjacencyList;
+
+		public:
+			Node()
+			{
+				country = NULL;
+				adjacencyList = new LinkedList(NULL);
+			}
+
+			void setCountry(Country* country)
+			{
+				this->country = country;
+			}
+
+			void addAdjacentCountry(Country* country)
+			{
+				adjacencyList->add(0, country);
+			}
+
+			Country* getCountry()
+			{
+				return country;
+			}
+
+			LinkedList* getAdjacencyList()
+			{
+				return adjacencyList;
+			}
+
+			void displayNode()
+			{
+				cout << "Country in Node:\n";
+				if (country != NULL)
+				{
+					cout << country->displayCountry() + "";
+					cout << "Adjacent List:\n";
+					adjacencyList->displayLinkedList();
+				}
+				else
+					cout << "Nothing in the Node!\n";
+			}
+
+			~Node()
+			{
+				delete country;
+				delete adjacencyList;
+			}
 	};
 
 	Map::Map(string* mapName, int numCountries, int numContinents)
@@ -21,7 +67,49 @@ namespace GraphWorld
 		*this->numCountries = numCountries;
 		this->numContinents = new int();
 		*this->numContinents = numContinents;
-		listOfCountries = new Node[numCountries];
+		size = new int();
+		*size = 0;
+
+		arrayOfCountries = new NodePtr[numCountries];
+		for (int i = 0; i < numCountries; ++i)
+		{
+			arrayOfCountries[i] = new Node();
+		}
+	}
+
+	void Map::addNode(Country* country)
+	{
+		if (*size <= *numCountries)
+		{
+			Node* nodeToModify = arrayOfCountries[country->getID()];
+			nodeToModify->setCountry(country);
+			*size = *size + 1;
+		}
+		else
+		{
+			cout << "Can't add any more nodes to graph!";
+		}
+	}
+
+	void Map::addEdge(Country* currentCountry, Country* adjacentCountry)
+	{
+		Node* toModify = arrayOfCountries[currentCountry->getID()];
+		toModify->addAdjacentCountry(adjacentCountry);
+	}
+
+	void Map::printMap()
+	{
+		if (*size == 0)
+		{
+			cout << "MAP is empty!";
+		}
+		else
+		{
+			for (int i = 0; i < *size; i++)
+			{
+				arrayOfCountries[i]->displayNode();
+			}
+		}
 	}
 
 	Map::~Map()
@@ -29,7 +117,7 @@ namespace GraphWorld
 		mapName.clear();
 		delete numContinents;
 		delete numCountries;
-		delete listOfCountries;
+		delete arrayOfCountries;
 	}
 
 	Country::Country()
@@ -165,13 +253,15 @@ namespace GraphWorld
 		{
 			head = NULL;
 			tail = NULL;
-			size = 0;
+			size = new int();
+			*size = 0;
 		}
 		else
 		{
 			head = new Node(country);
 			tail = head;
-			size++;
+			size = new int();
+			*size = *size + 1;
 		}
 	}
 
@@ -187,7 +277,7 @@ namespace GraphWorld
 
 	int LinkedList::sizeOf()
 	{
-		return size;
+		return *size;
 	}
 
 	bool LinkedList::addToHead(Country* country)
@@ -206,7 +296,7 @@ namespace GraphWorld
 				head->setPrev(n1);
 				head = n1;
 			}
-			size++;
+			*size = *size + 1;
 			returnMe = true;
 		}
 		else
@@ -232,7 +322,7 @@ namespace GraphWorld
 				tail->setNext(n1);
 				tail = n1;
 			}
-			size++;
+			*size = *size + 1;
 			returnMe = true;
 		}
 		else
@@ -249,7 +339,7 @@ namespace GraphWorld
 		{
 			if (where == 0)
 				returnMe = addToHead(country);
-			else if (where >= size)
+			else if (where >= *size)
 				returnMe = addToTail(country);
 			else
 			{
@@ -262,7 +352,7 @@ namespace GraphWorld
 				Node* n1 = new Node(country, current, prev);
 				prev->setNext(n1);
 				current->setPrev(n1);
-				size++;
+				*size = *size + 1;
 				returnMe = true;
 			}
 		}
@@ -275,28 +365,28 @@ namespace GraphWorld
 
 	Country* LinkedList::removeHead()
 	{
-		if (size == 0)
+		if (*size == 0)
 			return NULL;
 		else
 		{
 			Node* returnMe = head;
 			head = head->getNext();
 			head->setPrev(NULL);
-			size--;
+			*size = *size - 1;
 			return returnMe->getCountry();
 		}
 	}
 
 	Country* LinkedList::removeTail()
 	{
-		if (size == 0)
+		if (*size == 0)
 			return NULL;
 		else
 		{
 			Node* returnMe = tail;
 			tail = tail->getPrev();
 			tail->setNext(NULL);
-			size--;
+			*size = *size - 1;
 			return returnMe->getCountry();
 		}
 	}
@@ -305,7 +395,7 @@ namespace GraphWorld
 	{
 		if (where == 0)
 			return removeHead();
-		else if (where >= size)
+		else if (where >= *size)
 			return removeTail();
 		else
 		{
@@ -318,20 +408,20 @@ namespace GraphWorld
 			Node* next = current->getNext();
 			prev->setNext(next);
 			next->setPrev(prev);
-			size--;
+			*size = *size - 1;
 			return current->getCountry();
 		}
 	}
 
 	void LinkedList::displayLinkedList()
 	{
-		if (size == 0)
-			cout << "Nothing in the Linked List";
+		if (*size == 0)
+			cout << "Nothing in the Linked List\n";
 		else
 		{
-			cout << "size: " + to_string(size) + "\n";
+			cout << "size: " + to_string(*size) + "\n";
 			Node* toDisplay = this->head;
-			for (int i = 0; i < size; i++)
+			for (int i = 0; i < *size; i++)
 			{
 				toDisplay->displayNode();
 				toDisplay = this->getNext(toDisplay);
@@ -343,13 +433,13 @@ namespace GraphWorld
 	{
 		Node* current = this->head;
 		Node* next;
-		for (int i = 0; i < size; i++)
+		for (int i = 0; i < *size; i++)
 		{
 			next = current->getNext();
 			delete current;
 			current = next;
 		}
-		size = 0;
+		*size = 0;
 	}
 }
 

@@ -18,13 +18,15 @@ namespace GraphWorld
 		// match/go to one of the countries in adjacent list
 		class Node;
 		string mapName;
+		int* size;
 		int* numCountries;
 		int* numContinents;
-		Node* listOfCountries;
+		typedef Node* NodePtr;
+		NodePtr* arrayOfCountries;
 
 		public:
 			Map(string* mapName, int numCountries, int numContinents);
-			void addNode(Country*);
+			void addNode(Country* country);
 			void addEdge(Country* currentCountry, Country* adjacentCountry);
 			void printMap();
 			~Map();
@@ -52,7 +54,7 @@ namespace GraphWorld
 	class LinkedList
 	{
 		class Node;
-		int size;
+		int* size;
 		Node* head;
 		Node* tail;
 		Node* getNext(Node* current);
