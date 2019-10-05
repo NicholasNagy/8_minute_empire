@@ -13,6 +13,9 @@ namespace GraphWorld
 
 	class Map
 	{
+		// match click to country specified by ID
+		// print adjacent countries / list
+		// match/go to one of the countries in adjacent list
 		class Node;
 		string mapName;
 		int* numCountries;
