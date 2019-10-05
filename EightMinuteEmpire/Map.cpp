@@ -99,6 +99,9 @@ namespace GraphWorld
 
 	void Map::printMap()
 	{
+		cout << "MapName: " + mapName + "\n";
+		cout << "Number of Countries: " + to_string(*numCountries) + "\n";
+		cout << "Number of Continents: " + to_string(*numContinents) + "\n";
 		if (*size == 0)
 		{
 			cout << "MAP is empty!";
