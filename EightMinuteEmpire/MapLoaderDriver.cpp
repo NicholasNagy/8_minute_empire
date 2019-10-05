@@ -3,7 +3,7 @@
 #include <filesystem>
 
 
-/*int main()
+int main()
 
 {
 	MapLoader::load();
@@ -14,6 +14,6 @@
 
 	return 0;
 
-}*/
+}
 
 

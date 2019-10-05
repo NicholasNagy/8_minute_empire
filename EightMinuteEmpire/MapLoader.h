@@ -17,6 +17,7 @@ public:
 
 private:
 	static bool isStartingCountrySet;
+	static void initializeCountry(std::smatch& countryAttributes);
 
 	class Parser 
 	{
@@ -27,7 +28,7 @@ private:
 		static void processAttributes(std::ifstream& inputMapFile);
 		static void processCountries( std::ifstream& inputMapFile);
 		static void seekToStart(std::ifstream& inputMapFile);
-		static void initializeCountry(std::smatch& countryAttributes);
+		
 		static void initializeAdjacencyList(std::smatch& adjacentCountires);
 	};
 };

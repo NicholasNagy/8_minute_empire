@@ -4,7 +4,7 @@
 using namespace std;
 using namespace GraphWorld;
 
-int main()
+/*int main()
 {
 	string s1 = string("My Country");
 	Country* c1 = new Country(1, true, &s1);
@@ -26,4 +26,4 @@ int main()
 	cout << "\n";
 	system("PAUSE");
 	return 0;
-}
+}*/

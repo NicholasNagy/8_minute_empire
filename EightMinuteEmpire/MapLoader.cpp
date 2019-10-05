@@ -1,4 +1,5 @@
 #include "MapLoader.h"
+#include "Map.h"
 #include <fstream>
 #include <filesystem>
 #include <Windows.h>
@@ -6,6 +7,7 @@
 #include <string>
 #include<vector>
 #include <regex>
+#include <sstream> 
 
 bool MapLoader::isStartingCountrySet = false;
 
@@ -16,6 +18,29 @@ MapLoader::MapLoader()
 
 MapLoader::~MapLoader()
 {
+}
+
+void MapLoader::load()
+{
+	using namespace std;
+	string selectedMapPath = getMapsDir().append("\\").append(selectMap());
+
+	ifstream inputMapFile;
+	inputMapFile.open(selectedMapPath);
+
+	if (MapLoader::Parser::isFileStructureValid(inputMapFile))
+	{
+		cout << "Genuine Map File" << endl;
+		MapLoader::Parser::processAttributes(inputMapFile);
+		MapLoader::Parser::processCountries(inputMapFile);
+	}
+
+	else
+		cout << "INVALID";
+
+	inputMapFile.close();
+	if (MapLoader::isStartingCountrySet)
+		MapLoader::isStartingCountrySet = false;
 }
 
  std::string MapLoader::getMapsDir()
@@ -60,30 +85,6 @@ MapLoader::~MapLoader()
 
 	 return selectedMap;
  }
-
- void MapLoader::load()
- {
-	 using namespace std;
-	 string selectedMapPath = getMapsDir().append("\\").append(selectMap());
-
-	ifstream inputMapFile;
-	inputMapFile.open(selectedMapPath);
-
-	if (MapLoader::Parser::isFileStructureValid( inputMapFile ))
-	{
-		cout << "Genuine Map File" << endl;
-		MapLoader::Parser::processAttributes( inputMapFile );
-		MapLoader::Parser::processCountries( inputMapFile );
-	}
-		
-	else
-		cout << "INVALID";
-
-	inputMapFile.close();
-	if ( MapLoader::isStartingCountrySet )
-		MapLoader::isStartingCountrySet = false;
- }
-
 
  bool MapLoader::Parser::isFileStructureValid( std::ifstream& inputMapFile)
  {
@@ -132,18 +133,24 @@ MapLoader::~MapLoader()
  {
 	 using namespace std;
 	 string line;
+	 string mapName;
+	 string numContinents;
+	 string numCountries;
 
 	 while ( getline(inputMapFile, line) )
 	 {
 		 if (line.compare("<eme_attributes>") == 0)
 		 {
-			 // Get Map Attributes here.
-			 for (int i = 0; i <= 2; i++)
-			 {
-				 getline(inputMapFile, line);
-				 cout << line << endl;
-			 }	
-
+				 getline(inputMapFile, mapName);
+				 mapName = mapName.erase(0, 4);
+				 cout << "Map Name: " << mapName << endl;
+				 getline(inputMapFile, numContinents);
+				 numContinents = numContinents.erase(0, 11);
+				 cout << "# Continents: " << stoi(numContinents) << endl;
+				 getline(inputMapFile, numCountries);
+				 numContinents = numCountries.erase(0, 10);
+				 cout << "# Countries: " << numCountries << endl;
+			 
 			 break;
 		 }
 			
@@ -201,7 +208,7 @@ MapLoader::~MapLoader()
 	 inputMapFile.seekg(0, std::ios::beg);
  }
 
- void MapLoader::Parser::initializeCountry(std::smatch &countryAttributes)
+ void MapLoader::initializeCountry(std::smatch &countryAttributes)
  {
 	 using namespace std;
 
@@ -240,10 +247,24 @@ MapLoader::~MapLoader()
  void MapLoader::Parser::initializeAdjacencyList(std::smatch& adjacentCountires)
  {
 	 using namespace std;
-
 	 string s = adjacentCountires.str();
+	 string t;
+	 std::vector<std::string> adjacentCountries;
+	
+	
+	 //Remove quotes
+	 if (s.size() > 2)
+	 {
+		 s.pop_back();
+		 s.erase(s.begin());
+	 }
 
-	 cout << "List of adjacent countries: " << s << endl;
+	 std::stringstream ss(s);
+	 while (getline(ss, t, ','))
+		 adjacentCountries.push_back(t);
+
+	 for (auto i : adjacentCountries)
+		 std::cout << i << " ";
 
  }
 
