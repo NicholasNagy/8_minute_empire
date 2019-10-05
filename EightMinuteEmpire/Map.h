@@ -25,7 +25,7 @@ namespace GraphWorld
 		public:
 			Map(string* mapName, int numCountries, int numContinents);
 			void addNode(Country*);
-			void addEdge(Country* c1, Country* c2);
+			void addEdge(Country* currentCountry, Country* adjacentCountry);
 			void printMap();
 			~Map();
 	};
