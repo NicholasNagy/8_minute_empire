@@ -13,11 +13,14 @@ namespace GraphWorld
 
 	class Map
 	{
+		// match click to country specified by ID
+		// print adjacent countries / list
+		// match/go to one of the countries in adjacent list
 		class Node;
 		string mapName;
 		int* numCountries;
 		int* numContinents;
-		Country* listOfCountries;
+		Node* listOfCountries;
 
 		public:
 			Map(string* mapName, int numCountries, int numContinents);
@@ -39,9 +42,9 @@ namespace GraphWorld
 			int getID();
 			bool getStartCountry();
 			string getContinent();
-			bool setID(int id);
-			bool setStartCountry(bool maybe);
-			bool setContinent(string* continent);
+			void setID(int id);
+			void setStartCountry(bool maybe);
+			void setContinent(string* continent);
 			string displayCountry();
 			~Country();
 	};
