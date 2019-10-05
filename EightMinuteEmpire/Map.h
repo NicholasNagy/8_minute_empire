@@ -28,6 +28,8 @@ namespace GraphWorld
 			Map(string* mapName, int numCountries, int numContinents);
 			void addNode(Country* country);
 			void addEdge(Country* currentCountry, Country* adjacentCountry);
+			Country* getCountry(int id);
+			LinkedList* getAdjacentList(Country* country);
 			void printMap();
 			~Map();
 	};
@@ -68,6 +70,7 @@ namespace GraphWorld
 			LinkedList(Country* country);
 			int sizeOf();
 			bool add(int where, Country* country);
+			Country* get(int where);
 			Country* remove(int where);
 			void displayLinkedList();
 			~LinkedList();

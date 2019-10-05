@@ -79,7 +79,7 @@ namespace GraphWorld
 
 	void Map::addNode(Country* country)
 	{
-		if (*size <= *numCountries)
+		if (*size < *numCountries)
 		{
 			Node* nodeToModify = arrayOfCountries[country->getID()];
 			nodeToModify->setCountry(country);
@@ -95,6 +95,23 @@ namespace GraphWorld
 	{
 		Node* toModify = arrayOfCountries[currentCountry->getID()];
 		toModify->addAdjacentCountry(adjacentCountry);
+	}
+
+	Country* Map::getCountry(int id)
+	{
+		if (id < 0)
+			return arrayOfCountries[0]->getCountry();
+		else if (id >= *numCountries)
+			return arrayOfCountries[*numCountries - 1]->getCountry();
+		else
+			return arrayOfCountries[id]->getCountry();
+	}
+
+	LinkedList* Map::getAdjacentList(Country* country)
+	{
+		int nodeNum = country->getID();
+		Node* getMe = arrayOfCountries[nodeNum];
+		return getMe->getAdjacencyList();
 	}
 
 	void Map::printMap()
@@ -364,6 +381,23 @@ namespace GraphWorld
 			cout << "You tried to add nothing";
 		}
 		return returnMe;
+	}
+
+	Country* LinkedList::get(int where)
+	{
+		if (where >= *size)
+			return tail->getCountry();
+		else if (where <= 0)
+			return head->getCountry();
+		else
+		{
+			Node* getMe = head;
+			for (int i = 0; i < where; i++)
+			{
+				getMe = getMe->getNext();
+			}
+			return getMe->getCountry();
+		}
 	}
 
 	Country* LinkedList::removeHead()

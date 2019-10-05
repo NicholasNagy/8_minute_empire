@@ -23,18 +23,18 @@ int main()
 	graphy->addEdge(c1, c4);
 	graphy->addEdge(c4, c2);
 	graphy->printMap();
-	/*
+	cout << "\nLinkedList Part:\n";
 	LinkedList* ll = new LinkedList(c1);
 	ll->add(0, c2);
 	ll->add(2, c3);
 	ll->add(2, c4);
-	ll->displayLinkedList();
+	Country* ct = ll->get(1);
+	cout << ct->displayCountry();
 	cout << "\nRemoving Two Items\n";
 	ll->remove(0);
 	ll->remove(3);
 	ll->displayLinkedList();
 	delete ll;
-	*/
 	cout << "\n";
 	system("PAUSE");
 	return 0;
