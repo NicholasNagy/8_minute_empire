@@ -28,6 +28,7 @@ namespace GraphWorld
 			Country* getCountry(int id);
 			LinkedList* getAdjacentList(Country* country);
 			void printMap();
+			int getSize();
 			~Map();
 	};
 
@@ -39,6 +40,7 @@ namespace GraphWorld
 
 		public:
 			Country();
+			Country(const Country&);
 			Country(int country_ID, bool startCountry, string* continent);
 			int getID();
 			bool getStartCountry();

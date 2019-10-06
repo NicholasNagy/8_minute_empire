@@ -60,15 +60,29 @@ namespace GraphWorld
 			}
 	};
 
+	//Map::Map(const Map& map2)
+	//{
+
+	//	this->mapName = map2.mapName;
+	//	this->numCountries = map2.numCountries;
+	//	std::cout << "HEEEE: " << *this->numCountries << std::endl;
+	//	this->numContinents = map2.numContinents;
+	//	size = map2.size;
+
+	//	arrayOfCountries = new NodePtr[*numCountries];
+	//	for (int i = 0; i < *numCountries; ++i)
+	//	{
+	//		arrayOfCountries[i] = new Node();
+	//	}
+	//}
+
 	Map::Map(string* mapName, int numCountries, int numContinents)
 	{
+
 		this->mapName = string(*mapName);
-		this->numCountries = new int();
-		*this->numCountries = numCountries;
-		this->numContinents = new int();
-		*this->numContinents = numContinents;
-		size = new int();
-		*size = 0;
+		this->numCountries = new int(numCountries);
+		this->numContinents = new int(numContinents);
+		size = new int(0);
 
 		arrayOfCountries = new NodePtr[numCountries];
 		for (int i = 0; i < numCountries; ++i)
@@ -117,11 +131,11 @@ namespace GraphWorld
 	void Map::printMap()
 	{
 		cout << "MapName: " + mapName + "\n";
-		cout << "Number of Countries: " + to_string(*numCountries) + "\n";
 		cout << "Number of Continents: " + to_string(*numContinents) + "\n";
+		cout << "Number of Countries: " + to_string(*numCountries) + "\n\n";
 		if (*size == 0)
 		{
-			cout << "MAP is empty!";
+			cout << "MAP is empty!" << std::endl;
 		}
 		else
 		{
@@ -130,6 +144,11 @@ namespace GraphWorld
 				arrayOfCountries[i]->displayNode();
 			}
 		}
+	}
+
+	int Map::getSize()
+	{
+		return *size;
 	}
 
 	Map::~Map()
@@ -147,6 +166,14 @@ namespace GraphWorld
 		isStartCountry = new bool();
 		*isStartCountry = false;
 		continent = string("");
+	}
+
+	Country::Country(const Country& country2)
+	{
+		this->country_ID = country2.country_ID;
+		this->isStartCountry = country2.isStartCountry;
+		this->continent = country2.continent;
+
 	}
 
 	Country::Country(int country_ID, bool startCountry, string* continent)

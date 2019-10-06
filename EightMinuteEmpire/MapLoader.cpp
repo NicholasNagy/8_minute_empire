@@ -1,5 +1,4 @@
 #include "MapLoader.h"
-#include "Map.h"
 #include <fstream>
 #include <filesystem>
 #include <Windows.h>
@@ -13,35 +12,101 @@ bool MapLoader::isStartingCountrySet = false;
 
 MapLoader::MapLoader()
 {
+	this->numCountries = new int(0);
+	this->numContinents = new int(0);
 }
+
+
+MapLoader::MapLoader(string* mapPath, string* mapName, int numCountries, int numContinents)
+{
+	this->mapPath = string(*mapPath);
+	this->mapName = string(*mapName);
+	this->numCountries = new int(numCountries);
+	this->numContinents = new int(numContinents);
+
+}
+
+MapLoader::MapLoader(const MapLoader& loader2)
+{
+	this->mapPath = loader2.mapPath;
+	this->mapName = loader2.mapName;
+	this->numCountries = loader2.numCountries;
+	this->numContinents = loader2.numContinents;
+
+}
+
+string MapLoader::getMapName()
+{
+	return mapName;
+}
+
+int MapLoader::getNumCountries()
+{
+	return *numCountries;
+}
+
+int MapLoader::getNumContinents()
+{
+	return *numContinents;
+}
+
+void MapLoader::setMapPath(string* path)
+{
+	this->mapPath.clear();
+	this->mapPath = *path;
+}
+
 
 
 MapLoader::~MapLoader()
 {
+	mapPath.clear();
+	mapName.clear();
+	delete numCountries;
+	delete numContinents;
 }
 
-void MapLoader::load()
+MapLoader* MapLoader::initiateMapPicker()
 {
 	using namespace std;
-	string selectedMapPath = getMapsDir().append("\\").append(selectMap());
 
+	MapLoader* mapLoader = new MapLoader();
+	mapLoader->mapPath =  getMapsDir().append("\\").append(selectMap());
 	ifstream inputMapFile;
-	inputMapFile.open(selectedMapPath);
+	inputMapFile.open(mapLoader->mapPath);
 
-	if (MapLoader::Parser::isFileStructureValid(inputMapFile))
+	if (!MapLoader::Parser::isFileStructureValid(inputMapFile))
 	{
-		cout << "Genuine Map File" << endl;
-		MapLoader::Parser::processAttributes(inputMapFile);
-		MapLoader::Parser::processCountries(inputMapFile);
+		cout << "INVALID MAP FILE" << endl;
+		inputMapFile.close();
+		delete mapLoader;
+		return nullptr;
 	}
-
-	else
-		cout << "INVALID";
+		cout << "Genuine Map File" << endl;
+		mapLoader->initMap(inputMapFile);
 
 	inputMapFile.close();
 	if (MapLoader::isStartingCountrySet)
 		MapLoader::isStartingCountrySet = false;
+
+	return mapLoader;
 }
+
+ bool MapLoader::load(GraphWorld::Map* map)
+ {
+	 using namespace std;
+
+	 ifstream inputMapFile;
+	 inputMapFile.open(mapPath);
+	 
+	 if (!MapLoader::Parser::processCountries(inputMapFile, map, this->getNumCountries() ))
+	 {
+		 inputMapFile.close();
+		 return false;
+	}
+
+	 return true;
+ }
 
  std::string MapLoader::getMapsDir()
  {
@@ -86,6 +151,7 @@ void MapLoader::load()
 	 return selectedMap;
  }
 
+
  bool MapLoader::Parser::isFileStructureValid( std::ifstream& inputMapFile)
  {
 	 using namespace std;
@@ -122,14 +188,15 @@ void MapLoader::load()
 
 		 if (lastLine.compare(x) != 0)
 			 return false;
-
+		 
 	 }
 
 	 seekToStart(inputMapFile);
 	 return true;
  }
 
- void MapLoader::Parser::processAttributes( std::ifstream& inputMapFile )
+
+ void MapLoader::initMap(std::ifstream& inputMapFile)
  {
 	 using namespace std;
 	 string line;
@@ -137,27 +204,32 @@ void MapLoader::load()
 	 string numContinents;
 	 string numCountries;
 
-	 while ( getline(inputMapFile, line) )
+	 while (getline(inputMapFile, line))
 	 {
 		 if (line.compare("<eme_attributes>") == 0)
 		 {
-				 getline(inputMapFile, mapName);
-				 mapName = mapName.erase(0, 4);
-				 cout << "Map Name: " << mapName << endl;
-				 getline(inputMapFile, numContinents);
-				 numContinents = numContinents.erase(0, 11);
-				 cout << "# Continents: " << stoi(numContinents) << endl;
-				 getline(inputMapFile, numCountries);
-				 numContinents = numCountries.erase(0, 10);
-				 cout << "# Countries: " << numCountries << endl;
-			 
+			 getline(inputMapFile, mapName);
+			 //if line.contains "Map"
+			 mapName = mapName.erase(0, 4);
+			 //cout << "Map Name: " << mapName << endl;
+			 //if line.contains "Continents"
+			 getline(inputMapFile, numContinents);
+			 numContinents = numContinents.erase(0, 11);
+			//cout << "# Continents: " << stoi(numContinents) << endl;
+			  //if line.contains "Countries"
+			 getline(inputMapFile, numCountries);
+			 numCountries = numCountries.erase(0, 10);
+			//cout << "# Countries: " << numCountries << endl;
+
 			 break;
 		 }
-			
 	 }
+	this->mapName = mapName;
+	*this->numContinents = stoi(numContinents);
+	*this->numCountries = stoi(numCountries);
  }
 
- void MapLoader::Parser::processCountries( std::ifstream& inputMapFile )
+bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorld::Map* map, const int size )
  {
 	 using namespace std;
 	 string line;
@@ -166,8 +238,10 @@ void MapLoader::load()
 	 const std::regex countryLineIdentifier{"\\[\\d+!?-\\D\\w*\\]"};
 	 const std::regex adjacencyIdentifier{"\\{(\\s*\\d+\\~?\\s*\\,?)+\\}"};
 
-	 std::smatch countryAttributes;
-	 std::smatch adjacentCountires; 
+	 std::smatch countryAttributesMatch;
+	 std::smatch adjacentCountiresMatch; 
+
+	 std::vector<std::vector<string>> adjacentCountries; //Holds adjacent countries of each country
 
 	 while ( getline(inputMapFile, line) )
 	 {
@@ -176,83 +250,83 @@ void MapLoader::load()
 			 //Start processing country lines
 			 while ( getline(inputMapFile, line) )
 			 {
-	
 				 // Process country attributes
-				 if (std::regex_search(line, countryAttributes, countryLineIdentifier))
-				 {
-					 cout << " Reading: " << countryAttributes[0].str() << endl;
-					 initializeCountry(countryAttributes);
+				 if (std::regex_search(line, countryAttributesMatch, countryLineIdentifier))
+				 {			
+					 if (!initCountry(countryAttributesMatch, map, size))
+						 return false;
 				 }
 				 //Process adjacent countries
-				 if (std::regex_search(line, adjacentCountires, adjacencyIdentifier))
+				 if (std::regex_search(line, adjacentCountiresMatch, adjacencyIdentifier))
 				 {
-					 initializeAdjacencyList(adjacentCountires);
+					adjacentCountries.push_back(processAdjacency(adjacentCountiresMatch));
 				 }
 				 else if (line.compare("</eme_countries>") == 0)
 					 break;
-				 else
-					 cout << "Error reading country list." << endl;
+				 else 
+				 {
+					 std::cout << "Error reading country list." << endl;
+					 return false;
+				 }					 
 			 }
-
 		break;
 		 }
-
 	 }
-	 
 
+	 initAdjacencyLists(adjacentCountries, map);
+	 return true;
  }
 
- void MapLoader::Parser::seekToStart(std::ifstream& inputMapFile)
- {
-	 inputMapFile.clear();
-	 inputMapFile.seekg(0, std::ios::beg);
- }
-
- void MapLoader::initializeCountry(std::smatch &countryAttributes)
+ bool MapLoader::Parser::initCountry(std::smatch &countryAttributes, GraphWorld::Map* map, const int size)
  {
 	 using namespace std;
 
-	 std::smatch country;
-	 std::smatch continent;
-
+	 std::smatch countryMatch;
+	 std::smatch continentMatch;
+	 bool startCountry = false;
 	 const std::regex countryID{ "\\d+" };
 	 const std::regex continentID{ "-\\D\\w*" };
-
-	string s = countryAttributes[0].str();
+	 string s = countryAttributes[0].str();
 
 	 // Getting country ID
-	 std::regex_search(s, country, countryID);
-	 cout << "Country: " << country[0];
+	 std::regex_search(s, countryMatch, countryID);
+	// cout << "Country: " << countryMatch[0];
+
+	 if (stoi(countryMatch[0].str()) >= size)
+	 {
+		 cout << "Error. Map ID higher than map size." << endl;
+		 return false;
+	 }
 
 	 // Getting continent of the country 
-	 std::regex_search(s, continent, continentID);
-	 cout << " - Continent: " << continent[0].str().substr(1) << endl;
+	 std::regex_search(s, continentMatch, continentID);
+	 //cout << " - Continent: " << continentMatch[0].str().substr(1) << endl;
 
 	// Setting the starting country if it has not already been set 
 	 if (s.find('!') != string::npos && !MapLoader::isStartingCountrySet)
 	 {
 		 MapLoader::isStartingCountrySet = true;
-		 cout << " Is the starting country." << endl;
-
+		 startCountry = true;
 	 }
 	 else if (s.find('!') != string::npos && MapLoader::isStartingCountrySet)
 	 {
-		 cout << "Invalid Map File. More than one starting country specified.";
-	 
+		 cout << "Invalid Map File. More than one starting country specified." << endl;
+		 return false;
 	 }
 
-
+	 GraphWorld::Country* country= new GraphWorld::Country(GraphWorld::Country(stoi(countryMatch[0].str()), startCountry, &continentMatch[0].str().substr(1)));
+	 map->addNode(country);
+	 return true;
  }
 
- void MapLoader::Parser::initializeAdjacencyList(std::smatch& adjacentCountires)
+ std::vector<std::string> MapLoader::Parser::processAdjacency(std::smatch& adjacentCountiresMatch)
  {
 	 using namespace std;
-	 string s = adjacentCountires.str();
+	 string s = adjacentCountiresMatch.str();
 	 string t;
-	 std::vector<std::string> adjacentCountries;
-	
-	
-	 //Remove quotes
+	 std::vector<std::string> adjCountries;
+
+	 //Remove brackets
 	 if (s.size() > 2)
 	 {
 		 s.pop_back();
@@ -261,11 +335,40 @@ void MapLoader::load()
 
 	 std::stringstream ss(s);
 	 while (getline(ss, t, ','))
-		 adjacentCountries.push_back(t);
+		 adjCountries.push_back(t);
 
-	 for (auto i : adjacentCountries)
-		 std::cout << i << " ";
-
+	 return adjCountries;
  }
 
- 
+
+ void MapLoader::Parser::initAdjacencyLists(std::vector<std::vector<string>> adjacentCountries, GraphWorld::Map* map)
+ {
+	 using namespace std;
+	 string temp; // Country ID
+
+	 for (int i = 0; i < adjacentCountries.size(); i++)
+	 {
+		 for (int j = 0; j < adjacentCountries[i].size(); j++)
+		 {
+			 temp = adjacentCountries[i][j];
+			 temp.erase(std::remove(temp.begin(), temp.end(), '~'), temp.end());
+			map->addEdge(map->getCountry(i), map->getCountry( stoi(temp)));		 
+		 }
+	 }
+ }
+
+
+ void MapLoader::Parser::seekToStart(std::ifstream& inputMapFile)
+ {
+	 inputMapFile.clear();
+	 inputMapFile.seekg(0, std::ios::beg);
+ }
+
+ std::ostream& operator<<(std::ostream& s, const MapLoader& mapLoader)
+ {
+	 return  s << 
+		 "Loading Map: " << mapLoader.mapPath << std::endl <<
+		 "Map_Name: "<< mapLoader.mapName << std::endl << 
+		 "Num_Continents: " << *mapLoader.numContinents << std::endl <<
+		 "Num_Countries: "<< *mapLoader.numCountries << std::endl;
+ }

@@ -1,17 +1,47 @@
+#include "Map.h"
 #include "MapLoader.h"
 #include <iostream>
 #include <filesystem>
+#include <string>
 
 
 int main()
 
 {
-	MapLoader::load();
+
+	MapLoader* mapLoader = nullptr;
+
+	while (!mapLoader)
+		mapLoader = MapLoader::initiateMapPicker();
+
+	std::cout << *mapLoader << std::endl;
+	GraphWorld::Map* map = new GraphWorld::Map(&mapLoader->getMapName(), mapLoader->getNumCountries(), mapLoader->getNumContinents());
+
+	try 
+	{
+		if (!mapLoader->load(map))
+		{
+			delete mapLoader;
+			delete map;
+			system("PAUSE");
+			return 0;
+		}
+			
+	}
+	catch (...)
+	{
+		//Cleanup
+		delete map;
+		delete mapLoader;
+	}
+
+		map->printMap();
 
 
-	std::cout << std::endl;
+	
+	delete mapLoader;
+	delete map;
 	system("PAUSE");
-
 	return 0;
 
 }
