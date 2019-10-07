@@ -235,8 +235,8 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 	 string line;
 	 string p1;
 
-	 const std::regex countryLineIdentifier{"\\[\\d+!?-\\D\\w*\\]"};
-	 const std::regex adjacencyIdentifier{"\\{(\\s*\\d+\\~?\\s*\\,?)+\\}"};
+	 const std::regex countryLineIdentifier{"\\[\\d+!?\\+?;\\D\\w*\\]"};
+	 const std::regex adjacencyIdentifier{"\\{(\\s*\\d+\\s*\\,?)+\\}"};
 
 	 std::smatch countryAttributesMatch;
 	 std::smatch adjacentCountiresMatch; 
@@ -284,13 +284,13 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 	 std::smatch countryMatch;
 	 std::smatch continentMatch;
 	 bool startCountry = false;
+	 bool navalCountry = false;
 	 const std::regex countryID{ "\\d+" };
-	 const std::regex continentID{ "-\\D\\w*" };
+	 const std::regex continentID{ ";\\D\\w*" };
 	 string s = countryAttributes[0].str();
 
 	 // Getting country ID
 	 std::regex_search(s, countryMatch, countryID);
-	// cout << "Country: " << countryMatch[0];
 
 	 if (stoi(countryMatch[0].str()) >= size)
 	 {
@@ -300,7 +300,10 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 
 	 // Getting continent of the country 
 	 std::regex_search(s, continentMatch, continentID);
-	 //cout << " - Continent: " << continentMatch[0].str().substr(1) << endl;
+
+	 //Getting naval status
+	 if (s.find('+') != string::npos)
+		 navalCountry = true;
 
 	// Setting the starting country if it has not already been set 
 	 if (s.find('!') != string::npos && !MapLoader::isStartingCountrySet)
@@ -314,7 +317,7 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 		 return false;
 	 }
 
-	 GraphWorld::Country* country= new GraphWorld::Country(GraphWorld::Country(stoi(countryMatch[0].str()), startCountry, &continentMatch[0].str().substr(1)));
+	 GraphWorld::Country* country= new GraphWorld::Country(GraphWorld::Country(stoi(countryMatch[0].str()), startCountry, navalCountry, &continentMatch[0].str().substr(1)));
 	 map->addNode(country);
 	 return true;
  }
@@ -351,7 +354,6 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 		 for (int j = 0; j < adjacentCountries[i].size(); j++)
 		 {
 			 temp = adjacentCountries[i][j];
-			 temp.erase(std::remove(temp.begin(), temp.end(), '~'), temp.end());
 			map->addEdge(map->getCountry(i), map->getCountry( stoi(temp)));		 
 		 }
 	 }

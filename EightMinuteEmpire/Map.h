@@ -35,15 +35,17 @@ namespace GraphWorld
 	class Country
 	{
 		int* country_ID;
-		bool* isStartCountry;
+		bool* mIsStartCountry;
+		bool* mIsNavalCountry;
 		string continent;
 
 		public:
 			Country();
 			Country(const Country&);
-			Country(int country_ID, bool startCountry, string* continent);
+			Country(int country_ID, bool startCountry, bool navalCountry, string* continent);
 			int getID();
-			bool getStartCountry();
+			bool isStartCountry();
+			bool isNavalCountry();
 			string getContinent();
 			void setID(int id);
 			void setStartCountry(bool maybe);

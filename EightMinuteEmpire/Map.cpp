@@ -42,11 +42,11 @@ namespace GraphWorld
 
 			void displayNode()
 			{
-				cout << "Country in Node:\n";
+				cout << "COUNTRY IN NODE:\n";
 				if (country != NULL)
 				{
 					cout << country->displayCountry() + "";
-					cout << "Adjacent List:\n";
+					cout << "--Adjacent List--\n";
 					adjacencyList->displayLinkedList();
 				}
 				else
@@ -59,22 +59,6 @@ namespace GraphWorld
 				delete adjacencyList;
 			}
 	};
-
-	//Map::Map(const Map& map2)
-	//{
-
-	//	this->mapName = map2.mapName;
-	//	this->numCountries = map2.numCountries;
-	//	std::cout << "HEEEE: " << *this->numCountries << std::endl;
-	//	this->numContinents = map2.numContinents;
-	//	size = map2.size;
-
-	//	arrayOfCountries = new NodePtr[*numCountries];
-	//	for (int i = 0; i < *numCountries; ++i)
-	//	{
-	//		arrayOfCountries[i] = new Node();
-	//	}
-	//}
 
 	Map::Map(string* mapName, int numCountries, int numContinents)
 	{
@@ -163,25 +147,30 @@ namespace GraphWorld
 	{
 		country_ID = new int();
 		*country_ID = 0;
-		isStartCountry = new bool();
-		*isStartCountry = false;
+		mIsStartCountry = new bool();
+		*mIsStartCountry = false;
+		mIsNavalCountry = new bool();
+		*mIsNavalCountry = false;
 		continent = string("");
 	}
 
 	Country::Country(const Country& country2)
 	{
 		this->country_ID = country2.country_ID;
-		this->isStartCountry = country2.isStartCountry;
+		this->mIsStartCountry = country2.mIsStartCountry;
+		this->mIsNavalCountry = country2.mIsNavalCountry;
 		this->continent = country2.continent;
 
 	}
 
-	Country::Country(int country_ID, bool startCountry, string* continent)
+	Country::Country(int country_ID, bool startCountry, bool navalCountry, string* continent)
 	{
 		this->country_ID = new int();
 		*this->country_ID = country_ID;
-		this->isStartCountry = new bool();
-		*this->isStartCountry = startCountry;
+		this->mIsStartCountry = new bool();
+		*this->mIsStartCountry = startCountry;
+		this->mIsNavalCountry = new bool();
+		*this->mIsNavalCountry = navalCountry;
 		this->continent = string(*continent);
 	}
 
@@ -190,9 +179,14 @@ namespace GraphWorld
 		return *country_ID;
 	}
 
-	bool Country::getStartCountry()
+	bool Country::isStartCountry()
 	{
-		return *isStartCountry;
+		return *mIsStartCountry;
+	}
+
+	bool Country::isNavalCountry()
+	{
+		return *mIsNavalCountry;
 	}
 
 	string Country::getContinent()
@@ -207,7 +201,7 @@ namespace GraphWorld
 
 	void Country::setStartCountry(bool maybe)
 	{
-		*isStartCountry = maybe;
+		*mIsStartCountry = maybe;
 	}
 
 	void Country::setContinent(string* continent)
@@ -219,18 +213,17 @@ namespace GraphWorld
 	string Country::displayCountry()
 	{
 		string s1 = "countryID: " + to_string(*country_ID) + "\n";
-		string countryBool = "false";
-		if (*isStartCountry == 1)
-			countryBool = "true";
-		string s2 = "StartingCountry: " + countryBool + "\n";
-		string s3 = "Continent: " + continent + "\n";
-		return s1 + s2 + s3;
+		string s2 = (*mIsStartCountry) ? "true\n" : "false\n";
+		string s3 = (*mIsNavalCountry) ? "true\n" : "false\n";
+		string s4 = "Continent: " + continent + "\n";
+		return s1 + "StartingCountry: " + s2 + "NavalCountry: " +s3 + s4;
 	}
 
 	Country::~Country()
 	{
 		delete country_ID;
-		delete isStartCountry;
+		delete mIsStartCountry;
+		delete mIsNavalCountry;
 		continent.clear();
 	}
 
@@ -285,7 +278,7 @@ namespace GraphWorld
 
 			void displayNode()
 			{
-				cout << "Country:\n" + country->displayCountry() + "\n";
+				cout << "COUNTRY:\n" + country->displayCountry() + "\n";
 			}
 
 			~Node()
