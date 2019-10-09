@@ -267,7 +267,8 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 	 std::smatch countryAttributesMatch;
 	 std::smatch adjacentCountiresMatch; 
 
-	 std::vector<std::vector<string>> adjacentCountries; //Holds adjacent countries of each country
+	 std::vector<std::vector<int>> adjacentCountries; //Holds vectors of adjacent countries of each country
+	 vector<int> adjs; //holds adjacent countries
 
 	 while ( getline(inputMapFile, line) )
 	 {
@@ -287,12 +288,17 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 				 {			
 					 if (!initCountry(countryAttributesMatch[0].str(), map, i))
 						 return false;
-				 }
+
 				 //Process adjacent countries
-				 if (std::regex_search(line, adjacentCountiresMatch, adjacencyIdentifier))
-				 {
-					adjacentCountries.push_back(processAdjacency(adjacentCountiresMatch[0].str()));
-				 }		
+					 if (std::regex_search(line, adjacentCountiresMatch, adjacencyIdentifier))
+					 {
+						 adjs = processAdjacency(adjacentCountiresMatch[0].str(), map->getNumCountries());
+						 if (adjs.empty())
+							 return false;
+
+						 adjacentCountries.push_back(adjs);
+					 }
+				 }
 				 else 
 				 {
 					 std::cout << "Error reading country list. Check line [" << (n) << "].\n";
@@ -300,6 +306,8 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 				 }					 
 			 }
 
+		 if (!validateAdjacentCountries(adjacentCountries))
+				 return false;
 		initAdjacencyLists(adjacentCountries, map);
 		return true;
 		 }
@@ -383,11 +391,12 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 	 return true;
  }
 
- std::vector<std::string> MapLoader::Parser::processAdjacency(std::string adjacentCountiresMatch)
+ std::vector<int> MapLoader::Parser::processAdjacency(std::string adjacentCountiresMatch, const int numCountries)
  {
 	 using namespace std;
 	 string t;
-	 std::vector<std::string> adjCountries;
+	 int country;
+	 std::vector<int> adjCountries;
 
 	 //Remove brackets
 	 if (adjacentCountiresMatch.size() > 2)
@@ -398,22 +407,64 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 
 	 std::stringstream ss(adjacentCountiresMatch);
 	 while (getline(ss, t, ','))
-		 adjCountries.push_back(t);
+	 {
+		 country = stoi(t);
+		 if (country > numCountries || country < 0 )
+		 {
+			 cout << "Error! Country " << t << " is not a valid ID.\n";
+			 adjCountries.clear();
+			 return {};
+		 }
+		 adjCountries.push_back(country);
+
+	 }
 
 	 return adjCountries;
  }
 
- void MapLoader::Parser::initAdjacencyLists(std::vector<std::vector<string>> adjacentCountries, GraphWorld::Map* map)
+ bool MapLoader::Parser::validateAdjacentCountries(std::vector<std::vector<int>> adjacentCountries)
+ {
+	 int i = 0;
+	 bool check = false;
+	 int t;
+	 for (auto vec : adjacentCountries) 
+	 {		 
+		 for (auto c1 : vec) 
+		 {		
+			 for (auto c2 : adjacentCountries[c1])
+			 {
+				 if (c2 == i)
+				 {
+					 t = c2;
+					 check = true;
+					 break;
+				 }				
+			 } 
+			 if (!check) 
+			 {
+				 std::cout << "Invalid adjacency list for country " << c1;
+				 std::cout << ". It is missing country " << i << " in it's adjacency list.\n";
+				 return false;
+			 }
+
+		 check = false;
+		 }
+		 i++;
+	 }
+	 return true;
+ }
+
+ void MapLoader::Parser::initAdjacencyLists(std::vector<std::vector<int>> adjacentCountries, GraphWorld::Map* map)
  {
 	 using namespace std;
-	 string temp; // Country ID
+	 int temp; // Country ID
 
 	 for (int i = 0; i < adjacentCountries.size(); i++)
 	 {
 		 for (int j = 0; j < adjacentCountries[i].size(); j++)
-		 {
+		 { 
 			 temp = adjacentCountries[i][j];
-			map->addEdge(map->getCountry(i), map->getCountry( stoi(temp)));		 
+			map->addEdge(map->getCountry(i), map->getCountry( temp));		 
 		 }
 	 }
  }

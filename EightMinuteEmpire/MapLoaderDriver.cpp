@@ -35,10 +35,8 @@ int main()
 		delete mapLoader;
 	}
 
-		map->printMap();
+	map->printMap();
 
-
-	
 	delete mapLoader;
 	delete map;
 	system("PAUSE");
