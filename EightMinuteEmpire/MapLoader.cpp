@@ -295,9 +295,13 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 						 adjs = processAdjacency(adjacentCountiresMatch[0].str(), map->getNumCountries());
 						 if (adjs.empty())
 							 return false;
-
 						 adjacentCountries.push_back(adjs);
 					 }
+					 else
+					 {
+						 std::cout << "Error reading adjacent country list on line [" << (n) << "].\n";
+						 return false;
+					 }					 
 				 }
 				 else 
 				 {
@@ -409,13 +413,20 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 	 while (getline(ss, t, ','))
 	 {
 		 country = stoi(t);
-		 if (country > numCountries || country < 0 )
+		 if (country > numCountries)
 		 {
 			 cout << "Error! Country " << t << " is not a valid ID.\n";
 			 adjCountries.clear();
 			 return {};
 		 }
-		 adjCountries.push_back(country);
+		 if (std::find(adjCountries.begin(), adjCountries.end(), country) != adjCountries.end()) {
+				
+			 cout << "Error! Duplicate country '" << country << "' found.\n";
+			 return {};
+		 }
+		 else {
+			 adjCountries.push_back(country);
+		 }
 
 	 }
 
