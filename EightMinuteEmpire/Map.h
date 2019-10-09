@@ -26,6 +26,9 @@ namespace GraphWorld
 			void addNode(Country* country);
 			void addEdge(Country* currentCountry, Country* adjacentCountry);
 			Country* getCountry(int id);
+			string getMapName();
+			int getNumCountries();
+			int getNumContinents();
 			LinkedList* getAdjacentList(Country* country);
 			void printMap();
 			int getSize();

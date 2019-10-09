@@ -105,6 +105,21 @@ namespace GraphWorld
 			return arrayOfCountries[id]->getCountry();
 	}
 
+	string Map::getMapName()
+	{
+		return mapName;
+	}
+
+	int Map::getNumCountries()
+	{
+		return *numCountries;
+	}
+
+	int Map::getNumContinents()
+	{
+		return *numContinents;
+	}
+
 	LinkedList* Map::getAdjacentList(Country* country)
 	{
 		int nodeNum = country->getID();

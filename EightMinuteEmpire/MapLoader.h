@@ -19,7 +19,7 @@ public:
 	void setMapPath(string* path);
 	static MapLoader* initiateMapPicker();
 	bool load( GraphWorld::Map* map);
-	void initMap(std::ifstream& inputMapFile);
+	bool initMap(std::ifstream& inputMapFile);
 	static std::string getMapsDir();
 	static std::vector<std::string> getInstalledMaps();
 	static std::string selectMap();
@@ -37,11 +37,13 @@ private:
 		friend class MapLoader;
 
 	private:
+		static std::vector<string> vContinents; //Used to validate continents
 		static bool isFileStructureValid(std::ifstream& inputMapFile);
-		static  bool processCountries( std::ifstream& inputMapFile, GraphWorld::Map* map, const int size);
-		static  bool initCountry(std::smatch& countryAttributes, GraphWorld::Map* map, const int size);
-		static std::vector<std::string> processAdjacency(std::smatch& adjacentCountires);
+		static  bool processCountries( std::ifstream& inputMapFile, GraphWorld::Map* map);
+		static  bool initCountry(std::string countryAttributes, GraphWorld::Map* map, const int countryIndex);
+		static std::vector<std::string> processAdjacency(std::string adjacentCountires);
 		static void initAdjacencyLists(std::vector<std::vector<string>> adjacentCountries, GraphWorld::Map* map);
+		static bool validateContinent(std::string continent, const int numContinents);
 		static void seekToStart(std::ifstream& inputMapFile);	
 	};
 };

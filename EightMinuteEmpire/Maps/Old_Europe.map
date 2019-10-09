@@ -1,8 +1,8 @@
 <eme_map_file>
 <eme_attributes>
-Map:OLD_EUROPE
-Continents:4
-Countries:21
+Map_Name:OLD_EUROPE
+Num_Continents:4
+Num_Countries:21
 </eme_attributes>
 <eme_countries>
 [0+;A] {1,4}
