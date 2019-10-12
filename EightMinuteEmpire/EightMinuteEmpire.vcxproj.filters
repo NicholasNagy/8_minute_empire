@@ -81,5 +81,8 @@
     <Image Include="Maps\Images\Old_Europe_Image.jpg">
       <Filter>Resource Files\Maps\Images</Filter>
     </Image>
+    <Image Include="D:\Users\Mak\Desktop\maps\annotated\Ancient_Kingdom_Image.jpg">
+      <Filter>Resource Files\Maps\Images</Filter>
+    </Image>
   </ItemGroup>
 </Project>

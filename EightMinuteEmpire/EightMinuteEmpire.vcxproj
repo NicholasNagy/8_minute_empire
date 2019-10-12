@@ -140,6 +140,7 @@
     <None Include="Maps\Old_Europe.map" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="D:\Users\Mak\Desktop\maps\annotated\Ancient_Kingdom_Image.jpg" />
     <Image Include="Maps\Images\Old_Europe_Image.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
