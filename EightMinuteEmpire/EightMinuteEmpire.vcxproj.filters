@@ -76,12 +76,45 @@
     <None Include="Maps\map1.map">
       <Filter>Resource Files\Maps</Filter>
     </None>
+    <None Include="Maps\Starfall_Crater.map">
+      <Filter>Resource Files\Maps</Filter>
+    </None>
+    <None Include="Maps\Ancient_Kingdom.map">
+      <Filter>Resource Files\Maps</Filter>
+    </None>
+    <None Include="Maps\Archipelago_of_Azra.map">
+      <Filter>Resource Files\Maps</Filter>
+    </None>
+    <None Include="Maps\Isthmus_of_Gom.map">
+      <Filter>Resource Files\Maps</Filter>
+    </None>
+    <None Include="Maps\Sister_Continents.map">
+      <Filter>Resource Files\Maps</Filter>
+    </None>
+    <None Include="Maps\Southern_Plains.map">
+      <Filter>Resource Files\Maps</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Maps\Images\Old_Europe_Image.jpg">
       <Filter>Resource Files\Maps\Images</Filter>
     </Image>
     <Image Include="D:\Users\Mak\Desktop\maps\annotated\Ancient_Kingdom_Image.jpg">
+      <Filter>Resource Files\Maps\Images</Filter>
+    </Image>
+    <Image Include="D:\Users\Mak\Desktop\maps\annotated\Isthmus_of_Gom_Image.png">
+      <Filter>Resource Files\Maps\Images</Filter>
+    </Image>
+    <Image Include="D:\Users\Mak\Desktop\maps\annotated\Archipelago_of_Azra.png">
+      <Filter>Resource Files\Maps\Images</Filter>
+    </Image>
+    <Image Include="D:\Users\Mak\Desktop\maps\annotated\Sister_Continents_Image.png">
+      <Filter>Resource Files\Maps\Images</Filter>
+    </Image>
+    <Image Include="D:\Users\Mak\Desktop\maps\annotated\Southern_Plains_Image.png">
+      <Filter>Resource Files\Maps\Images</Filter>
+    </Image>
+    <Image Include="D:\Users\Mak\Desktop\maps\annotated\Starfall_Crater_Image.png">
       <Filter>Resource Files\Maps\Images</Filter>
     </Image>
   </ItemGroup>

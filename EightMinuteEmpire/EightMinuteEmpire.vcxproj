@@ -134,13 +134,24 @@
     <ClInclude Include="Player.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Maps\Ancient_Kingdom.map" />
+    <None Include="Maps\Archipelago_of_Azra.map" />
+    <None Include="Maps\Isthmus_of_Gom.map" />
     <None Include="Maps\map1.map" />
     <None Include="Maps\map2.map" />
     <None Include="Maps\map3.map" />
     <None Include="Maps\Old_Europe.map" />
+    <None Include="Maps\Sister_Continents.map" />
+    <None Include="Maps\Southern_Plains.map" />
+    <None Include="Maps\Starfall_Crater.map" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="D:\Users\Mak\Desktop\maps\annotated\Ancient_Kingdom_Image.jpg" />
+    <Image Include="D:\Users\Mak\Desktop\maps\annotated\Archipelago_of_Azra.png" />
+    <Image Include="D:\Users\Mak\Desktop\maps\annotated\Isthmus_of_Gom_Image.png" />
+    <Image Include="D:\Users\Mak\Desktop\maps\annotated\Sister_Continents_Image.png" />
+    <Image Include="D:\Users\Mak\Desktop\maps\annotated\Southern_Plains_Image.png" />
+    <Image Include="D:\Users\Mak\Desktop\maps\annotated\Starfall_Crater_Image.png" />
     <Image Include="Maps\Images\Old_Europe_Image.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
