@@ -435,7 +435,6 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 		 }
 
 	 }
-
 	 return adjCountries;
  }
 
@@ -445,6 +444,7 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 	 bool check = false;
 	 int t;
 	 int t2;
+	 std::string message;
 	 for (auto vec : adjacentCountries) 
 	 {		 
 		 for (auto c1 : vec) 
@@ -454,11 +454,13 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 			 {
 				 t2 = removeNavalSymbol(c2);
 
-				 if (t2 == i)
+				if((c1.find('+') != std::string::npos && c2.find('+') != std::string::npos && t2 == i) || (t2 == i && c1.find('+') == std::string::npos && c2.find('+') == std::string::npos))
 				 {
 					 check = true;
 					 break;
-				 }				
+				 }
+			
+
 			 } 
 			 if (!check) 
 			 {
