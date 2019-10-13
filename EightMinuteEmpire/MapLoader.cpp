@@ -402,6 +402,7 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 	 string t;
 	 int country;
 	 std::vector<std::string> adjCountries;
+	 std::vector<int> ids; // used to check for duplicates
 
 	 //Remove brackets
 	 if (adjacentCountiresMatch.size() > 2)
@@ -414,6 +415,7 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 	 while (getline(ss, t, ','))
 	 {
 		 country = removeNavalSymbol(t);
+		 
 		
 		 if (country > numCountries)
 		 {
@@ -421,13 +423,15 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 			 adjCountries.clear();
 			 return {};
 		 }
-		 if (std::find(adjCountries.begin(), adjCountries.end(), t) != adjCountries.end()) {
+		 if (std::find(ids.begin(), ids.end(), country) != ids.end())
+		 {
 				
 			 cout << "Error! Duplicate country '" << country << "' found.\n";
 			 return {};
 		 }
 		 else {
 			 adjCountries.push_back(t);
+			 ids.push_back(country);
 		 }
 
 	 }
@@ -482,7 +486,6 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 		 { 
 			 //remove '+' symbol from string
 			 temp = removeNavalSymbol(adjacentCountries[i][j]);
-			 cout <<  "PIZZA: "<<temp;
 			 //Check if the the adjacent country is naval (has a plus symbol next to it)
 			 //And that the node country is also a naval country
 			 if (adjacentCountries[i][j].find('+') != std::string::npos && map->getCountry(i)->isNavalCountry() && map->getCountry(temp)->isNavalCountry())
