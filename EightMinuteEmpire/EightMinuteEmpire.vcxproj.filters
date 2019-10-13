@@ -108,22 +108,22 @@
     <Image Include="Maps\Images\Old_Europe_Image.jpg">
       <Filter>Resource Files\Maps\Images</Filter>
     </Image>
-    <Image Include="D:\Users\Mak\Desktop\maps\annotated\Ancient_Kingdom_Image.jpg">
+    <Image Include="Maps\Images\Ancient_Kingdom_Image.jpg">
       <Filter>Resource Files\Maps\Images</Filter>
     </Image>
-    <Image Include="D:\Users\Mak\Desktop\maps\annotated\Isthmus_of_Gom_Image.png">
+    <Image Include="Maps\Images\Archipelago_of_Azra.png">
       <Filter>Resource Files\Maps\Images</Filter>
     </Image>
-    <Image Include="D:\Users\Mak\Desktop\maps\annotated\Archipelago_of_Azra.png">
+    <Image Include="Maps\Images\Isthmus_of_Gom_Image.png">
       <Filter>Resource Files\Maps\Images</Filter>
     </Image>
-    <Image Include="D:\Users\Mak\Desktop\maps\annotated\Sister_Continents_Image.png">
+    <Image Include="Maps\Images\Sister_Continents_Image.png">
       <Filter>Resource Files\Maps\Images</Filter>
     </Image>
-    <Image Include="D:\Users\Mak\Desktop\maps\annotated\Southern_Plains_Image.png">
+    <Image Include="Maps\Images\Southern_Plains_Image.png">
       <Filter>Resource Files\Maps\Images</Filter>
     </Image>
-    <Image Include="D:\Users\Mak\Desktop\maps\annotated\Starfall_Crater_Image.png">
+    <Image Include="Maps\Images\Starfall_Crater_Image.png">
       <Filter>Resource Files\Maps\Images</Filter>
     </Image>
   </ItemGroup>
