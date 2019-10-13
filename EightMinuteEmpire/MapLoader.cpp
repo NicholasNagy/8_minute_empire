@@ -311,7 +311,7 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 				 }					 
 			 }
 
-		 if (!validateAdjacentCountries(adjacentCountries))
+		 if (!validateAdjacentCountries(adjacentCountries, map))
 				 return false;
 		initAdjacencyLists(adjacentCountries, map);
 		return true;
@@ -415,8 +415,7 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 	 while (getline(ss, t, ','))
 	 {
 		 country = removeNavalSymbol(t);
-		 
-		
+	
 		 if (country > numCountries)
 		 {
 			 cout << "Error! Country " << country << " is not a valid ID.\n";
@@ -429,7 +428,8 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 			 cout << "Error! Duplicate country '" << country << "' found.\n";
 			 return {};
 		 }
-		 else {
+		 else 
+		 {
 			 adjCountries.push_back(t);
 			 ids.push_back(country);
 		 }
@@ -438,18 +438,26 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 	 return adjCountries;
  }
 
- bool MapLoader::Parser::validateAdjacentCountries(std::vector<std::vector<std::string>> adjacentCountries)
+ bool MapLoader::Parser::validateAdjacentCountries(std::vector<std::vector<std::string>> adjacentCountries, GraphWorld::Map* map)
  {
 	 int i = 0;
 	 bool check = false;
 	 int t;
 	 int t2;
-	 std::string message;
+	 bool isNaval;
+	 std::string message = "Invalid adjacency list for country ";
 	 for (auto vec : adjacentCountries) 
 	 {		 
+		 isNaval = map->getCountry(i)->isNavalCountry();
+
 		 for (auto c1 : vec) 
 		 {		
-				 t = removeNavalSymbol(c1);
+			 t = removeNavalSymbol(c1);
+			 if (!isNaval && c1.find('+') != std::string::npos)
+			 {
+				 std::cout << message << i << "\n Country " << t << " cannot be a naval passage to a non naval country.\n";
+				 return false;
+			 }			
 			 for (auto c2 : adjacentCountries[t])
 			 {
 				 t2 = removeNavalSymbol(c2);
@@ -459,13 +467,17 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 					 check = true;
 					 break;
 				 }
-			
+				else if (t2 == i)
+				{
+					std::cout << message << t << ".\nNaval passage mismatch detected with country " << t2 << ".\n";
+					return false;
+				}
 
 			 } 
 			 if (!check) 
 			 {
 				 std::cout << "Invalid adjacency list for country " << (t);
-				 std::cout << ". It is missing country " << i << " in it's adjacency list.\n";
+				 std::cout << "It is missing country " << i << " in it's adjacency list.\n";
 				 return false;
 			 }
 
