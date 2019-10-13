@@ -2,7 +2,7 @@
 #include "Player.h"
 #include <array>
 using namespace std;
-
+/*
 void printArrayContents(int anArray[], int length);
 
 int main() {
@@ -60,3 +60,4 @@ void printArrayContents(int anArray[], int length) {
 		cout << anArray[i] << " ";
 	}
 }
+*/

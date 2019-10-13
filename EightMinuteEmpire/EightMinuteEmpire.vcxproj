@@ -116,6 +116,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Bid.cpp" />
+    <ClCompile Include="BidDriver.cpp" />
     <ClCompile Include="Cards.cpp" />
     <ClCompile Include="CardsDriver.cpp" />
     <ClCompile Include="driver.cpp" />
@@ -127,6 +129,7 @@
     <ClCompile Include="PlayerDriver.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Bid.h" />
     <ClInclude Include="Cards.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="MapLoader.h" />

@@ -1,27 +1,53 @@
 #include "Player.h"
+#include <random>
 
 Player::Player()
 {
-	money = 1000;
+	name = "Default";
+	money = new int(20);
 	//totalNumberOfCountries = 30;
 	ownedCities = nullptr;
 	ownedCountries = nullptr;
+	age = new int(rand() % 100 + 1);
+}
+
+Player::Player(std::string* name, int age)
+{
+	money = new int(20);
+	this->name = std::string(*name);
+	this->age = new int(age);
 }
 
 Player::Player(int theMoney, int theOwnedCountries[], int theOwnedCities[]) {
-	money = theMoney;
+
+	name = "default";
+	money = new int(theMoney);
+	ownedCities = theOwnedCities;
+	ownedCountries = theOwnedCountries;
+	age = new int(rand() % 100 + 1);
+}
+
+Player::Player(std::string* name, int age, int theMoney, int theOwnedCountries[], int theOwnedCities[])
+{
+	this->name = std::string(*name);
+	*this->age = age;
+	money = new int(theMoney);
 	ownedCities = theOwnedCities;
 	ownedCountries = theOwnedCountries;
 }
 
-
 Player::~Player()
 {
-	//delete[]s;
+	//delete this;
 }
 
 int Player::getMoney() {
-	return int(money);
+	return *money;
+}
+
+string Player::getName()
+{
+	return name;
 }
 
 int* Player::getOwnedCities() {
@@ -32,8 +58,13 @@ int* Player::getOwnedCountries() {
 	return ownedCountries;
 }
 
+int Player::getAge()
+{
+	return *age;
+}
+
 void Player::PayCoin(int amount) {
-	money -= amount;
+	*money -= amount;
 }
 
 void Player::PlaceNewArmies(int numberOfArmies, int Country) {
@@ -51,7 +82,7 @@ void Player::MoveArmies(int numberOfArmies, int StartPosition, int EndPosition) 
 	int armiesAtStart = ownedCountries[StartPosition];
 	//if the number of armies to move from the start is more than the amount of armies already 
 	//at the starting position
-	if (armiesAtStart - numberOfArmies < 0) { 
+	if (armiesAtStart - numberOfArmies < 0) {
 		numberOfArmies = armiesAtStart;
 		armiesAtStart = 0;
 	}
@@ -61,7 +92,7 @@ void Player::MoveArmies(int numberOfArmies, int StartPosition, int EndPosition) 
 
 	int armiesAtEnd = ownedCountries[EndPosition];
 	armiesAtEnd += numberOfArmies;
-	
+
 	ownedCountries[StartPosition] = armiesAtStart;
 	ownedCountries[EndPosition] = armiesAtEnd;
 }
@@ -71,7 +102,7 @@ bool isValidMovement(int startPosition, int endPosition) {
 }
 
 void Player::MoveOverLand(int numberOfArmies, int StartPosition, int EndPosition) {
-	if (isValidMovement( StartPosition, EndPosition )){
+	if (isValidMovement(StartPosition, EndPosition)) {
 		MoveArmies(numberOfArmies, StartPosition, EndPosition);
 	}
 	else {
@@ -94,7 +125,16 @@ void Player::DestroyArmy(int position) {
 		//handle when armies is less than or equal to 0
 	}
 	ownedCountries[position] = armiesHeld;
-	
+
+}
+
+std::ostream& operator<<(std::ostream& s, const Player& player)
+{
+	return  s << "--Player Info--\n" <<
+		"Name: " << player.name << std::endl <<
+		"Age: " << *player.age << std::endl <<
+		"Money: " << *player.money << std::endl;
+
 }
 
 
