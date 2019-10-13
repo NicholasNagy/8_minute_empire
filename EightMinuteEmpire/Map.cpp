@@ -25,9 +25,9 @@ namespace GraphWorld
 				this->country = country;
 			}
 
-			void addAdjacentCountry(Country* country)
+			void addAdjacentCountry(Country* country, bool naval)
 			{
-				adjacencyList->add(0, country);
+				adjacencyList->add(0, country, naval);
 			}
 
 			Country* getCountry()
@@ -89,10 +89,10 @@ namespace GraphWorld
 		}
 	}
 
-	void Map::addEdge(Country* currentCountry, Country* adjacentCountry)
+	void Map::addEdge(Country* currentCountry, Country* adjacentCountry, bool naval)
 	{
 		Node* toModify = arrayOfCountries[currentCountry->getID()];
-		toModify->addAdjacentCountry(adjacentCountry);
+		toModify->addAdjacentCountry(adjacentCountry, naval);
 	}
 
 	Country* Map::getCountry(int id)
@@ -247,10 +247,12 @@ namespace GraphWorld
 		Country* country;
 		Node* next;
 		Node* previous;
+		bool* mRequiresNaval;
 
 		public:
-			Node(Country* country)
+			Node(Country* country, bool naval)
 			{
+				this->mRequiresNaval = new bool(naval);
 				if (country == NULL)
 					this->country = NULL;
 				else
@@ -259,8 +261,9 @@ namespace GraphWorld
 				previous = NULL;
 			}
 
-			Node(Country* country, Node* next, Node* previous)
+			Node(Country* country, Node* next, Node* previous, bool naval)
 			{
+				this->mRequiresNaval = new bool(naval);
 				this->country = country;
 				this->next = next;
 				this->previous = previous;
@@ -291,9 +294,15 @@ namespace GraphWorld
 				return country;
 			}
 
+			bool requiresNavalPassage()
+			{
+				return *mRequiresNaval;
+			}
+
 			void displayNode()
 			{
-				cout << "COUNTRY:\n" + country->displayCountry() + "\n";
+				cout << "COUNTRY:\n" + country->displayCountry()
+					<< "Requires naval passge: " << ((*mRequiresNaval) ? "Yes\n\n" : "No\n\n");
 			}
 
 			~Node()
@@ -313,7 +322,7 @@ namespace GraphWorld
 		}
 		else
 		{
-			head = new Node(country);
+			head = new Node(country, false);
 			tail = head;
 			size = new int();
 			*size = *size + 1;
@@ -335,19 +344,19 @@ namespace GraphWorld
 		return *size;
 	}
 
-	bool LinkedList::addToHead(Country* country)
+	bool LinkedList::addToHead(Country* country, bool naval)
 	{
 		bool returnMe = false;
 		if (country != NULL)
 		{
 			if (head == NULL)
 			{
-				head = new Node(country);
+				head = new Node(country, naval);
 				tail = head;
 			}
 			else
 			{
-				Node* n1 = new Node(country, head, NULL);
+				Node* n1 = new Node(country, head, NULL, naval);
 				head->setPrev(n1);
 				head = n1;
 			}
@@ -361,19 +370,19 @@ namespace GraphWorld
 		return returnMe;
 	}
 
-	bool LinkedList::addToTail(Country* country)
+	bool LinkedList::addToTail(Country* country, bool naval)
 	{
 		bool returnMe = false;
 		if (country != NULL)
 		{
 			if (tail == NULL)
 			{
-				tail = new Node(country);
+				tail = new Node(country, naval);
 				head = tail;
 			}
 			else
 			{
-				Node* n1 = new Node(country, NULL, tail);
+				Node* n1 = new Node(country, NULL, tail, naval);
 				tail->setNext(n1);
 				tail = n1;
 			}
@@ -387,15 +396,15 @@ namespace GraphWorld
 		return returnMe;
 	}
 
-	bool LinkedList::add(int where, Country* country)
+	bool LinkedList::add(int where, Country* country, bool naval)
 	{
 		bool returnMe = false;
 		if (country != NULL)
 		{
 			if (where == 0)
-				returnMe = addToHead(country);
+				returnMe = addToHead(country, naval);
 			else if (where >= *size)
-				returnMe = addToTail(country);
+				returnMe = addToTail(country, naval);
 			else
 			{
 				Node* current = head;
@@ -404,7 +413,7 @@ namespace GraphWorld
 					current = current->getNext();
 				}
 				Node* prev = current->getPrev();
-				Node* n1 = new Node(country, current, prev);
+				Node* n1 = new Node(country, current, prev, naval);
 				prev->setNext(n1);
 				current->setPrev(n1);
 				*size = *size + 1;

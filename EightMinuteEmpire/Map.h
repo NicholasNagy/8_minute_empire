@@ -24,7 +24,7 @@ namespace GraphWorld
 		public:
 			Map(string* mapName, int numCountries, int numContinents);
 			void addNode(Country* country);
-			void addEdge(Country* currentCountry, Country* adjacentCountry);
+			void addEdge(Country* currentCountry, Country* adjacentCountry, bool requiresNaval);
 			Country* getCountry(int id);
 			string getMapName();
 			int getNumCountries();
@@ -67,13 +67,13 @@ namespace GraphWorld
 		Node* getPrev(Node* current);
 		Country* removeHead();
 		Country* removeTail();
-		bool addToHead(Country* country);
-		bool addToTail(Country* country);
+		bool addToHead(Country* country, bool requiresNaval);
+		bool addToTail(Country* country, bool requiresNaval);
 
 		public:
 			LinkedList(Country* country);
 			int sizeOf();
-			bool add(int where, Country* country);
+			bool add(int where, Country* country, bool requiresNaval);
 			Country* get(int where);
 			Country* remove(int where);
 			void displayLinkedList();

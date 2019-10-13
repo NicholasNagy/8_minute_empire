@@ -41,10 +41,11 @@ private:
 		static bool isFileStructureValid(std::ifstream& inputMapFile);
 		static  bool processCountries( std::ifstream& inputMapFile, GraphWorld::Map* map);
 		static  bool initCountry(std::string countryAttributes, GraphWorld::Map* map, const int countryIndex);
-		static std::vector<int> processAdjacency(std::string adjacentCountires, const int numContries);
-		static void initAdjacencyLists(std::vector<std::vector<int>> adjacentCountries, GraphWorld::Map* map);
-		static bool validateAdjacentCountries(std::vector<std::vector<int>> adjacentCountries);
+		static std::vector<std::string> processAdjacency(std::string adjacentCountires, const int numContries);
+		static void initAdjacencyLists(std::vector<std::vector<std::string>> adjacentCountries, GraphWorld::Map* map);
+		static bool validateAdjacentCountries(std::vector<std::vector<std::string>> adjacentCountries);
 		static bool validateContinent(std::string continent, const int numContinents);
 		static void seekToStart(std::ifstream& inputMapFile);	
+		static int removeNavalSymbol(std::string);
 	};
 };

@@ -164,7 +164,7 @@ MapLoader* MapLoader::initiateMapPicker()
 
 	 if (firstLine.compare("<eme_map_file>") != 0)
 	 {
-		 cout << "INVALID MAP FILE." << endl;
+		 cout << "\nINVALID MAP FILE.\n" << endl;
 		 return false;
 	 }
 
@@ -262,13 +262,13 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 	 string p1;
 
 	 const std::regex countryLineIdentifier{"\\[\\d+!?\\+?;\\D\\w*\\]"};
-	 const std::regex adjacencyIdentifier{"\\{(\\s*\\d+\\s*\\,?)+\\}"};
+	 const std::regex adjacencyIdentifier{"\\{(\\s*\\d+\\s*\\+?\\s*\\,?)+\\}"};
 
 	 std::smatch countryAttributesMatch;
 	 std::smatch adjacentCountiresMatch; 
 
-	 std::vector<std::vector<int>> adjacentCountries; //Holds vectors of adjacent countries of each country
-	 vector<int> adjs; //holds adjacent countries
+	 std::vector<std::vector<std::string>> adjacentCountries; //Holds vectors of adjacent countries of each country
+	 vector<std::string> adjs; //holds adjacent countries
 
 	 while ( getline(inputMapFile, line) )
 	 {
@@ -292,6 +292,7 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 				 //Process adjacent countries
 					 if (std::regex_search(line, adjacentCountiresMatch, adjacencyIdentifier))
 					 {
+
 						 adjs = processAdjacency(adjacentCountiresMatch[0].str(), map->getNumCountries());
 						 if (adjs.empty())
 							 return false;
@@ -395,12 +396,12 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 	 return true;
  }
 
- std::vector<int> MapLoader::Parser::processAdjacency(std::string adjacentCountiresMatch, const int numCountries)
+ std::vector<string> MapLoader::Parser::processAdjacency(std::string adjacentCountiresMatch, const int numCountries)
  {
 	 using namespace std;
 	 string t;
 	 int country;
-	 std::vector<int> adjCountries;
+	 std::vector<std::string> adjCountries;
 
 	 //Remove brackets
 	 if (adjacentCountiresMatch.size() > 2)
@@ -412,20 +413,21 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 	 std::stringstream ss(adjacentCountiresMatch);
 	 while (getline(ss, t, ','))
 	 {
-		 country = stoi(t);
+		 country = removeNavalSymbol(t);
+		
 		 if (country > numCountries)
 		 {
-			 cout << "Error! Country " << t << " is not a valid ID.\n";
+			 cout << "Error! Country " << country << " is not a valid ID.\n";
 			 adjCountries.clear();
 			 return {};
 		 }
-		 if (std::find(adjCountries.begin(), adjCountries.end(), country) != adjCountries.end()) {
+		 if (std::find(adjCountries.begin(), adjCountries.end(), t) != adjCountries.end()) {
 				
 			 cout << "Error! Duplicate country '" << country << "' found.\n";
 			 return {};
 		 }
 		 else {
-			 adjCountries.push_back(country);
+			 adjCountries.push_back(t);
 		 }
 
 	 }
@@ -433,27 +435,30 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 	 return adjCountries;
  }
 
- bool MapLoader::Parser::validateAdjacentCountries(std::vector<std::vector<int>> adjacentCountries)
+ bool MapLoader::Parser::validateAdjacentCountries(std::vector<std::vector<std::string>> adjacentCountries)
  {
 	 int i = 0;
 	 bool check = false;
 	 int t;
+	 int t2;
 	 for (auto vec : adjacentCountries) 
 	 {		 
 		 for (auto c1 : vec) 
 		 {		
-			 for (auto c2 : adjacentCountries[c1])
+				 t = removeNavalSymbol(c1);
+			 for (auto c2 : adjacentCountries[t])
 			 {
-				 if (c2 == i)
+				 t2 = removeNavalSymbol(c2);
+
+				 if (t2 == i)
 				 {
-					 t = c2;
 					 check = true;
 					 break;
 				 }				
 			 } 
 			 if (!check) 
 			 {
-				 std::cout << "Invalid adjacency list for country " << c1;
+				 std::cout << "Invalid adjacency list for country " << (t);
 				 std::cout << ". It is missing country " << i << " in it's adjacency list.\n";
 				 return false;
 			 }
@@ -465,17 +470,25 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 	 return true;
  }
 
- void MapLoader::Parser::initAdjacencyLists(std::vector<std::vector<int>> adjacentCountries, GraphWorld::Map* map)
+ void MapLoader::Parser::initAdjacencyLists(std::vector<std::vector<std::string>> adjacentCountries, GraphWorld::Map* map)
  {
 	 using namespace std;
 	 int temp; // Country ID
+	 bool naval = false;
 
 	 for (int i = 0; i < adjacentCountries.size(); i++)
 	 {
 		 for (int j = 0; j < adjacentCountries[i].size(); j++)
 		 { 
-			 temp = adjacentCountries[i][j];
-			map->addEdge(map->getCountry(i), map->getCountry( temp));		 
+			 //remove '+' symbol from string
+			 temp = removeNavalSymbol(adjacentCountries[i][j]);
+			 cout <<  "PIZZA: "<<temp;
+			 //Check if the the adjacent country is naval (has a plus symbol next to it)
+			 //And that the node country is also a naval country
+			 if (adjacentCountries[i][j].find('+') != std::string::npos && map->getCountry(i)->isNavalCountry() && map->getCountry(temp)->isNavalCountry())
+				 naval = true;
+			map->addEdge(map->getCountry(i), map->getCountry( temp), naval);
+			naval = false;
 		 }
 	 }
  }
@@ -493,4 +506,11 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 		 "Map_Name: "<< mapLoader.mapName << std::endl << 
 		 "Num_Continents: " << *mapLoader.numContinents << std::endl <<
 		 "Num_Countries: "<< *mapLoader.numCountries << std::endl;
+ }
+
+int MapLoader::Parser::removeNavalSymbol(std::string country)
+ {
+	 if (country.find('+') != std::string::npos)
+		 country.pop_back();
+	 return stoi(country);
  }
