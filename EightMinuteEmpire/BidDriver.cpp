@@ -1,4 +1,4 @@
-#include "Player.h"
+/*#include "Player.h"
 #include "Bid.h"
 #include <iostream>
 
@@ -31,3 +31,4 @@ int main() {
 	system("PAUSE");
 	return 0;
 }
+*/

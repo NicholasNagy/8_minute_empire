@@ -1,8 +1,8 @@
-#include <iostream>
+/*#include <iostream>
 #include "Player.h"
 #include <array>
 using namespace std;
-/*
+
 void printArrayContents(int anArray[], int length);
 
 int main() {
