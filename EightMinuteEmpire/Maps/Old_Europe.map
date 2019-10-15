@@ -5,7 +5,7 @@ Num_Continents:4
 Num_Countries:21
 </eme_attributes>
 <eme_countries>
-  [0+;A] {1,4+}
+  [0+;A] {1+,4+}
   [1+;B] {0+,3}
   [2+;B] {3+}
   [3+;B] {1,2+,10+}

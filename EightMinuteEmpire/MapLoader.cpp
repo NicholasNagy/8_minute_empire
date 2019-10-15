@@ -438,7 +438,7 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 	 return adjCountries;
  }
 
- bool MapLoader::Parser::validateAdjacentCountries(std::vector<std::vector<std::string>> adjacentCountries, GraphWorld::Map* map)
+ bool MapLoader::Parser::validateAdjacentCountries(const std::vector<std::vector<std::string>>& adjacentCountries, GraphWorld::Map* map)
  {
 	 int i = 0;
 	 bool check = false;
@@ -488,7 +488,7 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 	 return true;
  }
 
- void MapLoader::Parser::initAdjacencyLists(std::vector<std::vector<std::string>> adjacentCountries, GraphWorld::Map* map)
+ void MapLoader::Parser::initAdjacencyLists(const std::vector<std::vector<std::string>>& adjacentCountries, GraphWorld::Map* map)
  {
 	 using namespace std;
 	 int temp; // Country ID

@@ -1,5 +1,6 @@
 #include "Player.h"
 #include <random>
+#include <ctime>
 
 Player::Player()
 {
@@ -8,6 +9,7 @@ Player::Player()
 	//totalNumberOfCountries = 30;
 	ownedCities = nullptr;
 	ownedCountries = nullptr;
+	srand(time(NULL));
 	age = new int(rand() % 100 + 1);
 }
 
@@ -20,10 +22,11 @@ Player::Player(std::string* name, int age)
 
 Player::Player(int theMoney, int theOwnedCountries[], int theOwnedCities[]) {
 
-	name = "default";
+	name = "Default";
 	money = new int(theMoney);
 	ownedCities = theOwnedCities;
 	ownedCountries = theOwnedCountries;
+	srand(time(NULL));
 	age = new int(rand() % 100 + 1);
 }
 
