@@ -70,8 +70,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>SDL2-2.0.10\SDL2_ttf-2.0.15\include;SDL2-2.0.10\include;SDL2-2.0.10\SDL2_image-2.0.5\include;$(IncludePath)</IncludePath>
-    <LibraryPath>SDL2-2.0.10\SDL2_ttf-2.0.15\lib\x64;SDL2-2.0.10\lib\x64;SDL2-2.0.10\SDL2_image-2.0.5\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>SDL2-2.0.10\SDL2_ttf\include;SDL2-2.0.10\include;SDL2-2.0.10\SDL2_image\include;$(IncludePath)</IncludePath>
+    <LibraryPath>SDL2-2.0.10\SDL2_ttf\lib\x64;SDL2-2.0.10\lib\x64;SDL2-2.0.10\SDL2_image\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -88,10 +88,10 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>SDL2-2.0.10\SDL2_image-2.0.5\include;SDL2-2.0.10\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>SDL2-2.0.10\SDL2_ttf\include;SDL2-2.0.10\SDL2_image\include;SDL2-2.0.10\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>SDL2-2.0.10\SDL2_ttf-2.0.15\lib\x64;SDL2-2.0.10\SDL2_image-2.0.5\lib\x64;SDL2-2.0.10\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>SDL2-2.0.10\SDL2_ttf\lib\x64;SDL2-2.0.10\SDL2_image\lib\x64;SDL2-2.0.10\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
