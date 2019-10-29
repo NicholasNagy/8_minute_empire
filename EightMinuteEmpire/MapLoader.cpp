@@ -10,7 +10,7 @@
 
 bool MapLoader::isStartingCountrySet = false;
 std::vector<std::string> MapLoader::Parser::vContinents;
-
+std::string MapLoader::selectedMap;
 
 MapLoader::MapLoader()
 {
@@ -73,7 +73,9 @@ MapLoader* MapLoader::initiateMapPicker()
 	using namespace std;
 
 	MapLoader* mapLoader = new MapLoader();
-	mapLoader->mapPath =  getMapsDir().append("\\").append(selectMap());
+	//MapLoader::selectMap();
+	mapLoader->mapPath =  getMapsDir().append("\\").append(MapLoader::selectedMap);
+	cout << mapLoader->mapPath << endl;
 	ifstream inputMapFile;
 	inputMapFile.open(mapLoader->mapPath);
 
@@ -107,7 +109,7 @@ MapLoader* MapLoader::initiateMapPicker()
 		 inputMapFile.close();
 		 return false;
 	}
-
+	 cout << "Map Successfully loaded." << endl;
 	 return true;
  }
 
@@ -134,7 +136,7 @@ MapLoader* MapLoader::initiateMapPicker()
 	 return maps;
  }
 
- std::string MapLoader::selectMap()
+void MapLoader::selectMap()
  {
 	 using namespace std;
 
@@ -144,14 +146,10 @@ MapLoader* MapLoader::initiateMapPicker()
 		 cout << (i + 1) << "." << maps.at(i) << endl;
 
 	 int n;
-	 std::string selectedMap;
 	 cout << "Chose the map you want to load: ";
 	 cin >> n;
-	 selectedMap = maps.at((double)n - 1);
-	 cout << "You have chosen the map " << selectedMap << endl;
-
-
-	 return selectedMap;
+	 MapLoader::selectedMap = maps.at((double)n - 1);
+	 cout << "You have chosen the map " << MapLoader::selectedMap << endl;
  }
 
 

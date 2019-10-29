@@ -22,7 +22,8 @@ public:
 	bool initMap(std::ifstream& inputMapFile);
 	static std::string getMapsDir();
 	static std::vector<std::string> getInstalledMaps();
-	static std::string selectMap();
+	static void selectMap();
+	static std::string selectedMap;
 	friend std::ostream& operator<<(std::ostream&, const MapLoader&);
 
 private:

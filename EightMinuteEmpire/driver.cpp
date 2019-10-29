@@ -3,41 +3,40 @@
 #include "SDL.h"
 #undef main
 #include <iostream>
-using namespace std;
+#include "Game.h"
+#include "MainMenuState.h"
 
-int main()
 
+int main(int argc, char* argv[])
 {
-	SDL_Window* window;                    // Declare a pointer
+	int const FPS = 60;
+	int const frameDelay = 1000 / FPS;
 
-	SDL_Init(SDL_INIT_EVERYTHING);              // Initialize SDL2
+	Uint32 frameStart;
+	int frameTime;
 
-	// Create an application window with the following settings:
-	window = SDL_CreateWindow(
-		"Eight Minute Empire",                  // window title
-		SDL_WINDOWPOS_UNDEFINED,           // initial x position
-		SDL_WINDOWPOS_UNDEFINED,           // initial y position
-		640,                               // width, in pixels
-		480,                               // height, in pixels
-		SDL_WINDOW_OPENGL                  // flags - see below
-	);
+	Game game;
 
-	// Check that the window was successfully created
-	if (window == NULL) {
-		// In the case that the window could not be made...
-		printf("Could not create window: %s\n", SDL_GetError());
-		return 1;
-	}
+	game.init("Eight Minute Empire", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1600, 800, SDL_WINDOW_SHOWN );
 
-	// The window is open: could enter program loop here (see SDL_PollEvent())
+	game.changeState(MainMenuState::Instance());
+		while (game.isRunning())
+		{
+			frameStart = SDL_GetTicks();
 
-	SDL_Delay(3000);  // Pause execution for 3000 milliseconds, for example
+				game.handleEvents();
+				game.update();
+				game.draw();
+	
+			frameTime = SDL_GetTicks() - frameStart;
+				
+			if (frameDelay > frameTime)
+				SDL_Delay(frameDelay - frameTime);
 
-	// Close and destroy the window
-	SDL_DestroyWindow(window);
 
-	// Clean up
-	SDL_Quit();
+		}
+
+		game.clean();
 
 	return 0;
 }
