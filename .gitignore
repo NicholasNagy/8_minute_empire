@@ -23,6 +23,8 @@ bld/
 [Oo]bj/
 [Ll]og/
 !lib/x64/
+!SDL2_image/lib/x64
+!SDL2_ttf/lib/x64
 
 # Visual Studio 2015 cache/options directory
 .vs/
