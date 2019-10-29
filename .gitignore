@@ -16,15 +16,14 @@
 [Rr]elease/
 [Rr]eleases/
 x64/
-x64/
 x86/
 bld/
 [Bb]in/
 [Oo]bj/
 [Ll]og/
 !lib/x64/
-!SDL2_image/lib/x64
-!SDL2_ttf/lib/x64
+!EightMinuteEmpire/SDL2-2.0.10/SDL2_image/lib/x64/
+!EightMinuteEmpire/SDL2-2.0.10/SDL2_ttf/lib/x64/
 
 # Visual Studio 2015 cache/options directory
 .vs/
