@@ -15,8 +15,10 @@ int f = 0;
 void GameplayState::init(Game* game)
 {
 	std::cout << "Game Started\n";
+	SDL_Window* gameWindow = SDL_CreateWindow("Eight Minute Empire", 0, SDL_WINDOWPOS_CENTERED, 1600, 640, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+	game->setWindow(gameWindow);
 	renderer = SDL_CreateRenderer(game->getWindow(), -1, SDL_RENDERER_ACCELERATED);
-	SDL_RenderSetLogicalSize(renderer, 800, 640);
+	SDL_RenderSetLogicalSize(renderer, 1600, 640);
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 	texture = TextureLoader::loadTexutre("assets/p1.png", renderer);
 }

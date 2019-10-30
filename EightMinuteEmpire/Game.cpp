@@ -133,3 +133,7 @@ SDL_Window* Game::getWindow()
 	return window;
 }
 
+void Game::setWindow(SDL_Window* win)
+{
+	window = win;
+}

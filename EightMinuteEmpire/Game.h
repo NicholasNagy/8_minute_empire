@@ -25,6 +25,7 @@ public:
 		std::vector<Player*> players(); //get vector of players
 		GraphWorld::Map* getMap();
 		SDL_Window* getWindow();
+		void setWindow(SDL_Window*);
 
 private:
 	bool mIsRunning;
