@@ -20,7 +20,7 @@ Game::~Game()
 void Game::init(const char* title, int initialX, int initialY, int width, int height, Uint32 flags)
 {
 	
-	SDL_Init(SDL_INIT_VIDEO);         
+	SDL_Init(SDL_INIT_EVERYTHING);         
 	window = SDL_CreateWindow(title, initialX, initialY, width, height, flags);
 	if (window)
 		mIsRunning = true;

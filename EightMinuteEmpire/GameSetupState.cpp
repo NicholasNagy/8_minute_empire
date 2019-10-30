@@ -20,15 +20,15 @@ bool GameSetupState::mapLoaded = false;
 void GameSetupState::init(Game* game)
 {
 	renderer = SDL_CreateRenderer(game->getWindow(), -1, SDL_RENDERER_ACCELERATED);
-
 	ImGui::CreateContext();
-	ImGuiSDL::Initialize(renderer, 1600, 800);
+	ImGuiSDL::Initialize(renderer, 800, 640);
 }
 
 void GameSetupState::clean(Game* game)
 {
 	ImGuiSDL::Deinitialize();
 	SDL_DestroyRenderer(renderer);
+	ImGui::DestroyContext();
 	std::cout << "Game Setup State Cleaned";
 }
 
@@ -77,7 +77,7 @@ void GameSetupState::handleEvents(Game* game)
 	io.MouseWheel = static_cast<float>(wheel);
 
 	ImGui::NewFrame();
-	ImGui::ShowDemoWindow();
+	//ImGui::ShowDemoWindow();
 	handleMapPicker(game);
 	handlePlayerPicker(game);
 	handleGameStart(game);
@@ -101,9 +101,9 @@ void GameSetupState::handleMapPicker(Game* game)
 {
 
 	ImGui::Begin("Choose your map", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
-	ImVec2 windowSize(400, 600);
+	ImVec2 windowSize(300, 500);
 	ImGui::SetWindowSize(windowSize);
-	ImVec2 windowPos(600, 40);
+	ImVec2 windowPos(5, 20);
 	ImGui::SetWindowPos(windowPos);
 
 	std::vector<std::string> maps = MapLoader::getInstalledMaps();
@@ -140,9 +140,9 @@ void GameSetupState::handleMapPicker(Game* game)
 void GameSetupState::handlePlayerPicker(Game* game)
 {
 	ImGui::Begin("Choose Players", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
-	ImVec2 windowSize(500, 600);
+	ImVec2 windowSize(490, 500);
 	ImGui::SetWindowSize(windowSize);
-	ImVec2 windowPos(1000, 40);
+	ImVec2 windowPos(305, 20);
 	ImGui::SetWindowPos(windowPos);
 
 	ImGui::Columns(3, "mixed");
@@ -248,7 +248,7 @@ void GameSetupState::handleGameStart(Game* game)
 	ImGui::Begin("Start Game", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
 	ImVec2 windowSize(200, 66);
 	ImGui::SetWindowSize(windowSize);
-	ImVec2 windowPos(1300, 650);
+	ImVec2 windowPos(595, 520);
 	ImGui::SetWindowPos(windowPos);
 
 	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(7.0f, 0.6f, 0.6f));

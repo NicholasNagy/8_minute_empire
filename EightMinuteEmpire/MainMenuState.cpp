@@ -17,7 +17,7 @@ void MainMenuState::init(Game* game)
 {
 	renderer = SDL_CreateRenderer(game->getWindow(), -1, SDL_RENDERER_ACCELERATED);
 	ImGui::CreateContext();
-	ImGuiSDL::Initialize(renderer, 1600, 800);
+	ImGuiSDL::Initialize(renderer, 800, 640);
 	logoTexture = TextureLoader::loadTexutre("assets/logo.png", renderer);
 
 	
@@ -86,7 +86,7 @@ void MainMenuState::draw(Game* game)
 {
 
 	SDL_RenderClear(renderer);
-	SDL_Rect logo_pos = { 1600 / 4, 100 / 4, 1600 / 2, 800 / 2 };
+	SDL_Rect logo_pos = { 800 / 4, 100 / 4, 800 / 2, 640 / 2 };
 	SDL_RenderCopy(renderer, logoTexture, NULL, &logo_pos);
 
 
@@ -101,7 +101,7 @@ void MainMenuState::handleButtons(Game* game)
 	ImGui::Begin("Eight Minute Empire", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove);
 	ImVec2 windowSize(250, 120);
 	ImGui::SetWindowSize(windowSize);
-	ImVec2 windowPos(650, 400);
+	ImVec2 windowPos(275, 325);
 	ImGui::SetWindowPos(windowPos);
 	ImVec2 size = ImGui::GetItemRectSize();
 	ImGui::BeginGroup();

@@ -16,6 +16,7 @@ void GameplayState::init(Game* game)
 {
 	std::cout << "Game Started\n";
 	renderer = SDL_CreateRenderer(game->getWindow(), -1, SDL_RENDERER_ACCELERATED);
+	SDL_RenderSetLogicalSize(renderer, 800, 640);
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 	texture = TextureLoader::loadTexutre("assets/p1.png", renderer);
 }
