@@ -1,6 +1,6 @@
 #ifndef MAP_H
 #define MAP_H
-
+#include "SDL.h"
 #include <string>
 
 using std::string;
@@ -11,6 +11,20 @@ namespace GraphWorld
 	class LinkedList;
 	class Country;
 
+	class TileMap
+	{
+	public:
+		TileMap();
+		~TileMap();
+		void drawTileMap(SDL_Renderer* renderer, SDL_Texture* texture);
+		int tiles[20][32];
+
+	private:
+		SDL_Rect src, dest;
+
+	};
+
+
 	class Map
 	{
 		class Node;
@@ -20,6 +34,7 @@ namespace GraphWorld
 		int* numContinents;
 		typedef Node* NodePtr;
 		NodePtr* arrayOfCountries;
+		TileMap* tileMap;
 
 		public:
 			Map(string* mapName, int numCountries, int numContinents);
@@ -32,6 +47,8 @@ namespace GraphWorld
 			LinkedList* getAdjacentList(Country* country);
 			void printMap();
 			int getSize();
+			TileMap* getTileMap();
+			void setTileMap(TileMap* tileMap);
 			~Map();
 	};
 
@@ -79,7 +96,11 @@ namespace GraphWorld
 			void displayLinkedList();
 			~LinkedList();
 	};
+
+
+
 }
+
 
 #endif
 

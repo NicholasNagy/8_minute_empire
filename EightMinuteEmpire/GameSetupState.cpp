@@ -30,17 +30,17 @@ void GameSetupState::clean(Game* game)
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(game->getWindow());
 ;	ImGui::DestroyContext();
-	std::cout << "Game Setup State Cleaned";
+	std::cout << "Game Setup State Cleaned\n";
 }
 
 void GameSetupState::pause()
 {
-	printf("Main menu paused");
+	printf("Main menu paused\n");
 }
 
 void GameSetupState::resume()
 {
-	printf("Main menu resumed");
+	printf("Main menu resumed\n");
 }
 
 void GameSetupState::handleEvents(Game* game)
@@ -278,8 +278,10 @@ bool GameSetupState::initMapLoader(Game* game)
 	std::cout << *mapLoader << std::endl;
 	GraphWorld::Map* map = new GraphWorld::Map(&mapLoader->getMapName(), mapLoader->getNumCountries(), mapLoader->getNumContinents());
 	game->setMap(map);
+	GraphWorld::TileMap* tileMap = new GraphWorld::TileMap();
+	map->setTileMap(tileMap);
 
-		if (mapLoader->load(map))
+		if ( mapLoader->load(map, tileMap, 20, 32 ) )
 		{
 			map->printMap();
 			std::cout << "Map Successfully loaded." << std::endl;
@@ -289,6 +291,7 @@ bool GameSetupState::initMapLoader(Game* game)
 		}
 
 		delete map;	
+		delete tileMap;
 		delete mapLoader;
 
 	return false;

@@ -93,7 +93,7 @@ MapLoader* MapLoader::initiateMapPicker()
 	return mapLoader;
 }
 
- bool MapLoader::load(GraphWorld::Map* map)
+ bool MapLoader::load(GraphWorld::Map* map, GraphWorld::TileMap* tileMap, int sizeX, int sizeY)
  {
 	 using namespace std;
 	 // Reset static variables
@@ -109,6 +109,11 @@ MapLoader* MapLoader::initiateMapPicker()
 		 inputMapFile.close();
 		 return false;
 	}
+	 inputMapFile.close();
+	 if (!loadTileMap(map, tileMap, sizeX, sizeY))
+	 {
+		 return false;
+	 }
 	 cout << "Map Successfully loaded." << endl;
 	 return true;
  }
@@ -201,6 +206,44 @@ void MapLoader::selectMap()
 	 seekToStart(inputMapFile);
 	 return true;
  }
+
+ bool MapLoader::loadTileMap(GraphWorld::Map* map, GraphWorld::TileMap* tileMap, int sizeRow, int sizeCol)
+ {
+	 using namespace std;
+
+
+	 fstream tileMapFile;
+	 tileMapFile.open("assets/TileMaps/Ancient_Kingdom.txt");
+	 cout << "Loading tile map for: " << map->getMapName() << endl;
+	 std::string tile;
+	 int tileID = 0;
+
+	
+	 char c;
+	 for (int row = 0; row < sizeRow; row++)
+	 {
+		 for (int col = 0; col < sizeCol; col++)
+		 {
+			 tileMapFile >> tileID;
+			 std::cout << tileID <<endl;
+			 if (tileID < 0)
+			 {
+				cout << "Error loading tile map. " << endl;
+				cout << tileID << " on line: " << row << " column: " << col << " is invalid." << endl;
+				tileMapFile.close();
+				return false;
+		     }
+			 tileMap->tiles[row][col] = tileID;
+			 tileMapFile.ignore();
+			 
+		 }
+	 }
+
+	 tileMapFile.close();
+	 cout << "Successfully loaded tile map!" << endl;
+	 return true;
+ }
+
 
 
  bool MapLoader::initMap(std::ifstream& inputMapFile)

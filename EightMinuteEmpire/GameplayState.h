@@ -20,11 +20,11 @@ public:
 		return &mGameplayState;
 	}
 
+	static SDL_Renderer* renderer;
 protected:
 	GameplayState() {}
 
 private:
 	static GameplayState mGameplayState;
-	static SDL_Renderer* renderer;
 
 };

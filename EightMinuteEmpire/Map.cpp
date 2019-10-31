@@ -1,6 +1,8 @@
 #include <string>
 #include <iostream>
 #include "Map.h"
+#include "TextureLoader.h"
+
 
 using std::string;
 using std::cout;
@@ -13,51 +15,51 @@ namespace GraphWorld
 		Country* country;
 		LinkedList* adjacencyList;
 
-		public:
-			Node()
-			{
-				country = NULL;
-				adjacencyList = new LinkedList(NULL);
-			}
+	public:
+		Node()
+		{
+			country = NULL;
+			adjacencyList = new LinkedList(NULL);
+		}
 
-			void setCountry(Country* country)
-			{
-				this->country = country;
-			}
+		void setCountry(Country* country)
+		{
+			this->country = country;
+		}
 
-			void addAdjacentCountry(Country* country, bool naval)
-			{
-				adjacencyList->add(0, country, naval);
-			}
+		void addAdjacentCountry(Country* country, bool naval)
+		{
+			adjacencyList->add(0, country, naval);
+		}
 
-			Country* getCountry()
-			{
-				return country;
-			}
+		Country* getCountry()
+		{
+			return country;
+		}
 
-			LinkedList* getAdjacencyList()
-			{
-				return adjacencyList;
-			}
+		LinkedList* getAdjacencyList()
+		{
+			return adjacencyList;
+		}
 
-			void displayNode()
+		void displayNode()
+		{
+			cout << "COUNTRY IN NODE:\n";
+			if (country != NULL)
 			{
-				cout << "COUNTRY IN NODE:\n";
-				if (country != NULL)
-				{
-					cout << country->displayCountry() + "";
-					cout << "--Adjacent List--\n";
-					adjacencyList->displayLinkedList();
-				}
-				else
-					cout << "Nothing in the Node!\n";
+				cout << country->displayCountry() + "";
+				cout << "--Adjacent List--\n";
+				adjacencyList->displayLinkedList();
 			}
+			else
+				cout << "Nothing in the Node!\n";
+		}
 
-			~Node()
-			{
-				delete country;
-				delete adjacencyList;
-			}
+		~Node()
+		{
+			delete country;
+			delete adjacencyList;
+		}
 	};
 
 	Map::Map(string* mapName, int numCountries, int numContinents)
@@ -150,6 +152,18 @@ namespace GraphWorld
 		return *size;
 	}
 
+	TileMap* GraphWorld::Map::getTileMap()
+	{
+		return tileMap;
+	}
+
+
+	void GraphWorld::Map::setTileMap(TileMap* tm)
+	{
+		tileMap = tm;
+	}
+
+
 	Map::~Map()
 	{
 		mapName.clear();
@@ -231,7 +245,7 @@ namespace GraphWorld
 		string s2 = (*mIsStartCountry) ? "true\n" : "false\n";
 		string s3 = (*mIsNavalCountry) ? "true\n" : "false\n";
 		string s4 = "Continent: " + continent + "\n";
-		return s1 + "StartingCountry: " + s2 + "NavalCountry: " +s3 + s4;
+		return s1 + "StartingCountry: " + s2 + "NavalCountry: " + s3 + s4;
 	}
 
 	Country::~Country()
@@ -249,66 +263,66 @@ namespace GraphWorld
 		Node* previous;
 		bool* mRequiresNaval;
 
-		public:
-			Node(Country* country, bool naval)
-			{
-				this->mRequiresNaval = new bool(naval);
-				if (country == NULL)
-					this->country = NULL;
-				else
-					this->country = country;
-				next = NULL;
-				previous = NULL;
-			}
-
-			Node(Country* country, Node* next, Node* previous, bool naval)
-			{
-				this->mRequiresNaval = new bool(naval);
+	public:
+		Node(Country* country, bool naval)
+		{
+			this->mRequiresNaval = new bool(naval);
+			if (country == NULL)
+				this->country = NULL;
+			else
 				this->country = country;
-				this->next = next;
-				this->previous = previous;
-			}
+			next = NULL;
+			previous = NULL;
+		}
 
-			Node* getNext()
-			{
-				return next;
-			}
+		Node(Country* country, Node* next, Node* previous, bool naval)
+		{
+			this->mRequiresNaval = new bool(naval);
+			this->country = country;
+			this->next = next;
+			this->previous = previous;
+		}
 
-			Node* getPrev()
-			{
-				return previous;
-			}
+		Node* getNext()
+		{
+			return next;
+		}
 
-			void setNext(Node* addMe)
-			{
-				next = addMe;
-			}
+		Node* getPrev()
+		{
+			return previous;
+		}
 
-			void setPrev(Node* addMe)
-			{
-				previous = addMe;
-			}
+		void setNext(Node* addMe)
+		{
+			next = addMe;
+		}
 
-			Country* getCountry()
-			{
-				return country;
-			}
+		void setPrev(Node* addMe)
+		{
+			previous = addMe;
+		}
 
-			bool requiresNavalPassage()
-			{
-				return *mRequiresNaval;
-			}
+		Country* getCountry()
+		{
+			return country;
+		}
 
-			void displayNode()
-			{
-				cout << "COUNTRY:\n" + country->displayCountry()
-					<< "Requires naval passge: " << ((*mRequiresNaval) ? "Yes\n\n" : "No\n\n");
-			}
+		bool requiresNavalPassage()
+		{
+			return *mRequiresNaval;
+		}
 
-			~Node()
-			{
-				delete country;
-			}
+		void displayNode()
+		{
+			cout << "COUNTRY:\n" + country->displayCountry()
+				<< "Requires naval passge: " << ((*mRequiresNaval) ? "Yes\n\n" : "No\n\n");
+		}
+
+		~Node()
+		{
+			delete country;
+		}
 	};
 
 	LinkedList::LinkedList(Country* country)
@@ -522,5 +536,58 @@ namespace GraphWorld
 		}
 		*size = 0;
 	}
-}
 
+
+	// Graphical Tile Map
+
+	TileMap::TileMap()
+	{
+		src.h = dest.h = 32;
+		src.w = dest.w = 32;
+
+		src.x = 0;
+		src.y = 0;
+
+		dest.x = 0;
+		dest.y = 0;
+
+	}
+
+	TileMap::~TileMap()
+	{
+	}
+
+
+	void TileMap::drawTileMap(SDL_Renderer* renderer, SDL_Texture* texture)
+	{
+		int type;
+
+		for (int row = 0; row < 20; row++)
+		{
+			for (int col = 0; col < 32; col++)
+			{
+				type = tiles[row][col];
+				std::string s = std::to_string(type);
+				int digit = s.at(0) - '0';
+
+				if (type < 10)
+				{
+					src.y = 0;
+					src.x = digit * 32;
+				}					
+				else
+				{
+					src.y = digit * 32;
+					src.x = stoi(&s[1]) * 32;
+				}
+
+				dest.x = col * 32;
+				dest.y = row * 32;
+				//std::cout << "xSrc: " << src.x << " ySrc:" << src.y << endl;
+				//std::cout << "xDest: " << dest.x << " yDest:" << dest.y << endl;
+				TextureLoader::draw(renderer, texture, src, dest);
+			}
+		}
+	}
+
+}

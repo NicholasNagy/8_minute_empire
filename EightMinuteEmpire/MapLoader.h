@@ -5,7 +5,6 @@
 #include <regex>
 #include "Map.h"
 
-
 class MapLoader
 {
 public:
@@ -18,13 +17,14 @@ public:
 	int getNumContinents();
 	void setMapPath(string* path);
 	static MapLoader* initiateMapPicker();
-	bool load( GraphWorld::Map* map);
+	bool load( GraphWorld::Map* map, GraphWorld::TileMap* tileMap, int sizeX, int sizeY);
 	bool initMap(std::ifstream& inputMapFile);
 	static std::string getMapsDir();
 	static std::vector<std::string> getInstalledMaps();
 	static void selectMap();
 	static std::string selectedMap;
 	friend std::ostream& operator<<(std::ostream&, const MapLoader&);
+	static bool loadTileMap(GraphWorld::Map* map, GraphWorld::TileMap* tileMap, int sizeX, int sizeY);
 
 private:
 	string mapPath;

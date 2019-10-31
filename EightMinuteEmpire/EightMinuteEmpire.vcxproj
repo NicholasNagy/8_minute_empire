@@ -185,7 +185,10 @@
     <None Include="Maps\Starfall_Crater.map" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="assets\country.png" />
     <Image Include="assets\p1.png" />
+    <Image Include="assets\TileMaps\Ancient_KingdomSet.png" />
+    <Image Include="assets\water.png" />
     <Image Include="Maps\Images\Ancient_Kingdom_Image.jpg" />
     <Image Include="Maps\Images\Archipelago_of_Azra.png" />
     <Image Include="Maps\Images\Isthmus_of_Gom_Image.png" />
@@ -194,6 +197,9 @@
     <Image Include="Maps\Images\Starfall_Crater_Image.png" />
     <Image Include="Maps\Images\Old_Europe_Image.jpg" />
     <Image Include="Res\logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="assets\TileMaps\Ancient_Kingdom.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

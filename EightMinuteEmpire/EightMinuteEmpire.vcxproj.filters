@@ -25,6 +25,9 @@
     <Filter Include="Resource Files\assets">
       <UniqueIdentifier>{e28e80b3-816a-41bc-bcc0-9960a7907a00}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\assets\TileMaps">
+      <UniqueIdentifier>{af3c7670-06c8-4744-8bba-1a4be7c20a5b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="driver.cpp">
@@ -219,5 +222,19 @@
     <Image Include="assets\p1.png">
       <Filter>Resource Files\assets</Filter>
     </Image>
+    <Image Include="assets\country.png">
+      <Filter>Resource Files\assets</Filter>
+    </Image>
+    <Image Include="assets\water.png">
+      <Filter>Resource Files\assets</Filter>
+    </Image>
+    <Image Include="assets\TileMaps\Ancient_KingdomSet.png">
+      <Filter>Resource Files\assets\TileMaps</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="assets\TileMaps\Ancient_Kingdom.txt">
+      <Filter>Resource Files\assets\TileMaps</Filter>
+    </Text>
   </ItemGroup>
 </Project>
