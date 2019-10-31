@@ -118,7 +118,7 @@ void Game::setMap(GraphWorld::Map* map)
 	this->map = map;
 }
 
-std::vector<Player*> Game::players()
+std::vector<Player>& Game::players()
 {
 	return mPlayers;
 }

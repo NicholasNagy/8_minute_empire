@@ -17,6 +17,11 @@ std::vector<bool> GameSetupState::players = { true, true, false, false, false };
 std::vector<int> GameSetupState::ages = { 18, 18, 18, 18, 18 };
 bool GameSetupState::mapLoaded = false;
 
+const int TWO_PLAYER_COIN_PURSE = 14;
+const int THREE_PLAYER_COIN_PURSE = 11;
+const int FOUR_PLAYER_COIN_PURSE = 9;
+const int FIVE_PLAYER_COIN_PURSE = 8;
+
 void GameSetupState::init(Game* game)
 {
 	renderer = SDL_CreateRenderer(game->getWindow(), -1, SDL_RENDERER_ACCELERATED);
@@ -240,6 +245,8 @@ void GameSetupState::handlePlayerPicker(Game* game)
 	ages[3] = age4;
 	ages[4] = age5;
 
+
+
 	ImGui::End();
 }
 
@@ -264,7 +271,12 @@ void GameSetupState::handleGameStart(Game* game)
 	ImGui::PopStyleColor(3);
 	ImGui::End();
 	if (select)
+	{
+
+		setupPlayers(game);
 		game->changeState(GameplayState::Instance());
+	}
+		
 }
 
 bool GameSetupState::initMapLoader(Game* game)
@@ -296,4 +308,61 @@ bool GameSetupState::initMapLoader(Game* game)
 
 	return false;
 	}
+}
+
+void GameSetupState::setupPlayers(Game* game)
+{
+	std::string name;
+	for (int i = 0; i < players.size(); i++)
+	{
+		name = "Player " + to_string(i);
+		if (players[i])
+		{
+		Player* p = new Player(&name, ages[i]);
+			game->players().push_back(*p);
+		}
+	}
+	assignCoins(game);
+	
+}
+
+void GameSetupState::assignCoins(Game* game)
+{
+
+	std::vector players = game->players();
+	const int numPlayers = players.size();
+
+		switch (numPlayers)
+		{
+		case 2:
+			game->players().at(0).setCoinPurse(TWO_PLAYER_COIN_PURSE);
+			game->players().at(1).setCoinPurse(TWO_PLAYER_COIN_PURSE);
+			break;
+		case 3:
+			game->players().at(0).setCoinPurse(THREE_PLAYER_COIN_PURSE);
+			game->players().at(1).setCoinPurse(THREE_PLAYER_COIN_PURSE);
+			game->players().at(2).setCoinPurse(THREE_PLAYER_COIN_PURSE);
+			break;
+		case 4:
+			game->players().at(0).setCoinPurse(FOUR_PLAYER_COIN_PURSE);
+			game->players().at(1).setCoinPurse(FOUR_PLAYER_COIN_PURSE);
+			game->players().at(2).setCoinPurse(FOUR_PLAYER_COIN_PURSE);
+			game->players().at(3).setCoinPurse(FOUR_PLAYER_COIN_PURSE);
+			break;
+		case 5:
+			game->players().at(0).setCoinPurse(FIVE_PLAYER_COIN_PURSE);
+			game->players().at(1).setCoinPurse(FIVE_PLAYER_COIN_PURSE);
+			game->players().at(2).setCoinPurse(FIVE_PLAYER_COIN_PURSE);
+			game->players().at(3).setCoinPurse(FIVE_PLAYER_COIN_PURSE);
+			game->players().at(4).setCoinPurse(FIVE_PLAYER_COIN_PURSE);
+			break;
+
+		default:
+			break;
+		}
+
+
+
+
+
 }

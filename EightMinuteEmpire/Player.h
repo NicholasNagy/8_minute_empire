@@ -12,10 +12,13 @@ public:
 	~Player();
 	int getMoney();
 	string getName();
+	void setName(std::string s);
 	int* getOwnedCountries();
 	int* getOwnedCities();
 	int getAge();
+	void setAge(int age);
 	void PayCoin(int amount);
+	void setCoinPurse(int amount);
 	void PlaceNewArmies(int numberOfArmies, int Country);
 	void MoveArmies(int numberOfArmies, int StartPosition, int EndPosition);
 	void MoveOverLand(int numberOfArmies, int StartPosition, int EndPosition);

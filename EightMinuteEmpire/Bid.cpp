@@ -5,6 +5,11 @@
 #include <algorithm>
 #include <conio.h>
 
+const int TWO_PLAYER_COIN_PURSE = 14;
+const int THREE_PLAYER_COIN_PURSE = 11;
+const int FOUR_PLAYER_COIN_PURSE = 9;
+const int FIVE_PLAYER_COIN_PURSE = 8;
+
 
 Bid::Bid(Player* p, int amountBid)
 {
@@ -12,10 +17,32 @@ Bid::Bid(Player* p, int amountBid)
 	this->amount = new int(amountBid);
 }
 
-Player* Bid::initiateBidding(Player players[], const int numPlayers)
+Player* Bid::initiateBidding(Game* game)
 {
 	using namespace std;
 
+	
+	std::vector<Player> players = game->players();
+	int numPlayers = players.size();
+	int bidLimit;
+
+	switch (numPlayers)
+	{
+	case 2:
+		bidLimit = TWO_PLAYER_COIN_PURSE;
+		break;
+	case 3:
+		bidLimit = THREE_PLAYER_COIN_PURSE;
+		break;
+	case 4:
+		bidLimit = FOUR_PLAYER_COIN_PURSE;
+		break;
+	case 5:
+		bidLimit = FIVE_PLAYER_COIN_PURSE;
+		break;
+	default:
+		break;
+	}
 	std::vector<Bid> bids;
 	bids.reserve(numPlayers);
 
@@ -23,7 +50,7 @@ Player* Bid::initiateBidding(Player players[], const int numPlayers)
 
 	for (auto i = 0; i < numPlayers; i++)
 	{
-		cout << endl << players[i].getName() << " enter the amount you wish to bid: " << endl;
+		cout << endl << players.at(i).getName() << " enter the amount you wish to bid: " << endl;
 
 		int x;
 		string in;
@@ -48,17 +75,17 @@ Player* Bid::initiateBidding(Player players[], const int numPlayers)
 			}
 			if (x == '\r' && in.size() > 0)
 			{
-				if ((stoi(in) < 0) || (stoi(in) > 20))
+				if ((stoi(in) < 0) || (stoi(in) > bidLimit))
 				{
-					cout << "\nPlease enter a value between 0 and 20:\n";
+					cout << "\nPlease enter a value between 0 and " << bidLimit << ".\n";
 					in.clear();
 					continue;
 				}
 				break;
 			}
 		}
-		cout << "\nConsole: " << players[i].getName() << " has bid." << endl;
-		Bid bid(&players[i], stoi(in));
+		cout << "\nConsole: " << players.at(i).getName() << " has bid." << endl;
+		Bid bid(&players.at(i), stoi(in));
 		bids.push_back(bid);
 	}
 	cout << "\nAll players have bid. The amounts were:\n";
@@ -94,10 +121,10 @@ Player* Bid::tallyBids(std::vector<Bid>* bids)
 	else
 		winner = bids->at(0).player;
 
-	cout << endl << winner->getName() << " has won the bidding! They shall chose who plays first.\n";
-	/*	winner->PayCoin(*bids->at(0).amount);
+	cout << endl << winner->getName() << " has won the bidding! They shall chose who plays first.\n\n";
+		winner->PayCoin(*bids->at(0).amount);
 		cout << *bids->at(0).amount << " coins has been deducted from " << winner->getName() << ".\n";
-		*/
+		
 
 	return winner;
 }

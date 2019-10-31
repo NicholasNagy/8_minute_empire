@@ -22,7 +22,7 @@ public:
 		void popState();
 		void pushState(GameState* state);
 		void setMap(GraphWorld::Map* map);
-		std::vector<Player*> players(); //get vector of players
+		std::vector<Player>& players(); //get vector of players
 		GraphWorld::Map* getMap();
 		SDL_Window* getWindow();
 		void setWindow(SDL_Window*);
@@ -32,7 +32,7 @@ private:
 	SDL_Window* window;
 	std::vector<GameState*> states;
 	GraphWorld::Map* map;
-	std::vector<Player*> mPlayers;
+	std::vector<Player> mPlayers;
 
 };
 

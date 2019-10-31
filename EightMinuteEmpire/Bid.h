@@ -1,12 +1,13 @@
 #pragma once
 #include "Player.h"
+#include "Game.h"
 #include <vector>
 
 class Bid
 {
 public:
 	Bid(Player* player, int amountBid);
-	static Player* initiateBidding(Player players[], const int numPlayers);
+	static Player* initiateBidding(Game* game);
 	friend std::ostream& operator<<(std::ostream&, const Bid&);
 
 private:

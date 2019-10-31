@@ -5,6 +5,7 @@
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_sdl.h"
 #include "Map.h"
+#include "Bid.h"
 
 GameplayState GameplayState::mGameplayState;
 SDL_Renderer* GameplayState::renderer = nullptr;
@@ -30,7 +31,11 @@ void GameplayState::init(Game* game)
 	texture = TextureLoader::loadTexutre("assets/TileMaps/Ancient_KingdomSet.png", renderer);
 	map = game->getMap();
 	numCountries = map->getNumCountries();
-
+	game->getMap()->getTileMap()->drawTileMap(renderer, texture);
+	SDL_RenderPresent(renderer);
+	Bid::initiateBidding(game);
+	for (auto p : game->players())
+		cout << p << endl;
 }
 
 void GameplayState::pause()

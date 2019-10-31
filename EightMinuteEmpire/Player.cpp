@@ -53,6 +53,11 @@ string Player::getName()
 	return name;
 }
 
+void Player::setName(std::string s)
+{
+	name = s;
+}
+
 int* Player::getOwnedCities() {
 	return ownedCities;
 }
@@ -66,8 +71,18 @@ int Player::getAge()
 	return *age;
 }
 
+void Player::setAge(int age)
+{
+	*this->age = age;
+}
+
 void Player::PayCoin(int amount) {
 	*money -= amount;
+}
+
+void Player::setCoinPurse(int amount)
+{
+	*money = amount;
 }
 
 void Player::PlaceNewArmies(int numberOfArmies, int Country) {

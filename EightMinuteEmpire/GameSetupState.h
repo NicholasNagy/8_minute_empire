@@ -31,4 +31,6 @@ private:
 	static void handlePlayerPicker(Game* game);
 	static void handleGameStart(Game* game);
 	static bool initMapLoader(Game* game);
+	static void setupPlayers(Game* game);
+	static void assignCoins(Game* game);
 };
