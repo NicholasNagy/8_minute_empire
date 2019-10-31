@@ -225,7 +225,6 @@ void MapLoader::selectMap()
 		 for (int col = 0; col < sizeCol; col++)
 		 {
 			 tileMapFile >> tileID;
-			 std::cout << tileID <<endl;
 			 if (tileID < 0)
 			 {
 				cout << "Error loading tile map. " << endl;

@@ -22,11 +22,11 @@ bool mouseHover = false;
 void GameplayState::init(Game* game)
 {
 	std::cout << "Game Started\n\n-------------------------------------------------\n\n";
-	SDL_Window* gameWindow = SDL_CreateWindow("Eight Minute Empire", 0, SDL_WINDOWPOS_CENTERED, 1600, 640, SDL_WINDOW_SHOWN );
+	SDL_Window* gameWindow = SDL_CreateWindow("Eight Minute Empire", 0, SDL_WINDOWPOS_CENTERED, 1280, 640, SDL_WINDOW_SHOWN );
 	game->setWindow(gameWindow);
 	renderer = SDL_CreateRenderer(game->getWindow(), -1, SDL_RENDERER_ACCELERATED);
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-	SDL_RenderSetLogicalSize(renderer, 1600, 640);
+	SDL_RenderSetLogicalSize(renderer, 1280, 640);
 	texture = TextureLoader::loadTexutre("assets/TileMaps/Ancient_KingdomSet.png", renderer);
 	map = game->getMap();
 	numCountries = map->getNumCountries();
