@@ -11,6 +11,13 @@ https://gamedev.stackexchange.com/questions/72878/how-can-i-implement-a-main-men
 
 */
 
+int WINDOW_X = 1280;
+int WINDOW_X_SMALL = 800;
+int WINDOW_Y = 640;
+int GRID_CELL_SIZE = 32;
+int MAP_WIDTH = 32;
+int MAP_HEIGHT = 20;
+
 Game::Game() : mIsRunning(false), window(nullptr), map(nullptr) {}
 
 Game::~Game()
@@ -127,6 +134,17 @@ GraphWorld::Map* Game::getMap()
 {
 	return map;
 }
+
+MapLoader* Game::getMapLoader()
+{
+	return mapLoader;
+}
+
+void Game::setMapLoader(MapLoader* m)
+{
+	mapLoader = m;
+}
+
 
 SDL_Window* Game::getWindow()
 {

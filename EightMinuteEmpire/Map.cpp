@@ -542,8 +542,8 @@ namespace GraphWorld
 
 	TileMap::TileMap()
 	{
-		src.h = dest.h = 32;
-		src.w = dest.w = 32;
+		src.h = dest.h = GRID_CELL_SIZE;
+		src.w = dest.w = GRID_CELL_SIZE;
 
 		src.x = 0;
 		src.y = 0;
@@ -562,9 +562,9 @@ namespace GraphWorld
 	{
 		int type;
 
-		for (int row = 0; row < 20; row++)
+		for (int row = 0; row < MAP_HEIGHT; row++)
 		{
-			for (int col = 0; col < 32; col++)
+			for (int col = 0; col < MAP_WIDTH; col++)
 			{
 				type = tiles[row][col];
 				std::string s = std::to_string(type);
@@ -573,19 +573,19 @@ namespace GraphWorld
 				if (type < 10)
 				{
 					src.y = 0;
-					src.x = digit * 32;
+					src.x = digit * GRID_CELL_SIZE;
 				}					
 				else
 				{
-					src.y = digit * 32;
-					src.x = stoi(&s[1]) * 32;
+					src.y = digit * GRID_CELL_SIZE;
+					src.x = stoi(&s[1]) * GRID_CELL_SIZE;
 				}
 
-				dest.x = col * 32;
-				dest.y = row * 32;
+				dest.x = col * GRID_CELL_SIZE;
+				dest.y = row * GRID_CELL_SIZE;
 				//std::cout << "xSrc: " << src.x << " ySrc:" << src.y << endl;
 				//std::cout << "xDest: " << dest.x << " yDest:" << dest.y << endl;
-				TextureLoader::draw(renderer, texture, src, dest);
+				TextureLoader::draw(renderer, texture, &src, &dest);
 			}
 		}
 	}

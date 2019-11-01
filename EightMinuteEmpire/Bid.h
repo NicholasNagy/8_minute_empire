@@ -3,6 +3,7 @@
 #include "Game.h"
 #include <vector>
 
+
 class Bid
 {
 public:

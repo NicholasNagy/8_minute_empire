@@ -132,6 +132,7 @@
     <ClCompile Include="CardsDriver.cpp" />
     <ClCompile Include="driver.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameOverlay.cpp" />
     <ClCompile Include="GameplayState.cpp" />
     <ClCompile Include="GameSetupState.cpp" />
     <ClCompile Include="GameState.cpp" />
@@ -154,6 +155,7 @@
     <ClInclude Include="Bid.h" />
     <ClInclude Include="Cards.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameOverlay.h" />
     <ClInclude Include="GameplayState.h" />
     <ClInclude Include="GameSetupState.h" />
     <ClInclude Include="GameState.h" />

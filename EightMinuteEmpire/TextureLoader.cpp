@@ -9,7 +9,7 @@ SDL_Texture* TextureLoader::loadTexutre(const char* texture, SDL_Renderer* rende
 	return tex;
 }
 
-void TextureLoader::draw(SDL_Renderer* renderer, SDL_Texture* texture, SDL_Rect src, SDL_Rect dest)
+ void TextureLoader::draw(SDL_Renderer* renderer, SDL_Texture* texture, SDL_Rect* src, SDL_Rect* dest)
 {
-	SDL_RenderCopy(renderer, texture, &src, &dest);
+	SDL_RenderCopy(renderer, texture, src, dest);
 }

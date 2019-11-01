@@ -292,13 +292,13 @@ bool GameSetupState::initMapLoader(Game* game)
 	game->setMap(map);
 	GraphWorld::TileMap* tileMap = new GraphWorld::TileMap();
 	map->setTileMap(tileMap);
+	game->setMapLoader(mapLoader);
 
-		if ( mapLoader->load(map, tileMap, 20, 32 ) )
+		if ( mapLoader->load(map, tileMap, MAP_HEIGHT, MAP_WIDTH ) )
 		{
 			map->printMap();
 			std::cout << "Map Successfully loaded." << std::endl;
 			mapLoaded = true;
-			delete mapLoader;
 			return true;
 		}
 
@@ -313,13 +313,15 @@ bool GameSetupState::initMapLoader(Game* game)
 void GameSetupState::setupPlayers(Game* game)
 {
 	std::string name;
+	int x = 1;
 	for (int i = 0; i < players.size(); i++)
 	{
-		name = "Player " + to_string(i);
+		name = "Player " + to_string(x);
 		if (players[i])
 		{
 		Player* p = new Player(&name, ages[i]);
-			game->players().push_back(*p);
+		game->players().push_back(*p);
+		x++;
 		}
 	}
 	assignCoins(game);

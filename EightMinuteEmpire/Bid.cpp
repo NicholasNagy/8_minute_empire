@@ -123,7 +123,7 @@ Player* Bid::tallyBids(std::vector<Bid>* bids)
 
 	cout << endl << winner->getName() << " has won the bidding! They shall chose who plays first.\n\n";
 		winner->PayCoin(*bids->at(0).amount);
-		cout << *bids->at(0).amount << " coins has been deducted from " << winner->getName() << ".\n";
+		cout << *bids->at(0).amount << " coins has been deducted from " << winner->getName() << ".\n\n";
 		
 
 	return winner;

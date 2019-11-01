@@ -16,6 +16,8 @@ public:
 	int getNumCountries();
 	int getNumContinents();
 	void setMapPath(string* path);
+	void setTileSetPath(string* path);
+	std::string getTileSetPath();
 	static MapLoader* initiateMapPicker();
 	bool load( GraphWorld::Map* map, GraphWorld::TileMap* tileMap, int sizeX, int sizeY);
 	bool initMap(std::ifstream& inputMapFile);
@@ -24,14 +26,19 @@ public:
 	static void selectMap();
 	static std::string selectedMap;
 	friend std::ostream& operator<<(std::ostream&, const MapLoader&);
-	static bool loadTileMap(GraphWorld::Map* map, GraphWorld::TileMap* tileMap, int sizeX, int sizeY);
+	
+
 
 private:
 	string mapPath;
 	string mapName;
+	string tileSetPath;
 	int* numCountries;
 	int* numContinents;
 	static bool isStartingCountrySet;
+
+	static bool fileExists(const std::string path);
+	bool loadTileMap(GraphWorld::Map* map, GraphWorld::TileMap* tileMap, int sizeX, int sizeY);
 
 	class Parser 
 	{

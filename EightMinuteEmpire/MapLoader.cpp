@@ -11,6 +11,7 @@
 bool MapLoader::isStartingCountrySet = false;
 std::vector<std::string> MapLoader::Parser::vContinents;
 std::string MapLoader::selectedMap;
+const std::string tileMapDir = "assets/TileMaps/";
 
 MapLoader::MapLoader()
 {
@@ -19,7 +20,7 @@ MapLoader::MapLoader()
 }
 
 
-MapLoader::MapLoader(string* mapPath, string* mapName, int numCountries, int numContinents)
+MapLoader::MapLoader(string* mapPath, string* mapName, int numCountries, int numContinents )
 {
 	this->mapPath = string(*mapPath);
 	this->mapName = string(*mapName);
@@ -54,8 +55,20 @@ int MapLoader::getNumContinents()
 
 void MapLoader::setMapPath(string* path)
 {
-	this->mapPath.clear();
+	mapPath.clear();
 	this->mapPath = *path;
+}
+
+void MapLoader::setTileSetPath(string* path)
+{
+	tileSetPath.clear();
+	this->tileSetPath = string(*path);
+}
+
+std::string MapLoader::getTileSetPath()
+{
+	
+	return tileSetPath;
 }
 
 
@@ -64,6 +77,7 @@ MapLoader::~MapLoader()
 {
 	mapPath.clear();
 	mapName.clear();
+	tileSetPath.clear();
 	delete numCountries;
 	delete numContinents;
 }
@@ -207,40 +221,64 @@ void MapLoader::selectMap()
 	 return true;
  }
 
+ bool MapLoader::fileExists(const std::string path)
+ {
+	 std::fstream fs(path.c_str());
+	 return fs.good();
+ }
+
  bool MapLoader::loadTileMap(GraphWorld::Map* map, GraphWorld::TileMap* tileMap, int sizeRow, int sizeCol)
  {
 	 using namespace std;
 
+	 
+	 string tileMapPath = tileMapDir + map->getMapName() + ".txt";
+	 bool tileMapFileExits = fileExists(tileMapPath);
 
-	 fstream tileMapFile;
-	 tileMapFile.open("assets/TileMaps/Ancient_Kingdom.txt");
-	 cout << "Loading tile map for: " << map->getMapName() << endl;
-	 std::string tile;
-	 int tileID = 0;
-
-	
-	 char c;
-	 for (int row = 0; row < sizeRow; row++)
+	 if (!tileMapFileExits)
 	 {
-		 for (int col = 0; col < sizeCol; col++)
-		 {
-			 tileMapFile >> tileID;
-			 if (tileID < 0)
-			 {
-				cout << "Error loading tile map. " << endl;
-				cout << tileID << " on line: " << row << " column: " << col << " is invalid." << endl;
-				tileMapFile.close();
-				return false;
-		     }
-			 tileMap->tiles[row][col] = tileID;
-			 tileMapFile.ignore();
-			 
-		 }
+		 cout << "Could not find Tile Map file: " << tileMapPath << endl;
+		 return false;
 	 }
 
-	 tileMapFile.close();
-	 cout << "Successfully loaded tile map!" << endl;
-	 return true;
+	 string tileSetPath = tileMapDir + map->getMapName() + "Set.png";
+	 bool tileSetFileExists = fileExists(tileSetPath);
+
+	 if (!tileSetFileExists)
+	 {
+		 
+		 cout << "Could not find Tile Set file: " << tileSetPath << endl;
+		 return false;
+	 }
+		 this->setTileSetPath(&tileSetPath);
+		 fstream tileMapFile;
+		 tileMapFile.open(tileMapPath);
+		 cout << "Loading tile map for: " << map->getMapName() << endl;
+		 std::string tile;
+		 int tileID = 0;
+
+		 char c;
+		 for (int row = 0; row < sizeRow; row++)
+		 {
+			 for (int col = 0; col < sizeCol; col++)
+			 {
+				 tileMapFile >> tileID;
+				 if (tileID < 0)
+				 {
+					 cout << "Error loading tile map. " << endl;
+					 cout << tileID << " on line: " << row << " column: " << col << " is invalid." << endl;
+					 tileMapFile.close();
+					 return false;
+				 }
+				 tileMap->tiles[row][col] = tileID;
+				 tileMapFile.ignore();
+
+			 }
+		 }
+
+		 tileMapFile.close();
+		 cout << "Successfully loaded tile map!" << endl;
+		 return true;
  }
 
 

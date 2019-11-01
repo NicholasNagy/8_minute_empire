@@ -17,7 +17,7 @@ void MainMenuState::init(Game* game)
 {
 	renderer = SDL_CreateRenderer(game->getWindow(), -1, SDL_RENDERER_ACCELERATED);
 	ImGui::CreateContext();
-	ImGuiSDL::Initialize(renderer, 800, 640);
+	ImGuiSDL::Initialize(renderer, WINDOW_X_SMALL, WINDOW_Y);
 	logoTexture = TextureLoader::loadTexutre("assets/logo.png", renderer);
 
 	
@@ -86,7 +86,7 @@ void MainMenuState::draw(Game* game)
 {
 
 	SDL_RenderClear(renderer);
-	SDL_Rect logo_pos = { 800 / 4, 100 / 4, 800 / 2, 640 / 2 };
+	SDL_Rect logo_pos = { WINDOW_X_SMALL / 4, 100 / 4, WINDOW_X_SMALL / 2, WINDOW_Y / 2 };
 	SDL_RenderCopy(renderer, logoTexture, NULL, &logo_pos);
 
 

@@ -2,7 +2,15 @@
 #include "SDL.h"
 #include "Map.h"
 #include "Player.h"
+#include "MapLoader.h"
 #include <vector>
+
+extern int WINDOW_X;
+extern int WINDOW_X_SMALL;
+extern int WINDOW_Y;
+extern int GRID_CELL_SIZE;
+extern int MAP_WIDTH; //number of columns 
+extern int MAP_HEIGHT; //number of rows
 
 class GameState;
 
@@ -24,6 +32,8 @@ public:
 		void setMap(GraphWorld::Map* map);
 		std::vector<Player>& players(); //get vector of players
 		GraphWorld::Map* getMap();
+		MapLoader* getMapLoader();
+		void setMapLoader(MapLoader*);
 		SDL_Window* getWindow();
 		void setWindow(SDL_Window*);
 
@@ -31,8 +41,10 @@ private:
 	bool mIsRunning;
 	SDL_Window* window;
 	std::vector<GameState*> states;
+	MapLoader* mapLoader;
 	GraphWorld::Map* map;
 	std::vector<Player> mPlayers;
+
 
 };
 
