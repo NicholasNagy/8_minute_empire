@@ -31,16 +31,19 @@ Label::~Label()
 void Label::setLabelText(SDL_Renderer* renderer, std::string text, TTF_Font* font)
 {
 	this->text = text;
-	SDL_Surface* surface = TTF_RenderText_Blended_Wrapped(font, text.c_str(), color, MAP_WIDTH*GRID_CELL_SIZE);
-	texture = SDL_CreateTextureFromSurface(renderer, surface);
-	SDL_FreeSurface(surface);
-
+	SDL_Surface* s = TTF_RenderText_Blended_Wrapped(font, text.c_str(), color, MAP_WIDTH*GRID_CELL_SIZE);
+	texture = SDL_CreateTextureFromSurface(renderer, s);
+	SDL_FreeSurface(s);
 	SDL_QueryTexture(texture, nullptr, nullptr, &position.w, &position.h);
-
 }
 
 void  Label::drawLabel(SDL_Renderer* renderer)
 {
 	TextureLoader::draw(renderer,texture, nullptr, &position);
+}
+
+void Label::destroyLabelTexture()
+{
+	SDL_DestroyTexture(texture);
 }
 

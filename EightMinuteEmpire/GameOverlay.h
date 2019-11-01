@@ -27,7 +27,7 @@ public:
 	~Label();
 	void setLabelText(SDL_Renderer* renderer, std::string text, TTF_Font* font);
 	void drawLabel(SDL_Renderer* renderer);
-
+	void destroyLabelTexture();
 
 private:
 	std::string text;

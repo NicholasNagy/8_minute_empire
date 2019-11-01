@@ -19,6 +19,7 @@ SDL_Rect cursorShadow = { cursor.x, cursor.y, GRID_CELL_SIZE, GRID_CELL_SIZE };
 SDL_Color cursorShadowColor = { 107, 107, 107, 107 };
 bool mouseActive = false;
 bool mouseHover = false;
+bool selectedCountry = false;
 
 GraphWorld::Map* gameMap;
 GraphWorld::Country* country = nullptr;
@@ -56,17 +57,21 @@ void GameplayState::init(Game* game)
 		std::cout << "TTF_Init: %s\n" << TTF_GetError();
 		exit(2);
 	}
-
+	string bidding = "Biding initiated in console!";
 	ui.addFonts("assets/Fonts/unispace bd.ttf", "unispace bd", 18);
 	SDL_Color black = { 0,0,0,0 };
-	label = new Label("TESTING", "unispace bd", 0, 0, black);
-	label->setLabelText(renderer,"TESTING", ui.getFont("unispace bd"));
+	label = new Label(bidding, "unispace bd", 0, 0, black);
+	label->setLabelText(renderer,bidding, ui.getFont("unispace bd"));
+	label->drawLabel(renderer);
 	SDL_RenderPresent(renderer);
 
 	//Bidding
 	Bid::initiateBidding(game);
 	for (auto p : game->players())
 		cout << p << endl;
+
+	label->destroyLabelTexture();
+	
 }
 
 void GameplayState::pause()
@@ -117,7 +122,10 @@ void GameplayState::handleEvents(Game* game)
 			if (type < numCountries && type >= 0)
 				country = gameMap->getCountry(type);
 			if (country)
+			{
+				selectedCountry = true;
 				std::cout << "Selected: " << country->displayCountry() << std::endl;
+			}
 		}
 		break;
 	case SDL_MOUSEMOTION:
@@ -158,10 +166,12 @@ void GameplayState::draw(Game* game)
 void GameplayState::update(Game* game)
 {
 	std::stringstream ss;
-	if (country)
+	if (country && selectedCountry)
 	{
+		label->destroyLabelTexture();
+		selectedCountry = false;
 		ss << "Selected: " << country->displayCountry();
-	//	label->setLabelText(renderer, ss.str(), ui.getFont("unispace bd"));
+		label->setLabelText(renderer, ss.str(), ui.getFont("unispace bd"));
 	}
 
 }
