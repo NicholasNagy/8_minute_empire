@@ -13,8 +13,6 @@
 GameplayState GameplayState::mGameplayState;
 SDL_Renderer* GameplayState::renderer = nullptr;
 
-
-
 SDL_Texture* texture = nullptr;
 SDL_Rect cursor;
 SDL_Rect cursorShadow = { cursor.x, cursor.y, GRID_CELL_SIZE, GRID_CELL_SIZE };
@@ -163,7 +161,7 @@ void GameplayState::update(Game* game)
 	if (country)
 	{
 		ss << "Selected: " << country->displayCountry();
-		label->setLabelText(renderer, ss.str(), ui.getFont("unispace bd"));
+	//	label->setLabelText(renderer, ss.str(), ui.getFont("unispace bd"));
 	}
 
 }
