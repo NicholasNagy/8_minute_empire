@@ -28,11 +28,12 @@ Label::~Label()
 	delete this;
 }
 
-void Label::setLabelText(SDL_Renderer* renderer, std::string text, TTF_Font* font)
+void Label::setLabelText(SDL_Renderer* renderer, SDL_Surface* screen, std::string text, TTF_Font* font)
 {
 	this->text = text;
 	SDL_Surface* s = TTF_RenderText_Blended_Wrapped(font, text.c_str(), color, MAP_WIDTH*GRID_CELL_SIZE);
 	texture = SDL_CreateTextureFromSurface(renderer, s);
+	SDL_BlitSurface(s, NULL, screen, &position);
 	SDL_FreeSurface(s);
 	SDL_QueryTexture(texture, nullptr, nullptr, &position.w, &position.h);
 }

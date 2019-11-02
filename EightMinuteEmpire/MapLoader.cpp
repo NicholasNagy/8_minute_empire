@@ -445,6 +445,8 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 
 	 GraphWorld::Country* country= new GraphWorld::Country(GraphWorld::Country(stoi(countryMatch[0].str()), startCountry, navalCountry, &continentMatch[0].str().substr(1)));
 	 map->addNode(country);
+	 if (startCountry)	
+		 map->setStartingCountry(country);
 	 return true;
  }
 

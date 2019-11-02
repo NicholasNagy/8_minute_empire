@@ -2,6 +2,16 @@
 #include <random>
 #include <ctime>
 
+
+
+Holdings::Holdings() : numArmies(0), numCities(0){}
+
+Holdings::~Holdings()
+{
+}
+
+
+
 Player::Player()
 {
 	name = "Default";
@@ -85,13 +95,28 @@ void Player::setCoinPurse(int amount)
 	*money = amount;
 }
 
-void Player::PlaceNewArmies(int numberOfArmies, int Country) {
-	//int *theCountries[totalNumberOfCountries];
-//	int* theCountries;
-//	theCountries= ownedCountries;
-	int numberOfArmiesHeld = ownedCountries[Country];
-	numberOfArmiesHeld += numberOfArmies;
-	ownedCountries[Country] = numberOfArmiesHeld;
+void Player::PlaceNewArmies(int numberOfArmies,GraphWorld::Country* country) {
+
+	string messageFail = "Cannot place a new army on country " + to_string(country->getID());
+	
+	if ( (country->occupyingPlayers().find(this) == country->occupyingPlayers().end()) )
+	{
+		cout << messageFail << endl;
+		return;
+	}
+
+	Holdings* playerHoldings = mHoldings.at(country->getID());
+
+	//Check if the player has a city on the country or it is a starting country
+
+	if ( playerHoldings->numCities == 0 && !country->isStartCountry() )
+	{
+		cout << messageFail << endl;
+		return;
+	}
+	cout << "Adding " << numberOfArmies << " Armies to Country: " << country->getID() << " For player: " << this->getName() << endl;
+	playerHoldings->numArmies += numberOfArmies;
+
 }
 
 void Player::MoveArmies(int numberOfArmies, int StartPosition, int EndPosition) {
@@ -146,6 +171,27 @@ void Player::DestroyArmy(int position) {
 
 }
 
+Holdings* Player::getHoldings(GraphWorld::Country* country, int maxNumCountries)
+{
+	int countryID = country->getID();
+	if (countryID < 0 || countryID > maxNumCountries)
+		return nullptr;
+
+	return mHoldings.at(country->getID());
+}
+
+std::unordered_map<int, Holdings*>& Player::holdings()
+{
+	return mHoldings;
+}
+
+std::ostream& operator<<(std::ostream& s, const Holdings& holdings)
+{
+	return  s << 
+		"Number of Cites: " << holdings.numCities << std::endl <<
+		"Number of Armies: " << holdings.numArmies << std::endl;
+}
+
 std::ostream& operator<<(std::ostream& s, const Player& player)
 {
 	return  s << "--Player Info--\n" <<
@@ -154,5 +200,4 @@ std::ostream& operator<<(std::ostream& s, const Player& player)
 		"Money: " << *player.money << std::endl;
 
 }
-
 

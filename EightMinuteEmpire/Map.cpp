@@ -122,6 +122,16 @@ namespace GraphWorld
 		return *numContinents;
 	}
 
+	void Map::setStartingCountry(Country* c)
+	{
+		startingCountry = c;
+	}
+
+	Country* Map::getStartingCountry()
+	{
+		return startingCountry;
+	}
+
 	LinkedList* Map::getAdjacentList(Country* country)
 	{
 		int nodeNum = country->getID();
@@ -221,6 +231,11 @@ namespace GraphWorld
 	string Country::getContinent()
 	{
 		return continent;
+	}
+
+	std::unordered_set<Player*>& Country::occupyingPlayers()
+	{
+		return mOccupyingPlayers;
 	}
 
 	void Country::setID(int id)

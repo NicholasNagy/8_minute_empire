@@ -2,6 +2,9 @@
 #define MAP_H
 #include "SDL.h"
 #include <string>
+#include <unordered_set>
+
+class Player;
 
 using std::string;
 
@@ -35,6 +38,7 @@ namespace GraphWorld
 		typedef Node* NodePtr;
 		NodePtr* arrayOfCountries;
 		TileMap* tileMap;
+		Country* startingCountry;
 
 		public:
 			Map(string* mapName, int numCountries, int numContinents);
@@ -44,6 +48,8 @@ namespace GraphWorld
 			string getMapName();
 			int getNumCountries();
 			int getNumContinents();
+			void setStartingCountry(Country*);
+			Country* getStartingCountry();
 			LinkedList* getAdjacentList(Country* country);
 			void printMap();
 			int getSize();
@@ -58,6 +64,7 @@ namespace GraphWorld
 		bool* mIsStartCountry;
 		bool* mIsNavalCountry;
 		string continent;
+		std::unordered_set<Player*> mOccupyingPlayers;
 
 		public:
 			Country();
@@ -67,6 +74,7 @@ namespace GraphWorld
 			bool isStartCountry();
 			bool isNavalCountry();
 			string getContinent();
+			std::unordered_set<Player*>& occupyingPlayers();
 			void setID(int id);
 			void setStartCountry(bool maybe);
 			void setContinent(string* continent);

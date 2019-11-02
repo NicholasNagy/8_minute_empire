@@ -14,6 +14,7 @@ GameplayState GameplayState::mGameplayState;
 SDL_Renderer* GameplayState::renderer = nullptr;
 
 SDL_Texture* texture = nullptr;
+SDL_Surface* screen;
 SDL_Rect cursor;
 SDL_Rect cursorShadow = { cursor.x, cursor.y, GRID_CELL_SIZE, GRID_CELL_SIZE };
 SDL_Color cursorShadowColor = { 107, 107, 107, 107 };
@@ -25,11 +26,14 @@ bool nextAction = false;
 
 GraphWorld::Map* gameMap;
 GraphWorld::Country* country = nullptr;
+GraphWorld::Country* startingCountry = nullptr;
 int numCountries;
 int numPlayers;
+Player* toPlay;
 
 GameOverlay ui;
-Label* label;
+Label* countryHoverLabel;
+Label* playerInfoLabel;
 
 
 int playerMove;  //The current player's turn
@@ -47,6 +51,7 @@ void GameplayState::init(Game* game)
 
 	int playerMove = Bid::initiateBidding(game);
 	bid = true;
+	placeStartingArmies(game);
 	handlePlayerAction(game);
 
 }
@@ -57,7 +62,7 @@ void GameplayState::initWindow(Game* game)
 	//Creating Game Window
 	SDL_Window* gameWindow = SDL_CreateWindow("Eight Minute Empire", 0, SDL_WINDOWPOS_CENTERED, WINDOW_X, WINDOW_Y, SDL_WINDOW_SHOWN);
 	game->setWindow(gameWindow);
-
+	screen = SDL_GetWindowSurface(gameWindow);
 	//Creating Renderer to draw on window
 	renderer = SDL_CreateRenderer(game->getWindow(), -1, SDL_RENDERER_ACCELERATED);
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
@@ -72,7 +77,8 @@ void GameplayState::initMap(Game* game)
 	texture = TextureLoader::loadTexutre(path.c_str(), renderer);
 	numCountries = gameMap->getNumCountries();
 	gameMap->getTileMap()->drawTileMap(renderer, texture);
-
+	startingCountry = gameMap->getStartingCountry();
+	initPlayerHoldings(game);
 }
 
 void GameplayState::initUI(Game* game)
@@ -84,12 +90,20 @@ void GameplayState::initUI(Game* game)
 	}
 	string bidding = "Biding initiated in console!";
 	ui.addFonts("assets/Fonts/unispace bd.ttf", "unispace bd", 18);
+	ui.addFonts("assets/Fonts/arial.ttf", "arial", 22);
 	SDL_Color black = { 0,0,0,0 };
-	label = new Label(bidding, "unispace bd", 0, 0, black);
-	label->setLabelText(renderer, bidding, ui.getFont("unispace bd"));
-	label->drawLabel(renderer);
+	countryHoverLabel = new Label(bidding, "arial", 0, 0, black);
+	countryHoverLabel->setLabelText(renderer,screen, bidding, ui.getFont("arial"));
+	countryHoverLabel->drawLabel(renderer);
+	playerInfoLabel = new Label("", "unispace bd", 1040, 0, black);
+	playerInfoLabel->setLabelText(renderer,screen, "", ui.getFont("unispace bd"));
+	playerInfoLabel->drawLabel(renderer);
 	SDL_RenderPresent(renderer);
-	label->destroyLabelTexture();
+	countryHoverLabel->destroyLabelTexture();
+	playerInfoLabel->destroyLabelTexture();
+
+
+
 }
 
 void GameplayState::pause()
@@ -186,7 +200,8 @@ void GameplayState::draw(Game* game)
 		SDL_RenderFillRect(renderer, &cursorShadow);
 	}
 
-	label->drawLabel(renderer);
+	countryHoverLabel->drawLabel(renderer);
+	playerInfoLabel->drawLabel(renderer);
 	SDL_RenderPresent(renderer);
 
 }
@@ -194,13 +209,22 @@ void GameplayState::draw(Game* game)
 void GameplayState::update(Game* game)
 
 {
-	label->destroyLabelTexture();
+	std::stringstream ss;
+	countryHoverLabel->destroyLabelTexture();
+	playerInfoLabel->destroyLabelTexture();
 
+	for (Player* p : game->players())
+		ss << *p;
+	
+	playerInfoLabel->setLabelText(renderer,screen, ss.str(), ui.getFont("unispace bd"));
+
+	ss.clear();
 	if (country)
 	{
 		std::stringstream ss;
-		ss << country->displayCountry();
-		label->setLabelText(renderer, ss.str(), ui.getFont("unispace bd"));
+		ss << country->displayCountry() << *toPlay->getHoldings(country, numCountries);
+		countryHoverLabel->setLabelText(renderer,screen, ss.str(), ui.getFont("arial"));
+
 	}
 
 }
@@ -209,14 +233,16 @@ void GameplayState::update(Game* game)
 
 void GameplayState::handlePlayerAction(Game* game)
 {
-	Player* toPlay = game->players().at(playerMove);
+	toPlay = game->players().at(playerMove);
+	
+	cout << toPlay->getName() << " turn to play\n";
 
-	switch (playerMove)
+	switch (playerMove+1)
 	{
 
 	case 1:
 
-		//toPlay->PlaceNewArmies();
+		toPlay->PlaceNewArmies(3, gameMap->getCountry(5) );
 
 		break;
 
@@ -248,13 +274,42 @@ void GameplayState::handlePlayerAction(Game* game)
 	nextMove();
 }
 
-void GameplayState::nextMove()
+inline void GameplayState::nextMove()
 {
 	playerMove++;
 
 	if (playerMove > numPlayers);
 	playerMove = 1;
 }
+
+void GameplayState::placeStartingArmies(Game* game)
+{
+	for ( Player* p: game->players() )
+	{
+		startingCountry->occupyingPlayers().emplace(p);
+		p->holdings().emplace(startingCountry->getID(), new Holdings());	
+		p->PlaceNewArmies(3, startingCountry);
+	}
+
+	cout << "\n------------------------------------------------------------\n";
+
+}
+
+void GameplayState::initPlayerHoldings(Game* game)
+{
+	for (int i = 0; i < numCountries; i++)
+	{
+		for (Player* p : game->players())
+		{
+			p->holdings().emplace(i, new Holdings());
+		}
+
+
+
+	}
+
+}
+
 
 void choseMove()
 {

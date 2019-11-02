@@ -131,6 +131,7 @@
     <ClCompile Include="Cards.cpp" />
     <ClCompile Include="CardsDriver.cpp" />
     <ClCompile Include="driver.cpp" />
+    <ClCompile Include="g.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameOverlay.cpp" />
     <ClCompile Include="GameplayState.cpp" />

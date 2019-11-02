@@ -1,5 +1,3 @@
-// main driver
-
 #include "SDL.h"
 #undef main
 #include <iostream>
