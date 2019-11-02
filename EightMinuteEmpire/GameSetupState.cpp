@@ -34,7 +34,7 @@ void GameSetupState::clean(Game* game)
 	ImGuiSDL::Deinitialize();
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(game->getWindow());
-;	ImGui::DestroyContext();
+	;	ImGui::DestroyContext();
 	std::cout << "Game Setup State Cleaned\n";
 }
 
@@ -126,7 +126,7 @@ void GameSetupState::handleMapPicker(Game* game)
 			std::cout << "User selected: " << maps.at(n) << std::endl;
 		}
 	}
-	
+
 	ImVec2 buttonSize(100, 50);
 	static bool load = false;
 	if (ImGui::Button("Load this Map", buttonSize))
@@ -166,9 +166,9 @@ void GameSetupState::handlePlayerPicker(Game* game)
 	ImGui::NextColumn();
 
 
-	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(1/7.0f, 0.6f, 0.6f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(1/7.0f, 0.7f, 0.7f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(1/7.0f, 0.8f, 0.8f));
+	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(1 / 7.0f, 0.6f, 0.6f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(1 / 7.0f, 0.7f, 0.7f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(1 / 7.0f, 0.8f, 0.8f));
 	ImGui::Button("Player 2");
 	ImGui::PopStyleColor(3);
 	static int age2 = ages[1];
@@ -276,7 +276,7 @@ void GameSetupState::handleGameStart(Game* game)
 		setupPlayers(game);
 		game->changeState(GameplayState::Instance());
 	}
-		
+
 }
 
 bool GameSetupState::initMapLoader(Game* game)
@@ -286,15 +286,15 @@ bool GameSetupState::initMapLoader(Game* game)
 	mapLoader = MapLoader::initiateMapPicker();
 
 	if (mapLoader)
-	{	
-	std::cout << *mapLoader << std::endl;
-	GraphWorld::Map* map = new GraphWorld::Map(&mapLoader->getMapName(), mapLoader->getNumCountries(), mapLoader->getNumContinents());
-	game->setMap(map);
-	GraphWorld::TileMap* tileMap = new GraphWorld::TileMap();
-	map->setTileMap(tileMap);
-	game->setMapLoader(mapLoader);
+	{
+		std::cout << *mapLoader << std::endl;
+		GraphWorld::Map* map = new GraphWorld::Map(&mapLoader->getMapName(), mapLoader->getNumCountries(), mapLoader->getNumContinents());
+		game->setMap(map);
+		GraphWorld::TileMap* tileMap = new GraphWorld::TileMap();
+		map->setTileMap(tileMap);
+		game->setMapLoader(mapLoader);
 
-		if ( mapLoader->load(map, tileMap, MAP_HEIGHT, MAP_WIDTH ) )
+		if (mapLoader->load(map, tileMap, MAP_HEIGHT, MAP_WIDTH))
 		{
 			map->printMap();
 			std::cout << "Map Successfully loaded." << std::endl;
@@ -302,11 +302,11 @@ bool GameSetupState::initMapLoader(Game* game)
 			return true;
 		}
 
-		delete map;	
+		delete map;
 		delete tileMap;
 		delete mapLoader;
 
-	return false;
+		return false;
 	}
 }
 
@@ -319,13 +319,13 @@ void GameSetupState::setupPlayers(Game* game)
 		name = "Player " + to_string(x);
 		if (players[i])
 		{
-		Player* p = new Player(&name, ages[i]);
-		game->players().push_back(*p);
-		x++;
+			Player* p = new Player(&name, ages[i]);
+			game->players().push_back(p);
+			x++;
 		}
 	}
 	assignCoins(game);
-	
+
 }
 
 void GameSetupState::assignCoins(Game* game)
@@ -334,34 +334,34 @@ void GameSetupState::assignCoins(Game* game)
 	std::vector players = game->players();
 	const int numPlayers = players.size();
 
-		switch (numPlayers)
-		{
-		case 2:
-			game->players().at(0).setCoinPurse(TWO_PLAYER_COIN_PURSE);
-			game->players().at(1).setCoinPurse(TWO_PLAYER_COIN_PURSE);
-			break;
-		case 3:
-			game->players().at(0).setCoinPurse(THREE_PLAYER_COIN_PURSE);
-			game->players().at(1).setCoinPurse(THREE_PLAYER_COIN_PURSE);
-			game->players().at(2).setCoinPurse(THREE_PLAYER_COIN_PURSE);
-			break;
-		case 4:
-			game->players().at(0).setCoinPurse(FOUR_PLAYER_COIN_PURSE);
-			game->players().at(1).setCoinPurse(FOUR_PLAYER_COIN_PURSE);
-			game->players().at(2).setCoinPurse(FOUR_PLAYER_COIN_PURSE);
-			game->players().at(3).setCoinPurse(FOUR_PLAYER_COIN_PURSE);
-			break;
-		case 5:
-			game->players().at(0).setCoinPurse(FIVE_PLAYER_COIN_PURSE);
-			game->players().at(1).setCoinPurse(FIVE_PLAYER_COIN_PURSE);
-			game->players().at(2).setCoinPurse(FIVE_PLAYER_COIN_PURSE);
-			game->players().at(3).setCoinPurse(FIVE_PLAYER_COIN_PURSE);
-			game->players().at(4).setCoinPurse(FIVE_PLAYER_COIN_PURSE);
-			break;
+	switch (numPlayers)
+	{
+	case 2:
+		game->players().at(0)->setCoinPurse(TWO_PLAYER_COIN_PURSE);
+		game->players().at(1)->setCoinPurse(TWO_PLAYER_COIN_PURSE);
+		break;
+	case 3:
+		game->players().at(0)->setCoinPurse(THREE_PLAYER_COIN_PURSE);
+		game->players().at(1)->setCoinPurse(THREE_PLAYER_COIN_PURSE);
+		game->players().at(2)->setCoinPurse(THREE_PLAYER_COIN_PURSE);
+		break;
+	case 4:
+		game->players().at(0)->setCoinPurse(FOUR_PLAYER_COIN_PURSE);
+		game->players().at(1)->setCoinPurse(FOUR_PLAYER_COIN_PURSE);
+		game->players().at(2)->setCoinPurse(FOUR_PLAYER_COIN_PURSE);
+		game->players().at(3)->setCoinPurse(FOUR_PLAYER_COIN_PURSE);
+		break;
+	case 5:
+		game->players().at(0)->setCoinPurse(FIVE_PLAYER_COIN_PURSE);
+		game->players().at(1)->setCoinPurse(FIVE_PLAYER_COIN_PURSE);
+		game->players().at(2)->setCoinPurse(FIVE_PLAYER_COIN_PURSE);
+		game->players().at(3)->setCoinPurse(FIVE_PLAYER_COIN_PURSE);
+		game->players().at(4)->setCoinPurse(FIVE_PLAYER_COIN_PURSE);
+		break;
 
-		default:
-			break;
-		}
+	default:
+		break;
+	}
 
 
 

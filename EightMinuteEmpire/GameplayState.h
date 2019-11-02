@@ -27,4 +27,10 @@ protected:
 private:
 	static GameplayState mGameplayState;
 
+	void initWindow(Game* game);
+	void initMap(Game* game);
+	void initUI(Game* game);
+	void getCursorCountry();
+	void handlePlayerAction(Game* game);
+	void nextMove();
 };

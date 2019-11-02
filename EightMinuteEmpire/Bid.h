@@ -8,7 +8,7 @@ class Bid
 {
 public:
 	Bid(Player* player, int amountBid);
-	static Player* initiateBidding(Game* game);
+	static int initiateBidding(Game* game);
 	friend std::ostream& operator<<(std::ostream&, const Bid&);
 
 private:
@@ -16,6 +16,7 @@ private:
 	int* amount;
 	static Player* tallyBids(std::vector<Bid>* bids);
 	static Player* handleTie(std::vector<Bid>* highestBidders);
+	static int decideOrder(Game* game, Player* winner);
 
 };
 

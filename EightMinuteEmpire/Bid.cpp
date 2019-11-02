@@ -17,12 +17,12 @@ Bid::Bid(Player* p, int amountBid)
 	this->amount = new int(amountBid);
 }
 
-Player* Bid::initiateBidding(Game* game)
+int Bid::initiateBidding(Game* game)
 {
 	using namespace std;
+	Player* winner;
 
-	
-	std::vector<Player> players = game->players();
+	std::vector<Player*> players = game->players();
 	int numPlayers = players.size();
 	int bidLimit;
 
@@ -50,7 +50,7 @@ Player* Bid::initiateBidding(Game* game)
 
 	for (auto i = 0; i < numPlayers; i++)
 	{
-		cout << endl << players.at(i).getName() << " enter the amount you wish to bid: " << endl;
+		cout << endl << players.at(i)->getName() << " enter the amount you wish to bid: " << endl;
 
 		int x;
 		string in;
@@ -84,8 +84,8 @@ Player* Bid::initiateBidding(Game* game)
 				break;
 			}
 		}
-		cout << "\nConsole: " << players.at(i).getName() << " has bid." << endl;
-		Bid bid(&players.at(i), stoi(in));
+		cout << "\n" << players.at(i)->getName() << " has bid." << endl;
+		Bid bid(players.at(i), stoi(in));
 		bids.push_back(bid);
 	}
 	cout << "\nAll players have bid. The amounts were:\n";
@@ -93,8 +93,11 @@ Player* Bid::initiateBidding(Game* game)
 	{
 		cout << i;
 	}
+	winner = tallyBids(&bids);
+	if (!winner)
+		return 0;
 
-	return tallyBids(&bids);
+	return decideOrder(game, winner);
 }
 
 Player* Bid::tallyBids(std::vector<Bid>* bids)
@@ -122,9 +125,9 @@ Player* Bid::tallyBids(std::vector<Bid>* bids)
 		winner = bids->at(0).player;
 
 	cout << endl << winner->getName() << " has won the bidding! They shall chose who plays first.\n\n";
-		winner->PayCoin(*bids->at(0).amount);
-		cout << *bids->at(0).amount << " coins has been deducted from " << winner->getName() << ".\n\n";
-		
+	winner->PayCoin(*bids->at(0).amount);
+	cout << *bids->at(0).amount << " coins has been deducted from " << winner->getName() << ".\n\n";
+
 
 	return winner;
 }
@@ -137,6 +140,45 @@ Player* Bid::handleTie(std::vector<Bid>* highestBidders)
 	});
 
 	return highestBidders->at(0).player;
+}
+
+int Bid::decideOrder(Game* game, Player* winner)
+{
+
+	vector<Player*> players = game->players();
+
+	cout << winner->getName() << " please enter who goes first:\n\n";
+
+	int n = 1;
+	for (Player* p : players)
+	{
+		cout << n << ". " << p->getName() << ((p->getName().compare(winner->getName()) == 0) ? " (You)" : "") << endl;
+		n++;
+	}
+	cout << endl;
+	int firstPlayer;
+	cin >> firstPlayer;
+	while ((firstPlayer > players.size() || firstPlayer < 1) || (!cin))
+	{
+		if (!cin)
+		{
+			cin.clear();
+			cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+			cout << "Please enter a number: " << endl;
+			cin >> firstPlayer;
+		}
+		else if (firstPlayer > players.size() || firstPlayer < 1)
+		{
+			cout << "Please enter a number within: 1 and " << players.size() << endl;
+			cin >> firstPlayer;
+		}
+
+	}
+	firstPlayer -= 1;
+	cout << players.at(firstPlayer)->getName() << " will go first!\n";
+
+	return firstPlayer;
+
 }
 
 std::ostream& operator<<(std::ostream& s, const Bid& bid)

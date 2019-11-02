@@ -19,19 +19,40 @@ SDL_Rect cursorShadow = { cursor.x, cursor.y, GRID_CELL_SIZE, GRID_CELL_SIZE };
 SDL_Color cursorShadowColor = { 107, 107, 107, 107 };
 bool mouseActive = false;
 bool mouseHover = false;
-bool selectedCountry = false;
+bool mouseClick = false;
+bool bid = false;
+bool nextAction = false;
 
 GraphWorld::Map* gameMap;
 GraphWorld::Country* country = nullptr;
 int numCountries;
+int numPlayers;
 
 GameOverlay ui;
 Label* label;
 
 
+int playerMove;  //The current player's turn
+
 void GameplayState::init(Game* game)
 {
 	std::cout << "\nGame Started\n\n-------------------------------------------------\n\n";
+	numPlayers = game->players().size();
+
+	GameplayState::initWindow(game);
+
+	GameplayState::initMap(game);
+
+	GameplayState::initUI(game);
+
+	int playerMove = Bid::initiateBidding(game);
+	bid = true;
+	handlePlayerAction(game);
+
+}
+
+void GameplayState::initWindow(Game* game)
+{
 
 	//Creating Game Window
 	SDL_Window* gameWindow = SDL_CreateWindow("Eight Minute Empire", 0, SDL_WINDOWPOS_CENTERED, WINDOW_X, WINDOW_Y, SDL_WINDOW_SHOWN);
@@ -42,16 +63,20 @@ void GameplayState::init(Game* game)
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 	SDL_RenderSetLogicalSize(renderer, WINDOW_X, WINDOW_Y);
 
+}
 
-	//Drawing the map tiles once
+void GameplayState::initMap(Game* game)
+{
 	gameMap = game->getMap();
 	string path = game->getMapLoader()->getTileSetPath();
 	texture = TextureLoader::loadTexutre(path.c_str(), renderer);
 	numCountries = gameMap->getNumCountries();
 	gameMap->getTileMap()->drawTileMap(renderer, texture);
 
+}
 
-	//Drawing the UI Labels
+void GameplayState::initUI(Game* game)
+{
 	if (TTF_Init() == -1)
 	{
 		std::cout << "TTF_Init: %s\n" << TTF_GetError();
@@ -61,17 +86,10 @@ void GameplayState::init(Game* game)
 	ui.addFonts("assets/Fonts/unispace bd.ttf", "unispace bd", 18);
 	SDL_Color black = { 0,0,0,0 };
 	label = new Label(bidding, "unispace bd", 0, 0, black);
-	label->setLabelText(renderer,bidding, ui.getFont("unispace bd"));
+	label->setLabelText(renderer, bidding, ui.getFont("unispace bd"));
 	label->drawLabel(renderer);
 	SDL_RenderPresent(renderer);
-
-	//Bidding
-	Bid::initiateBidding(game);
-	for (auto p : game->players())
-		cout << p << endl;
-
 	label->destroyLabelTexture();
-	
 }
 
 void GameplayState::pause()
@@ -106,34 +124,18 @@ void GameplayState::handleEvents(Game* game)
 	case SDL_MOUSEBUTTONDOWN:
 		cursor.x = (event.motion.x / GRID_CELL_SIZE) * GRID_CELL_SIZE;
 		cursor.y = (event.motion.y / GRID_CELL_SIZE) * GRID_CELL_SIZE;
-		//std::cout << "x: " << cursor.x << " y: " << cursor.y << std::endl;
-
-		//Find out type of tile clicked
-		static int typeCol;
-		static int typeRow;
-		static int type;
-
-		typeCol = cursor.x / GRID_CELL_SIZE;
-		typeRow = cursor.y / GRID_CELL_SIZE;
-
-		if (cursor.x < MAP_WIDTH * GRID_CELL_SIZE)
-		{
-			type = gameMap->getTileMap()->tiles[typeRow][typeCol];
-			if (type < numCountries && type >= 0)
-				country = gameMap->getCountry(type);
-			if (country)
-			{
-				selectedCountry = true;
-				std::cout << "Selected: " << country->displayCountry() << std::endl;
-			}
-		}
+		if (bid)
+			//getCursorCountry();
+			mouseClick = true;
 		break;
 	case SDL_MOUSEMOTION:
-		cursorShadow.x = (event.motion.x / GRID_CELL_SIZE) * GRID_CELL_SIZE;
-		cursorShadow.y = (event.motion.y / GRID_CELL_SIZE) * GRID_CELL_SIZE;
+		cursor.x = cursorShadow.x = (event.motion.x / GRID_CELL_SIZE) * GRID_CELL_SIZE;
+		cursor.y = cursorShadow.y = (event.motion.y / GRID_CELL_SIZE) * GRID_CELL_SIZE;
 		//std::cout << "x: " << cursor.x << " y: " << cursor.y << std::endl;
 		if (!mouseActive)
 			mouseActive = true;
+		if (bid)
+			getCursorCountry();
 		break;
 	case SDL_WINDOWEVENT:
 		if (event.window.event == SDL_WINDOWEVENT_ENTER && !mouseHover)
@@ -145,6 +147,32 @@ void GameplayState::handleEvents(Game* game)
 		break;
 	}
 
+
+}
+
+void GameplayState::getCursorCountry()
+{
+
+	//Find out type of tile clicked
+	static int typeCol;
+	static int typeRow;
+	static int type;
+
+	typeCol = cursor.x / GRID_CELL_SIZE;
+	typeRow = cursor.y / GRID_CELL_SIZE;
+
+	if (cursor.x < MAP_WIDTH * GRID_CELL_SIZE)
+	{
+		type = gameMap->getTileMap()->tiles[typeRow][typeCol];
+		if (type < numCountries && type >= 0)
+			country = gameMap->getCountry(type);
+		if (country && mouseClick)
+		{
+			std::cout << "Selected: " << country->displayCountry() << std::endl;
+			mouseClick = false;
+		}
+
+	}
 
 }
 
@@ -164,14 +192,76 @@ void GameplayState::draw(Game* game)
 }
 
 void GameplayState::update(Game* game)
+
 {
-	std::stringstream ss;
-	if (country && selectedCountry)
+	label->destroyLabelTexture();
+
+	if (country)
 	{
-		label->destroyLabelTexture();
-		selectedCountry = false;
-		ss << "Selected: " << country->displayCountry();
+		std::stringstream ss;
+		ss << country->displayCountry();
 		label->setLabelText(renderer, ss.str(), ui.getFont("unispace bd"));
 	}
 
+}
+
+
+
+void GameplayState::handlePlayerAction(Game* game)
+{
+	Player* toPlay = game->players().at(playerMove);
+
+	switch (playerMove)
+	{
+
+	case 1:
+
+		//toPlay->PlaceNewArmies();
+
+		break;
+
+
+	case 2:
+
+
+		break;
+
+	case 3:
+
+
+		break;
+
+	case 4:
+
+
+		break;
+
+	case 5:
+
+
+		break;
+
+	default:
+		break;
+	}
+
+	nextMove();
+}
+
+void GameplayState::nextMove()
+{
+	playerMove++;
+
+	if (playerMove > numPlayers);
+	playerMove = 1;
+}
+
+void choseMove()
+{
+	// PlaceNewArmies():Place new armies on the board.
+	//MoveOverLand() and MoveOverWater():Move over land and/or water
+	//BuildCity() :Build a city.
+	//DestroyArmy():Destroy army.
+	//AndOrAction(): “And/Or” actions. 
+	// Ignore() : Player may take the card and ignore the action
 }

@@ -17,25 +17,25 @@ class GameState;
 class Game
 {
 public:
-		Game();
-		~Game();
-		void init(const char* title, int initialX, int initialY, int width, int height, Uint32 flags);
-		void handleEvents();
-		void update();
-		void draw();
-		void clean();
-		bool isRunning();
-		void setRunning(bool);
-		void changeState(GameState* state); 
-		void popState();
-		void pushState(GameState* state);
-		void setMap(GraphWorld::Map* map);
-		std::vector<Player>& players(); //get vector of players
-		GraphWorld::Map* getMap();
-		MapLoader* getMapLoader();
-		void setMapLoader(MapLoader*);
-		SDL_Window* getWindow();
-		void setWindow(SDL_Window*);
+	Game();
+	~Game();
+	void init(const char* title, int initialX, int initialY, int width, int height, Uint32 flags);
+	void handleEvents();
+	void update();
+	void draw();
+	void clean();
+	bool isRunning();
+	void setRunning(bool);
+	void changeState(GameState* state);
+	void popState();
+	void pushState(GameState* state);
+	void setMap(GraphWorld::Map* map);
+	std::vector<Player*>& players(); //get vector of players
+	GraphWorld::Map* getMap();
+	MapLoader* getMapLoader();
+	void setMapLoader(MapLoader*);
+	SDL_Window* getWindow();
+	void setWindow(SDL_Window*);
 
 private:
 	bool mIsRunning;
@@ -43,7 +43,7 @@ private:
 	std::vector<GameState*> states;
 	MapLoader* mapLoader;
 	GraphWorld::Map* map;
-	std::vector<Player> mPlayers;
+	std::vector<Player*> mPlayers;
 
 
 };
