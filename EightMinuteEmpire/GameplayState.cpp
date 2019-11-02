@@ -49,8 +49,9 @@ void GameplayState::init(Game* game)
 
 	GameplayState::initUI(game);
 
-	int playerMove = Bid::initiateBidding(game);
+	playerMove = Bid::initiateBidding(game);
 	bid = true;
+
 	placeStartingArmies(game);
 	handlePlayerAction(game);
 
@@ -234,7 +235,7 @@ void GameplayState::update(Game* game)
 void GameplayState::handlePlayerAction(Game* game)
 {
 	toPlay = game->players().at(playerMove);
-	
+
 	cout << toPlay->getName() << " turn to play\n";
 
 	switch (playerMove+1)
