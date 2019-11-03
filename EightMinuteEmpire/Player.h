@@ -17,9 +17,6 @@ private:
 	int numCities;
 
 public:
-	void increaseArmies(int n);
-	void decreaseArmies(int n);
-	void increaseCities(int n);
 	friend std::ostream& operator<<(std::ostream&, const Holdings&);
 
 };
@@ -42,11 +39,10 @@ public:
 	void PayCoin(int amount);
 	void setCoinPurse(int amount);
 	void PlaceNewArmies(int numberOfArmies, GraphWorld::Country* country);
-	void MoveArmies(int numberOfArmies, int StartPosition, int EndPosition);
-	void MoveOverLand(int numberOfArmies, int StartPosition, int EndPosition);
-	void BuildCity(int Position);
-	void DestroyArmy(int Position);
-	Holdings* getHoldings(GraphWorld::Country*, int maxNumCountries);
+	void MoveArmies(GraphWorld::Map*, GraphWorld::Country* srcCountry, GraphWorld::Country* destCountry);
+	void BuildCity(GraphWorld::Country* country);
+	void DestroyArmy(GraphWorld::Country* country);
+	Holdings* getHoldings(GraphWorld::Country*);
 	std::unordered_map<int, Holdings*>& holdings(); // How much the player holds on each country (key is the country id, could use country pointers ask keys as well)
 	friend std::ostream& operator<<(std::ostream&, const Player&);
 

@@ -25,7 +25,9 @@ bool bid = false;
 bool nextAction = false;
 
 GraphWorld::Map* gameMap;
-GraphWorld::Country* country = nullptr;
+GraphWorld::Country* hoveredCountry = nullptr;
+GraphWorld::Country* srcCountry = nullptr;
+GraphWorld::Country* destCountry = nullptr;
 GraphWorld::Country* startingCountry = nullptr;
 int numCountries;
 int numPlayers;
@@ -34,6 +36,7 @@ Player* toPlay;
 GameOverlay ui;
 Label* countryHoverLabel;
 Label* playerInfoLabel;
+bool armyMove = false;
 
 
 int playerMove;  //The current player's turn
@@ -51,9 +54,8 @@ void GameplayState::init(Game* game)
 
 	playerMove = Bid::initiateBidding(game);
 	bid = true;
-
+	toPlay = game->players().at(playerMove);
 	placeStartingArmies(game);
-	handlePlayerAction(game);
 
 }
 
@@ -139,9 +141,13 @@ void GameplayState::handleEvents(Game* game)
 	case SDL_MOUSEBUTTONDOWN:
 		cursor.x = (event.motion.x / GRID_CELL_SIZE) * GRID_CELL_SIZE;
 		cursor.y = (event.motion.y / GRID_CELL_SIZE) * GRID_CELL_SIZE;
+
 		if (bid)
-			//getCursorCountry();
+		{
+			getCursorCountry();
 			mouseClick = true;
+		}
+
 		break;
 	case SDL_MOUSEMOTION:
 		cursor.x = cursorShadow.x = (event.motion.x / GRID_CELL_SIZE) * GRID_CELL_SIZE;
@@ -158,6 +164,48 @@ void GameplayState::handleEvents(Game* game)
 		else if (event.window.event == SDL_WINDOWEVENT_LEAVE && mouseHover)
 			mouseHover = false;
 		break;
+
+	case SDL_KEYDOWN:
+		{
+
+			switch (event.key.keysym.sym)
+			{
+
+			case SDLK_1:
+				cout << "Card 1 \n\n";
+
+				//get type of card
+				//card.Action
+				armyMove = true;
+				handlePlayerAction(game);
+
+				break;
+
+			case SDLK_2:
+				cout << "Card 2 \n\n";
+				toPlay->BuildCity(startingCountry);
+				break;
+			case SDLK_3:
+				cout << "Card 3 \n\n";
+				toPlay->DestroyArmy(startingCountry);
+				break;
+			case SDLK_4:
+				cout << "Card 4 \n\n";
+				toPlay->PlaceNewArmies(69, gameMap->getCountry(15));
+				break;
+
+			case SDLK_5:
+				cout << "Card 5 \n\n";
+				break;
+			case SDLK_6:
+				cout << "Card 6 \n\n";
+				break;
+			default:
+				break;
+			}
+
+		}
+
 	default:
 		break;
 	}
@@ -180,99 +228,40 @@ void GameplayState::getCursorCountry()
 	{
 		type = gameMap->getTileMap()->tiles[typeRow][typeCol];
 		if (type < numCountries && type >= 0)
-			country = gameMap->getCountry(type);
-		if (country && mouseClick)
+			hoveredCountry = gameMap->getCountry(type);
+		if (srcCountry && mouseClick)
 		{
-			std::cout << "Selected: " << country->displayCountry() << std::endl;
+			destCountry = gameMap->getCountry(type);
+			std::cout << "Selected Country (to move): " << destCountry->getID() << std::endl;
 			mouseClick = false;
 		}
+		if (mouseClick && armyMove)
+		{
+			srcCountry = gameMap->getCountry(type);
+			std::cout << "Selected Country (source): " << srcCountry->getID() << std::endl;
+			mouseClick = false;
+			armyMove = false;
+		}
+
 
 	}
 
 }
-
-void GameplayState::draw(Game* game)
-{
-	SDL_RenderClear(renderer);
-	gameMap->getTileMap()->drawTileMap(renderer, texture);
-	if (mouseActive && mouseHover)
-	{
-		SDL_SetRenderDrawColor(renderer, cursorShadowColor.r, cursorShadowColor.g, cursorShadowColor.b, cursorShadowColor.a);
-		SDL_RenderFillRect(renderer, &cursorShadow);
-	}
-
-	countryHoverLabel->drawLabel(renderer);
-	playerInfoLabel->drawLabel(renderer);
-	SDL_RenderPresent(renderer);
-
-}
-
-void GameplayState::update(Game* game)
-
-{
-	std::stringstream ss;
-	countryHoverLabel->destroyLabelTexture();
-	playerInfoLabel->destroyLabelTexture();
-
-	for (Player* p : game->players())
-		ss << *p;
-	
-	playerInfoLabel->setLabelText(renderer,screen, ss.str(), ui.getFont("unispace bd"));
-
-	ss.clear();
-	if (country)
-	{
-		std::stringstream ss;
-		ss << country->displayCountry() << *toPlay->getHoldings(country, numCountries);
-		countryHoverLabel->setLabelText(renderer,screen, ss.str(), ui.getFont("arial"));
-
-	}
-
-}
-
-
 
 void GameplayState::handlePlayerAction(Game* game)
 {
 	toPlay = game->players().at(playerMove);
 
-	cout << toPlay->getName() << " turn to play\n";
+	cout << toPlay->getName() << " move\n";
 
-	switch (playerMove+1)
+	if (srcCountry && destCountry)
 	{
 
-	case 1:
-
-		toPlay->PlaceNewArmies(3, gameMap->getCountry(5) );
-
-		break;
-
-
-	case 2:
-
-
-		break;
-
-	case 3:
-
-
-		break;
-
-	case 4:
-
-
-		break;
-
-	case 5:
-
-
-		break;
-
-	default:
-		break;
+	toPlay->MoveArmies(gameMap, srcCountry, destCountry);
+	srcCountry = nullptr;
+	destCountry = nullptr;
 	}
 
-	nextMove();
 }
 
 inline void GameplayState::nextMove()
@@ -280,7 +269,7 @@ inline void GameplayState::nextMove()
 	playerMove++;
 
 	if (playerMove > numPlayers);
-	playerMove = 1;
+	playerMove = 0;
 }
 
 void GameplayState::placeStartingArmies(Game* game)
@@ -320,4 +309,43 @@ void choseMove()
 	//DestroyArmy():Destroy army.
 	//AndOrAction(): “And/Or” actions. 
 	// Ignore() : Player may take the card and ignore the action
+}
+
+void GameplayState::draw(Game* game)
+{
+	SDL_RenderClear(renderer);
+	gameMap->getTileMap()->drawTileMap(renderer, texture);
+	if (mouseActive && mouseHover)
+	{
+		SDL_SetRenderDrawColor(renderer, cursorShadowColor.r, cursorShadowColor.g, cursorShadowColor.b, cursorShadowColor.a);
+		SDL_RenderFillRect(renderer, &cursorShadow);
+	}
+
+	countryHoverLabel->drawLabel(renderer);
+	playerInfoLabel->drawLabel(renderer);
+	SDL_RenderPresent(renderer);
+
+}
+
+void GameplayState::update(Game* game)
+{
+
+	std::stringstream ss;
+	countryHoverLabel->destroyLabelTexture();
+	playerInfoLabel->destroyLabelTexture();
+
+	for (Player* p : game->players())
+		ss << *p;
+
+	playerInfoLabel->setLabelText(renderer, screen, ss.str(), ui.getFont("unispace bd"));
+
+	ss.clear();
+	if (hoveredCountry)
+	{
+		std::stringstream ss;
+		ss << hoveredCountry->displayCountry() << *toPlay->getHoldings(hoveredCountry);
+		countryHoverLabel->setLabelText(renderer, screen, ss.str(), ui.getFont("arial"));
+
+	}
+
 }

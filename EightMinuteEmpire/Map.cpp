@@ -533,9 +533,32 @@ namespace GraphWorld
 			Node* toDisplay = this->head;
 			for (int i = 0; i < *size; i++)
 			{
+
 				toDisplay->displayNode();
 				toDisplay = this->getNext(toDisplay);
 			}
+		}
+	}
+
+	bool LinkedList::isAdjacent(Country* country)
+	{
+		if (*size == 0)
+		{
+			cout << "Nothing in the Linked List\n";
+			return false;
+		}
+					
+		else
+		{
+			Node* node = this->head;
+			for (int i = 0; i < *size; i++)
+			{
+				if (node->getCountry()->getID() == country->getID())
+					return true;
+
+				node = this->getNext(node);
+			}
+			return false;
 		}
 	}
 

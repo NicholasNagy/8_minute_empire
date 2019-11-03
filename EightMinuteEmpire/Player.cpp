@@ -10,8 +10,6 @@ Holdings::~Holdings()
 {
 }
 
-
-
 Player::Player()
 {
 	name = "Default";
@@ -114,69 +112,74 @@ void Player::PlaceNewArmies(int numberOfArmies,GraphWorld::Country* country) {
 		cout << messageFail << endl;
 		return;
 	}
-	cout << "Adding " << numberOfArmies << " Armies to Country: " << country->getID() << " For player: " << this->getName() << endl;
 	playerHoldings->numArmies += numberOfArmies;
+	cout << "Added " << numberOfArmies << " Armies to Country: " << country->getID() << " For player: " << this->getName() << endl;
 
 }
 
-void Player::MoveArmies(int numberOfArmies, int StartPosition, int EndPosition) {
-	int* theCountries;
-	theCountries = ownedCountries;
-	int armiesAtStart = ownedCountries[StartPosition];
-	//if the number of armies to move from the start is more than the amount of armies already 
-	//at the starting position
-	if (armiesAtStart - numberOfArmies < 0) {
-		numberOfArmies = armiesAtStart;
-		armiesAtStart = 0;
+void Player::MoveArmies(GraphWorld::Map* map, GraphWorld::Country* start, GraphWorld::Country* destination)
+{
+
+	Holdings* holdingsOnStartCountry = mHoldings.at(start->getID());
+
+	//Check if the player has armies on the starting country
+	if (holdingsOnStartCountry->numArmies == 0)
+	{
+		cout << "\nNo armies to move." << endl;
+		return;
 	}
-	else {
-		armiesAtStart -= numberOfArmies;
+	
+	//Check if the start and destination countries are adjacent to each other
+	if (!map->getAdjacentList(start)->isAdjacent(destination))
+	{
+		cout << "Cannot move armies there." << endl;
+		return;
+	}
+	
+	//Check if the move requires naval
+	if (start->isNavalCountry() && destination->isNavalCountry())
+	{
+		cout << "Cannot move armies there. Requires Naval movement." << endl;
+		return;
 	}
 
-	int armiesAtEnd = ownedCountries[EndPosition];
-	armiesAtEnd += numberOfArmies;
+	//Move armies
+	Holdings* holdingsOnDestCountry = mHoldings.at(destination->getID());
+	holdingsOnStartCountry->numArmies -= 1;
+	holdingsOnDestCountry->numArmies += 1;
+	cout << "Moved " << 1  << " Army from Country: " << start->getID() << " to Country: " << destination->getID() << endl;
 
-	ownedCountries[StartPosition] = armiesAtStart;
-	ownedCountries[EndPosition] = armiesAtEnd;
+
 }
 
 bool isValidMovement(int startPosition, int endPosition) {
 	return true;
 }
 
-void Player::MoveOverLand(int numberOfArmies, int StartPosition, int EndPosition) {
-	if (isValidMovement(StartPosition, EndPosition)) {
-		MoveArmies(numberOfArmies, StartPosition, EndPosition);
-	}
-	else {
-		// handle cannot move armies
-	}
-}
 
-void Player::BuildCity(int position) {
-	int cities = ownedCities[position];
-	cities += 1;
-	ownedCities[position] = cities;
-}
-
-void Player::DestroyArmy(int position) {
-	int armiesHeld = ownedCountries[position];
-	if (armiesHeld > 0) {
-		armiesHeld -= 1;
-	}
-	else {
-		//handle when armies is less than or equal to 0
-	}
-	ownedCountries[position] = armiesHeld;
-
-}
-
-Holdings* Player::getHoldings(GraphWorld::Country* country, int maxNumCountries)
+void Player::BuildCity(GraphWorld::Country* country) 
 {
-	int countryID = country->getID();
-	if (countryID < 0 || countryID > maxNumCountries)
-		return nullptr;
+	//TODO: check if the player still has any armies left to place (if numCountries > 0 )
+	getHoldings(country)->numCities++;
+	cout << "Built " << 1 << " City on Country: " << country->getID() << endl;
+}
 
+
+void Player::DestroyArmy(GraphWorld::Country* country)
+{
+	int armies = getHoldings(country)->numArmies;
+
+	if (armies != 0)
+	{
+		getHoldings(country)->numArmies--;
+	cout << "Destroyed " << 1 << " Army on Country: " << country->getID() << endl;
+	}
+	else
+		cout << "No armies to Destroy!\n" << endl;
+}
+
+Holdings* Player::getHoldings(GraphWorld::Country* country)
+{
 	return mHoldings.at(country->getID());
 }
 

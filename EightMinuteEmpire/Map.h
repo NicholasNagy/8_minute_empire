@@ -100,6 +100,7 @@ namespace GraphWorld
 			int sizeOf();
 			bool add(int where, Country* country, bool requiresNaval);
 			Country* get(int where);
+			bool isAdjacent(Country* country);
 			Country* remove(int where);
 			void displayLinkedList();
 			~LinkedList();
