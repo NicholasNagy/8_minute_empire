@@ -1,23 +1,29 @@
 #pragma once
 #include <vector>  
+#include <iostream>  
+#include "Action.h"
 using namespace std;
+
 
 
 class Card
 {
 public:
 	Card();
-	Card(int myGood, int myAction);
+	Card(const int myGood, const Action& myAction);
+	Card(const Card& c); // Copy constructor
+	Card & operator=(const Card& c); // Overload assignment operator
 	~Card();
-	void setParameters(int good, int action);
-	void printCard();
-	int getGood();
-	int getAction();
+	void printCard() { 
+		cout << "Card: Goods = " << *good << ", ";
+		action->printAction();
+	}
 
 private:
 	int* good;
-	int* action;
+	Action* action;
 };
+
 
 
 class Deck
@@ -26,26 +32,13 @@ public:
 	Deck();
 	~Deck();
 	void printDeck();
-	Card draw(); // Draw the top card from the deck.
+	Card* draw(); // Draw the top card from the deck.
+	void shuffleDeck(); // Shuffle the cards in the deck.
+
 
 private:
-	const int* NumOfCardsInDeck = new int(42);
-	vector<Card>* cardsDeck = new vector<Card>(*NumOfCardsInDeck);
-};
-
-// HandSlot class has a card with a corressponding value. To be used by the Hand class.
-class HandSlot
-{
-public:
-	HandSlot();
-	HandSlot(int newSlotValue, Card newSlotCard);
-	~HandSlot();
-	void printHandSlot();
-	void setParameters(int newSlotValue, Card newSlotCard);
-
-private:
-	int* slotValue;
-	Card* slotCard;
+	static const int NumOfCardsInDeck = 42;
+	vector<Card * >* cardsDeck = new vector<Card * >(42);
 };
 
 
@@ -54,11 +47,14 @@ class Hand
 {
 public:
 	Hand();
-	Hand(Deck& newDeck);
+	Hand(Deck* newDeck);
 	~Hand();
 	void printHand();
+	int getCardCostAtPosition(int postion);
+	Card* getCardAtPosition(int postion, Deck* deck);
+	void moveCards(int postionOfTheRemovedCard, Deck* deck);
+
 
 private:
-	const int* NumOfCardsInHand = new int(6);
-	vector<HandSlot>* cardsHand = new vector<HandSlot>(*NumOfCardsInHand);
+	vector<Card* >* cardsHand = new vector<Card* >(6);
 };
