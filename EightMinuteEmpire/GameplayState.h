@@ -32,7 +32,12 @@ private:
 	void initUI(Game* game);
 	void getCursorCountry();
 	void handlePlayerAction(Game* game);
-	void nextMove();
+
+	void nextMove(Game* game);
 	void placeStartingArmies(Game* game);
 	void initPlayerHoldings(Game* game); // Initilizes each players'holdings to default values 0 cities and 0 armies)
+
+
+
+
 };

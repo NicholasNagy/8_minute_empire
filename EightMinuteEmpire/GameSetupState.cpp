@@ -22,6 +22,11 @@ const int THREE_PLAYER_COIN_PURSE = 11;
 const int FOUR_PLAYER_COIN_PURSE = 9;
 const int FIVE_PLAYER_COIN_PURSE = 8;
 
+const int TWO_PLAYER_CARDS = 13;
+const int THREE_PLAYER_CARDS = 10;
+const int FOUR_PLAYER_CARDS = 8;
+const int FIVE_PLAYER_CARDS = 7;
+
 void GameSetupState::init(Game* game)
 {
 	renderer = SDL_CreateRenderer(game->getWindow(), -1, SDL_RENDERER_ACCELERATED);
@@ -339,17 +344,31 @@ void GameSetupState::assignCoins(Game* game)
 	case 2:
 		game->players().at(0)->setCoinPurse(TWO_PLAYER_COIN_PURSE);
 		game->players().at(1)->setCoinPurse(TWO_PLAYER_COIN_PURSE);
+
+		game->players().at(0)->setCardToPlay(TWO_PLAYER_CARDS);
+		game->players().at(1)->setCardToPlay(TWO_PLAYER_CARDS);
+
 		break;
 	case 3:
 		game->players().at(0)->setCoinPurse(THREE_PLAYER_COIN_PURSE);
 		game->players().at(1)->setCoinPurse(THREE_PLAYER_COIN_PURSE);
 		game->players().at(2)->setCoinPurse(THREE_PLAYER_COIN_PURSE);
+
+		game->players().at(0)->setCardToPlay(THREE_PLAYER_CARDS);
+		game->players().at(1)->setCardToPlay(THREE_PLAYER_CARDS);
+		game->players().at(3)->setCardToPlay(THREE_PLAYER_CARDS);
+
 		break;
 	case 4:
 		game->players().at(0)->setCoinPurse(FOUR_PLAYER_COIN_PURSE);
 		game->players().at(1)->setCoinPurse(FOUR_PLAYER_COIN_PURSE);
 		game->players().at(2)->setCoinPurse(FOUR_PLAYER_COIN_PURSE);
 		game->players().at(3)->setCoinPurse(FOUR_PLAYER_COIN_PURSE);
+
+		game->players().at(0)->setCardToPlay(FOUR_PLAYER_CARDS);
+		game->players().at(1)->setCardToPlay(FOUR_PLAYER_CARDS);
+		game->players().at(3)->setCardToPlay(FOUR_PLAYER_CARDS);
+		game->players().at(4)->setCardToPlay(FOUR_PLAYER_CARDS);
 		break;
 	case 5:
 		game->players().at(0)->setCoinPurse(FIVE_PLAYER_COIN_PURSE);
@@ -357,6 +376,12 @@ void GameSetupState::assignCoins(Game* game)
 		game->players().at(2)->setCoinPurse(FIVE_PLAYER_COIN_PURSE);
 		game->players().at(3)->setCoinPurse(FIVE_PLAYER_COIN_PURSE);
 		game->players().at(4)->setCoinPurse(FIVE_PLAYER_COIN_PURSE);
+
+		game->players().at(0)->setCardToPlay(FIVE_PLAYER_CARDS);
+		game->players().at(1)->setCardToPlay(FIVE_PLAYER_CARDS);
+		game->players().at(2)->setCardToPlay(FIVE_PLAYER_CARDS);
+		game->players().at(3)->setCardToPlay(FIVE_PLAYER_CARDS);
+		game->players().at(4)->setCardToPlay(FIVE_PLAYER_CARDS);
 		break;
 
 	default:

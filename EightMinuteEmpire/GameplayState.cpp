@@ -177,30 +177,42 @@ void GameplayState::handleEvents(Game* game)
 				//get type of card
 				//card.Action
 				armyMove = true;
-				handlePlayerAction(game);
+				if (srcCountry && destCountry)
+				{
+					toPlay->MoveArmies(gameMap, srcCountry, destCountry);
+					srcCountry = nullptr;
+					destCountry = nullptr;
+					toPlay->computeScore(gameMap);
+				}
+				nextMove(game);
 				break;
 
 			case SDLK_2:
 				cout << "Card 2 \n\n";
 				toPlay->BuildCity(startingCountry);
 				toPlay->computeScore(gameMap);
+				nextMove(game);
 				break;
 			case SDLK_3:
 				cout << "Card 3 \n\n";
 				toPlay->DestroyArmy(startingCountry);
 				toPlay->computeScore(gameMap);
+				nextMove(game);
 				break;
 			case SDLK_4:
 				cout << "Card 4 \n\n";
 				toPlay->PlaceNewArmies(69, gameMap->getCountry(15));
 				toPlay->computeScore(gameMap);
+				nextMove(game);
 				break;
 
 			case SDLK_5:
 				cout << "Card 5 \n\n";
+				nextMove(game);
 				break;
 			case SDLK_6:
 				cout << "Card 6 \n\n";
+				nextMove(game);
 				break;
 			default:
 				break;
@@ -252,27 +264,20 @@ void GameplayState::getCursorCountry()
 
 void GameplayState::handlePlayerAction(Game* game)
 {
-	toPlay = game->players().at(playerMove);
 
-	cout << toPlay->getName() << " move\n";
-
-	if (srcCountry && destCountry)
-	{
-
-	toPlay->MoveArmies(gameMap, srcCountry, destCountry);
-	srcCountry = nullptr;
-	destCountry = nullptr;
-	toPlay->computeScore(gameMap);
-	}
+	
 
 }
 
-inline void GameplayState::nextMove()
+void GameplayState::nextMove(Game* game)
 {
 	playerMove++;
 
-	if (playerMove > numPlayers);
-	playerMove = 0;
+	if (playerMove == numPlayers)
+		playerMove = 0;
+
+	toPlay = game->players().at(playerMove);
+	cout << toPlay->getName() << " turn to move\n";
 }
 
 void GameplayState::placeStartingArmies(Game* game)

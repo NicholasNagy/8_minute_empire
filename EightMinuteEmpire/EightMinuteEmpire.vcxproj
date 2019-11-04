@@ -126,6 +126,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Action.cpp" />
     <ClCompile Include="Bid.cpp" />
     <ClCompile Include="BidDriver.cpp" />
     <ClCompile Include="Cards.cpp" />
@@ -153,6 +154,7 @@
     <ClCompile Include="TextureLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Action.h" />
     <ClInclude Include="Bid.h" />
     <ClInclude Include="Cards.h" />
     <ClInclude Include="Game.h" />

@@ -260,6 +260,16 @@ void Player::updateContinentPoints(int points)
 	sumVictoryPoints();
 }
 
+void Player::setCardToPlay(int n)
+{
+	cardsToPlay = n;
+}
+
+int Player::getCardsToPlay()
+{
+	return cardsToPlay;
+}
+
 int Player::sumVictoryPoints()
 {
 	return totalVictoryPoints = countryVictoryPoints + continentVictoryPoints + goodsVictoryPoints;;
@@ -276,6 +286,7 @@ std::ostream& operator<<(std::ostream& s, const Player& player)
 {
 	return  s << "--" << player.name << "--\n" <<
 		"Coins: " << *player.money << std::endl <<
+		"Cards Left to play: " << player.cardsToPlay << std::endl <<
 		"Victory Points: " << player.totalVictoryPoints << endl <<
 		"Goods: " << player.goodsVictoryPoints << endl <<
 		"Countries: " << player.countryVictoryPoints << endl <<
