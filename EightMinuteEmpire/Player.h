@@ -13,11 +13,13 @@ public:
 	~Holdings();
 
 private:
-	int numArmies;
-	int numCities;
+	int mNumArmies;
+	int mNumCities;
 
 public:
 	friend std::ostream& operator<<(std::ostream&, const Holdings&);
+	int numArmies();
+	int numCities();
 
 };
 
@@ -43,16 +45,26 @@ public:
 	void BuildCity(GraphWorld::Country* country);
 	void DestroyArmy(GraphWorld::Country* country);
 	Holdings* getHoldings(GraphWorld::Country*);
-	std::unordered_map<int, Holdings*>& holdings(); // How much the player holds on each country (key is the country id, could use country pointers ask keys as well)
+	std::unordered_map<int, Holdings*>& holdings();
+	int computeScore(GraphWorld::Map*);
 	friend std::ostream& operator<<(std::ostream&, const Player&);
+	void updateCountryPoints(int points);
+	void updateGoodsPoints(int points);
+	void updateContinentPoints(int points);
+	int sumVictoryPoints();
 
 private:
-	std::unordered_map<int, Holdings*> mHoldings;
+	std::unordered_map<int, Holdings*> mHoldings;  // How much the player holds on each country (key is the country id, could use country pointers as keys as well)
 	std::string name;
-	int* ownedCountries; //Pointer to an array of Countries
-	int* ownedCities; //Pointer to an array of built cities
 	int* money; //Amount of money that the player holds
 	int* age;
+	int totalVictoryPoints;
+	int goodsVictoryPoints;
+	int countryVictoryPoints;
+	int continentVictoryPoints;
+
 	const static int totalNumberOfCountries = 30;
+	int* ownedCountries; //Pointer to an array of Countries
+	int* ownedCities; //Pointer to an array of built cities
 };
 

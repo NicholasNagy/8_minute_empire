@@ -92,13 +92,13 @@ void GameplayState::initUI(Game* game)
 		exit(2);
 	}
 	string bidding = "Biding initiated in console!";
-	ui.addFonts("assets/Fonts/unispace bd.ttf", "unispace bd", 18);
+	ui.addFonts("assets/Fonts/unispace bd.ttf", "unispace bd", 12);
 	ui.addFonts("assets/Fonts/arial.ttf", "arial", 22);
 	SDL_Color black = { 0,0,0,0 };
 	countryHoverLabel = new Label(bidding, "arial", 0, 0, black);
 	countryHoverLabel->setLabelText(renderer,screen, bidding, ui.getFont("arial"));
 	countryHoverLabel->drawLabel(renderer);
-	playerInfoLabel = new Label("", "unispace bd", 1040, 0, black);
+	playerInfoLabel = new Label("", "unispace bd", 1040, 10, black);
 	playerInfoLabel->setLabelText(renderer,screen, "", ui.getFont("unispace bd"));
 	playerInfoLabel->drawLabel(renderer);
 	SDL_RenderPresent(renderer);
@@ -178,20 +178,22 @@ void GameplayState::handleEvents(Game* game)
 				//card.Action
 				armyMove = true;
 				handlePlayerAction(game);
-
 				break;
 
 			case SDLK_2:
 				cout << "Card 2 \n\n";
 				toPlay->BuildCity(startingCountry);
+				toPlay->computeScore(gameMap);
 				break;
 			case SDLK_3:
 				cout << "Card 3 \n\n";
 				toPlay->DestroyArmy(startingCountry);
+				toPlay->computeScore(gameMap);
 				break;
 			case SDLK_4:
 				cout << "Card 4 \n\n";
 				toPlay->PlaceNewArmies(69, gameMap->getCountry(15));
+				toPlay->computeScore(gameMap);
 				break;
 
 			case SDLK_5:
@@ -260,6 +262,7 @@ void GameplayState::handlePlayerAction(Game* game)
 	toPlay->MoveArmies(gameMap, srcCountry, destCountry);
 	srcCountry = nullptr;
 	destCountry = nullptr;
+	toPlay->computeScore(gameMap);
 	}
 
 }
@@ -276,12 +279,22 @@ void GameplayState::placeStartingArmies(Game* game)
 {
 	for ( Player* p: game->players() )
 	{
-		startingCountry->occupyingPlayers().emplace(p);
+
+		startingCountry->updateOccupyingPlayerScore(3, p);
 		p->holdings().emplace(startingCountry->getID(), new Holdings());	
 		p->PlaceNewArmies(3, startingCountry);
-	}
 
+
+		/*for (int i = 0; i < numCountries; i++)
+		{
+			cout << p->getName();
+
+		}*/
+
+	}
 	cout << "\n------------------------------------------------------------\n";
+	
+
 
 }
 
@@ -291,10 +304,10 @@ void GameplayState::initPlayerHoldings(Game* game)
 	{
 		for (Player* p : game->players())
 		{
+			gameMap->getCountry(i)->updateOccupyingPlayerScore(0, p);
 			p->holdings().emplace(i, new Holdings());
+
 		}
-
-
 
 	}
 
@@ -343,7 +356,7 @@ void GameplayState::update(Game* game)
 	if (hoveredCountry)
 	{
 		std::stringstream ss;
-		ss << hoveredCountry->displayCountry() << *toPlay->getHoldings(hoveredCountry);
+		ss << *hoveredCountry << *toPlay->getHoldings(hoveredCountry);
 		countryHoverLabel->setLabelText(renderer, screen, ss.str(), ui.getFont("arial"));
 
 	}

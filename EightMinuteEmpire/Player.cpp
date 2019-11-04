@@ -4,10 +4,20 @@
 
 
 
-Holdings::Holdings() : numArmies(0), numCities(0){}
+Holdings::Holdings() : mNumArmies(0), mNumCities(0){}
 
 Holdings::~Holdings()
 {
+}
+
+int Holdings::numArmies()
+{
+	return mNumArmies;
+}
+
+int Holdings::numCities()
+{
+	return mNumCities;
 }
 
 Player::Player()
@@ -96,24 +106,20 @@ void Player::setCoinPurse(int amount)
 void Player::PlaceNewArmies(int numberOfArmies,GraphWorld::Country* country) {
 
 	string messageFail = "Cannot place a new army on country " + to_string(country->getID());
-	
-	if ( (country->occupyingPlayers().find(this) == country->occupyingPlayers().end()) )
-	{
-		cout << messageFail << endl;
-		return;
-	}
+
 
 	Holdings* playerHoldings = mHoldings.at(country->getID());
 
 	//Check if the player has a city on the country or it is a starting country
 
-	if ( playerHoldings->numCities == 0 && !country->isStartCountry() )
+	if ( playerHoldings->mNumCities == 0 && !country->isStartCountry() )
 	{
 		cout << messageFail << endl;
 		return;
 	}
-	playerHoldings->numArmies += numberOfArmies;
+	playerHoldings->mNumArmies += numberOfArmies;
 	cout << "Added " << numberOfArmies << " Armies to Country: " << country->getID() << " For player: " << this->getName() << endl;
+	country->updateOccupyingPlayerScore(playerHoldings->mNumArmies + playerHoldings->mNumCities, this);
 
 }
 
@@ -123,7 +129,7 @@ void Player::MoveArmies(GraphWorld::Map* map, GraphWorld::Country* start, GraphW
 	Holdings* holdingsOnStartCountry = mHoldings.at(start->getID());
 
 	//Check if the player has armies on the starting country
-	if (holdingsOnStartCountry->numArmies == 0)
+	if (holdingsOnStartCountry->mNumArmies == 0)
 	{
 		cout << "\nNo armies to move." << endl;
 		return;
@@ -145,11 +151,11 @@ void Player::MoveArmies(GraphWorld::Map* map, GraphWorld::Country* start, GraphW
 
 	//Move armies
 	Holdings* holdingsOnDestCountry = mHoldings.at(destination->getID());
-	holdingsOnStartCountry->numArmies -= 1;
-	holdingsOnDestCountry->numArmies += 1;
+	holdingsOnStartCountry->mNumArmies -= 1;
+	holdingsOnDestCountry->mNumArmies += 1;
 	cout << "Moved " << 1  << " Army from Country: " << start->getID() << " to Country: " << destination->getID() << endl;
-
-
+	start->updateOccupyingPlayerScore(holdingsOnStartCountry->mNumArmies + holdingsOnStartCountry->mNumCities, this);
+	destination->updateOccupyingPlayerScore(holdingsOnDestCountry->mNumArmies + holdingsOnDestCountry->mNumCities, this);
 }
 
 bool isValidMovement(int startPosition, int endPosition) {
@@ -160,22 +166,28 @@ bool isValidMovement(int startPosition, int endPosition) {
 void Player::BuildCity(GraphWorld::Country* country) 
 {
 	//TODO: check if the player still has any armies left to place (if numCountries > 0 )
-	getHoldings(country)->numCities++;
+	Holdings* countryHoldings = getHoldings(country);
+	countryHoldings->mNumCities++;
 	cout << "Built " << 1 << " City on Country: " << country->getID() << endl;
+	country->updateOccupyingPlayerScore(countryHoldings->mNumArmies + countryHoldings->mNumCities, this);
 }
 
 
 void Player::DestroyArmy(GraphWorld::Country* country)
 {
-	int armies = getHoldings(country)->numArmies;
+	Holdings* countryHoldings = getHoldings(country);
+	int armies = countryHoldings->mNumArmies;
 
 	if (armies != 0)
 	{
-		getHoldings(country)->numArmies--;
+		getHoldings(country)->mNumArmies--;
 	cout << "Destroyed " << 1 << " Army on Country: " << country->getID() << endl;
+	country->updateOccupyingPlayerScore(countryHoldings->mNumArmies + countryHoldings->mNumCities, this);
 	}
 	else
 		cout << "No armies to Destroy!\n" << endl;
+
+	
 }
 
 Holdings* Player::getHoldings(GraphWorld::Country* country)
@@ -188,19 +200,87 @@ std::unordered_map<int, Holdings*>& Player::holdings()
 	return mHoldings;
 }
 
+int Player::computeScore(GraphWorld::Map* map)
+{
+
+	GraphWorld::Country* country;
+	Player* countryOwner;
+	for (int i = 0; i < map->getNumCountries(); i++)
+	{
+		country = map->getCountry(i);
+		countryOwner = country->getCountryOwner();
+	auto it = country->occupyingPlayers().begin(); // Top element is the highest points, if tied with second there is no country owner
+	auto it2 = it;
+	std::advance(it2, 1);
+
+	//for (int i = 0; i < map->getCountry(i)->occupyingPlayers().size(); ++i)
+	//{
+	//	std::cout << it->first << "--" << it->second->getName() << std::endl;
+	//	++it;
+	//}
+
+	if (it->first == it2->first)
+	{
+		if (countryOwner)
+		{
+			countryOwner->updateCountryPoints(-1);
+			country->setCountryOwner(nullptr);
+		}
+
+	}
+
+		if (it->first > it2->first)
+		{
+			country->setCountryOwner(it->second);
+		if(!countryOwner)
+			it->second->updateCountryPoints(1);
+		}
+	
+	}
+
+	return totalVictoryPoints;
+}
+
+void Player::updateCountryPoints(int points)
+{
+	countryVictoryPoints += points;
+	sumVictoryPoints();
+
+}
+
+void Player::updateGoodsPoints(int points)
+{
+	goodsVictoryPoints += points;
+	sumVictoryPoints();
+}
+
+void Player::updateContinentPoints(int points)
+{
+	continentVictoryPoints += points;
+	sumVictoryPoints();
+}
+
+int Player::sumVictoryPoints()
+{
+	return totalVictoryPoints = countryVictoryPoints + continentVictoryPoints + goodsVictoryPoints;;
+}
+
 std::ostream& operator<<(std::ostream& s, const Holdings& holdings)
 {
 	return  s << 
-		"Number of Cites: " << holdings.numCities << std::endl <<
-		"Number of Armies: " << holdings.numArmies << std::endl;
+		"Number of Cites: " << holdings.mNumCities << std::endl <<
+		"Number of Armies: " << holdings.mNumArmies << std::endl;
 }
 
 std::ostream& operator<<(std::ostream& s, const Player& player)
 {
-	return  s << "--Player Info--\n" <<
-		"Name: " << player.name << std::endl <<
-		"Age: " << *player.age << std::endl <<
-		"Money: " << *player.money << std::endl;
+	return  s << "--" << player.name << "--\n" <<
+		"Coins: " << *player.money << std::endl <<
+		"Victory Points: " << player.totalVictoryPoints << endl <<
+		"Goods: " << player.goodsVictoryPoints << endl <<
+		"Countries: " << player.countryVictoryPoints << endl <<
+		"Countinents: " << player.continentVictoryPoints << endl << endl;
+		;
 
 }
 

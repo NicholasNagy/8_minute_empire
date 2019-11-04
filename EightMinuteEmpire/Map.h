@@ -2,7 +2,7 @@
 #define MAP_H
 #include "SDL.h"
 #include <string>
-#include <unordered_set>
+#include <set>
 
 class Player;
 
@@ -58,13 +58,23 @@ namespace GraphWorld
 			~Map();
 	};
 
+	struct Cmp
+	{
+		bool operator ()(const std::pair<int, Player*>& a, const std::pair<int, Player*>& b) const
+		{
+			return a.first > b.first;
+		}
+	};
+
 	class Country
 	{
 		int* country_ID;
 		bool* mIsStartCountry;
 		bool* mIsNavalCountry;
 		string continent;
-		std::unordered_set<Player*> mOccupyingPlayers;
+		std::multiset<std::pair<int, Player*>, Cmp> mOccupyingPlayers;  //Players occupying this country, sorted by most holdings(armies/cities) which are the keys
+
+		Player* owner;   
 
 		public:
 			Country();
@@ -74,12 +84,16 @@ namespace GraphWorld
 			bool isStartCountry();
 			bool isNavalCountry();
 			string getContinent();
-			std::unordered_set<Player*>& occupyingPlayers();
+			std::multiset<std::pair<int, Player*>, Cmp>& occupyingPlayers();
+			void updateOccupyingPlayerScore(int Score, Player*);
 			void setID(int id);
 			void setStartCountry(bool maybe);
 			void setContinent(string* continent);
 			string displayCountry();
+			void setCountryOwner(Player*);
+			Player* getCountryOwner();
 			~Country();
+			friend std::ostream& operator<<(std::ostream&, const Country&);
 	};
 
 	class LinkedList

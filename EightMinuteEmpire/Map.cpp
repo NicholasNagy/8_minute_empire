@@ -1,8 +1,8 @@
 #include <string>
 #include <iostream>
+#include <algorithm> 
 #include "Map.h"
 #include "TextureLoader.h"
-
 
 using std::string;
 using std::cout;
@@ -233,9 +233,32 @@ namespace GraphWorld
 		return continent;
 	}
 
-	std::unordered_set<Player*>& Country::occupyingPlayers()
+	std::multiset<std::pair<int, Player*>, Cmp>& Country::occupyingPlayers()
 	{
 		return mOccupyingPlayers;
+	}
+
+	void Country::updateOccupyingPlayerScore(int score, Player* p)
+	{
+
+		//Check if already exits first
+		bool found = false;
+
+		auto it = mOccupyingPlayers.begin();
+		for (int i = 0; i < mOccupyingPlayers.size(); ++i)
+		{
+			if (it->second == p)
+			{
+				found = true;
+				break;
+			}
+			++it;
+		}
+	
+		if (found)
+			mOccupyingPlayers.erase(it);
+
+		mOccupyingPlayers.emplace(std::make_pair(score, p));
 	}
 
 	void Country::setID(int id)
@@ -254,6 +277,7 @@ namespace GraphWorld
 		this->continent = *continent;
 	}
 
+
 	string Country::displayCountry()
 	{
 		string s1 = "countryID: " + to_string(*country_ID) + "\n";
@@ -261,6 +285,16 @@ namespace GraphWorld
 		string s3 = (*mIsNavalCountry) ? "true\n" : "false\n";
 		string s4 = "Continent: " + continent + "\n";
 		return s1 + "StartingCountry: " + s2 + "NavalCountry: " + s3 + s4;
+	}
+
+	void Country::setCountryOwner(Player* p)
+	{
+		owner = p;
+	}
+
+	Player* Country::getCountryOwner()
+	{
+		return owner;
 	}
 
 	Country::~Country()
@@ -626,6 +660,17 @@ namespace GraphWorld
 				TextureLoader::draw(renderer, texture, &src, &dest);
 			}
 		}
+	}
+
+	std::ostream& operator<<(std::ostream& s, const Country& country)
+	{
+	
+		return  s << "Country: " << *country.country_ID << endl <<
+			"Continent: " << country.continent << std::endl <<
+			"IsNavalCountry: " << *country.mIsNavalCountry << endl <<
+			"IsStartCountry: " << *country.mIsStartCountry << endl <<
+			"Owner: " << (country.owner? country.owner->getName() : "None") << endl;
+		
 	}
 
 }
