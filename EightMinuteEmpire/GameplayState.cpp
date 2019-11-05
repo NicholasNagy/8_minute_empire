@@ -32,7 +32,7 @@ GraphWorld::Country* destCountry = nullptr;
 GraphWorld::Country* startingCountry = nullptr;
 
 std::vector<GraphWorld::Country*> selectedCountries; //the countries selected by the use
-int selectedAction;  // the action id;
+int selectedAction = -1;  // the action id;
  
 int numCountries;
 int numPlayers;
@@ -46,7 +46,7 @@ Label* countryHoverLabel;
 Label* playerInfoLabel;
 Label* gameMessagesLabel;
 std::string gameMessages;
-Label* cards;
+Label* cardsLabel;
 
 int playerMove;  //The current player's turn
 
@@ -61,12 +61,26 @@ void GameplayState::init(Game* game)
 
 	GameplayState::initUI(game);
 
+	//Bidding
 	playerMove = Bid::initiateBidding(game);
 	bid = true;
+
+	//Initial Army Placement
 	placeStartingArmies(game);
+
+	//Deck shuffling
+	game->deck()->shuffleDeck();
+	game->deck()->printDeck();
+	
 	toPlay = game->players().at(playerMove);
-	gameMessages =  toPlay->getName() + " turn to move\n";
-	cout << gameMessages;
+	gameMessages =  toPlay->getName() + " turn to move. Select a card by pressing (1-6) on the keyboard. 'Enter' to confirm move.\n";
+
+	Hand* hand = new Hand(game->deck()); cout << "\n------------------------------------------------------------\n";
+	game->setHand(hand);
+
+	hand->printHand();
+	cout << "\n------------------------------------------------------------\n";
+	cout << endl <<gameMessages;
 }
 
 void GameplayState::initWindow(Game* game)
@@ -102,12 +116,14 @@ void GameplayState::initUI(Game* game)
 		exit(2);
 	}
 	string bidding = "Biding initiated in console!";
-	ui.addFonts("assets/Fonts/unispace bd.ttf", "unispace bd", 10);
+	ui.addFonts("assets/Fonts/unispace bd.ttf", "unispace bd", 9);
 	ui.addFonts("assets/Fonts/arial.ttf", "arial", 22);
-	ui.addFonts("assets/Fonts/ARIALN.TTF", "arialN", 30);
+	ui.addFonts("assets/Fonts/ARIALN.TTF", "arialN", 26);
 
 
 	SDL_Color black = { 0,0,0,0 };
+	SDL_Color r = {3,2,23,0 };
+
 	countryHoverLabel = new Label(bidding, "arial", 0, 0, black);
 	countryHoverLabel->setLabelText(renderer,screen, bidding, ui.getFont("arial"));
 	countryHoverLabel->drawLabel(renderer);
@@ -120,10 +136,15 @@ void GameplayState::initUI(Game* game)
 	gameMessagesLabel->setLabelText(renderer, screen, "", ui.getFont("arialN"));
 	gameMessagesLabel->drawLabel(renderer);
 
+	cardsLabel = new Label("", "unispace bd", 1035, 565, r);
+	cardsLabel->setLabelText(renderer, screen, "", ui.getFont("unispace bd"));
+	cardsLabel->drawLabel(renderer);
+
 	SDL_RenderPresent(renderer);
 	countryHoverLabel->destroyLabelTexture();
 	playerInfoLabel->destroyLabelTexture();
 	gameMessagesLabel->destroyLabelTexture();
+	cardsLabel->destroyLabelTexture();
 
 }
 
@@ -163,11 +184,14 @@ void GameplayState::handleEvents(Game* game)
 		if (bid)
 		{
 
-			if (selectedAction > 0) // && ACTION ID == place new armies
+			if (selectedAction >= 0 && selectedAction != 1)
 			{
 				getClickedCountry(false);
 			}
-		
+			else if (selectedAction == 1)
+			{
+				getClickedCountry(true);
+			}
 		}
 		break;
 	case SDL_MOUSEMOTION:
@@ -195,26 +219,39 @@ void GameplayState::handleEvents(Game* game)
 			case SDLK_1:
 				if (!destroyArmyAction)
 				{
-					cout << "Handslot 1 \n\n";
-					selectedAction = 1;
-
+					 cout << " -- Selected Handslot 1 -- \n";
+					 if (toPlay->getMoney() >= game->hand()->getCardCostAtPosition(1))
+					 {
+						 toPlay->setHand(game->hand()->getCardAtPosition(1, game->deck()));
+						 toPlay->setCoinPurse(toPlay->getMoney() - game->hand()->getCardCostAtPosition(1));
+						 toPlay->getHand()->printCard();
+						 selectedAction = toPlay->getHand()->getAction()->getID();
+					 }
+					 else
+						 cout << "\nCannot afford the cost of this card. Please select another card.\n";
 				}
 				else if (numPlayers <= 5)
 				{
 					toDestroy = game->players().at(0);
 					cout << "Selected Player " << 1 << endl;
 				}
-					
-				//get type of card
-				//card.Action
-				
 				break;
 
 			case SDLK_2:
 				if (!destroyArmyAction)
 				{
-					cout << "Handslot 2 \n\n";
-					selectedAction = 2;
+					cout << "-- Selected Handslot 2 -- \n";
+					if (toPlay->getMoney() >= game->hand()->getCardCostAtPosition(2))
+					{
+						toPlay->setHand(game->hand()->getCardAtPosition(2, game->deck()));
+						toPlay->setCoinPurse(toPlay->getMoney() - game->hand()->getCardCostAtPosition(2));
+						selectedAction = toPlay->getHand()->getAction()->getID();
+						toPlay->getHand()->printCard();
+						cout << "selectedAction: " << selectedAction << endl;
+					}
+					else
+						cout << "\nCannot afford the cost of this card. Please select another card.\n";
+
 				}
 				else if (numPlayers <= 5)
 				{
@@ -226,8 +263,18 @@ void GameplayState::handleEvents(Game* game)
 			case SDLK_3:
 				if (!destroyArmyAction)
 				{
-					cout << "Handslot 3 \n\n";
-					selectedAction = 3;
+					cout << "-- Selected Handslot 3 -- \n";
+					if (toPlay->getMoney() >= game->hand()->getCardCostAtPosition(3))
+					{
+					toPlay->setHand(game->hand()->getCardAtPosition(3, game->deck()));
+					toPlay->setCoinPurse(toPlay->getMoney() - game->hand()->getCardCostAtPosition(3));
+					selectedAction = toPlay->getHand()->getAction()->getID();
+					toPlay->getHand()->printCard();
+					cout << "selectedAction: " << selectedAction << endl;
+					}
+					else
+						cout << "\nCannot afford the cost of this card. Please select another card.\n";
+					
 				}
 				else if (numPlayers <= 5 && numPlayers >=3 )
 				{
@@ -239,9 +286,18 @@ void GameplayState::handleEvents(Game* game)
 			case SDLK_4:
 				if (!destroyArmyAction)
 				{
-					cout << "Handslot 4 \n\n";
-					selectedAction = 4;
-					destroyArmyAction = true;
+					cout << "-- Selected Handslot 4 -- \n";
+					if (toPlay->getMoney() >= game->hand()->getCardCostAtPosition(4))
+					{
+						toPlay->setHand(game->hand()->getCardAtPosition(4, game->deck()));
+						toPlay->setCoinPurse(toPlay->getMoney() - game->hand()->getCardCostAtPosition(4));
+						destroyArmyAction = true;
+						toPlay->getHand()->printCard();
+						selectedAction = toPlay->getHand()->getAction()->getID();
+					}
+					else
+						cout << "\nCannot afford the cost of this card. Please select another card.\n";
+
 				}
 				else if (numPlayers == 4 || numPlayers == 5)
 				{
@@ -254,8 +310,17 @@ void GameplayState::handleEvents(Game* game)
 			case SDLK_5:
 				if (!destroyArmyAction)
 				{
-					cout << "Handslot 5 \n\n";
-					selectedAction = 5;
+					cout << "-- Selected Handslot 5 -- \n";
+					if (toPlay->getMoney() >= game->hand()->getCardCostAtPosition(5))
+					{
+						toPlay->setHand(game->hand()->getCardAtPosition(5, game->deck()));
+						toPlay->setCoinPurse(toPlay->getMoney() - game->hand()->getCardCostAtPosition(5));
+						toPlay->getHand()->printCard();
+						selectedAction = toPlay->getHand()->getAction()->getID();
+					}
+					else
+						cout << "\nCannot afford the cost of this card. Please select another card.\n";
+
 				}
 				else if (numPlayers == 5)
 				{
@@ -266,41 +331,43 @@ void GameplayState::handleEvents(Game* game)
 			case SDLK_6:
 				if (!destroyArmyAction)
 				{
-					cout << "Handslot 6 \n\n";
-					selectedAction = 6;
+					cout << "-- Selected Handslot 6 -- \n";
+					if (toPlay->getMoney() >= game->hand()->getCardCostAtPosition(6))
+					{
+						toPlay->setHand(game->hand()->getCardAtPosition(6, game->deck()));
+						toPlay->setCoinPurse(toPlay->getMoney() - game->hand()->getCardCostAtPosition(6));
+						toPlay->getHand()->printCard();
+						selectedAction = toPlay->getHand()->getAction()->getID();
+					}
+					else
+						cout << "Cannot afford the cost of this card. Please select another card.\n";
 				}
 				break;
 			case SDLK_RETURN:
 
-				if (selectedAction > 0)
+				if (selectedAction >= 0)
 				{
 					handlePlayerAction(game);
 					nextMove(game);
 				}
 
-
 				break;
 			default:
 				break;
 			}
-
 		}
 
 	default:
 		break;
 	}
 
-
 }
 
 void GameplayState::getHoveredCountry()
 {
-
-	//Find out type of tile clicked
 	static int typeCol;
 	static int typeRow;
 	static int type;
-
 	typeCol = cursor.x / GRID_CELL_SIZE;
 	typeRow = cursor.y / GRID_CELL_SIZE;
 
@@ -309,9 +376,7 @@ void GameplayState::getHoveredCountry()
 		type = gameMap->getTileMap()->tiles[typeRow][typeCol];
 		if (type < numCountries && type >= 0)
 			hoveredCountry = gameMap->getCountry(type);
-
 	}
-
 }
 
 void GameplayState::getClickedCountry(bool armyMove)
@@ -331,64 +396,54 @@ void GameplayState::getClickedCountry(bool armyMove)
 		if (type < numCountries && type >= 0)
 			clickedON = gameMap->getCountry(type);
 
-
 		if (!armyMove)
 		{		
 			selectedCountries.push_back(clickedON);
-			std::cout << "Selected Country: " << clickedON->getID() << std::endl;
-			
+			std::cout << "\nSelected Country: " << clickedON->getID() << std::endl;			
 		}
 		else
 		{
-
 			switch (selectedCountries.size())
 			{
 			case 0:
 				selectedCountries.push_back(clickedON);
-				std::cout << "Selected Country To Move From: " << clickedON->getID() << std::endl;
+				std::cout << "\nSelected Country To Move From: " << clickedON->getID() << std::endl;
 				break;
 			case 1:
 				selectedCountries.push_back(clickedON);
-				std::cout << "Selected Country To Move To: " << clickedON->getID() << std::endl;
+				std::cout << "\nSelected Country To Move To: " << clickedON->getID() << std::endl;
 				break;
 			case 2:
 				selectedCountries.at(1) = clickedON;
-				std::cout << "Selected Country To Move To: " << clickedON->getID() << std::endl;
+				std::cout << "\nSelected Country To Move To: " << clickedON->getID() << std::endl;
 				break;
-			}
-			
-		
-			
-
+			}			
 		}
-
-
-
 	}
-
-
 }
 
 void GameplayState::handlePlayerAction(Game* game)
 {
 
-	//switch
-
 	switch (selectedAction)
 	{
-	case 1:
+	case 0:
 		handlePlaceNewArmies(game);
 		break;
-	case 2:
+	case 1:
 		handleMoveArmies(game);
 		break;
-	case 3:
+	case 2:
 		handleBuildCity(game);
 		break;
-	case 4:
+	case 3:
 		handleDestroyArmy(game);
 		break;
-	case 5:
+	case 4: //and
+		handleAndOrAction(game);
+		break;
+	case 5:  //or
+		handleAndOrAction(game);
 		break;
 	case 6:
 		handleIgnore(game);
@@ -402,15 +457,14 @@ void GameplayState::handlePlayerAction(Game* game)
 void GameplayState::handlePlaceNewArmies(Game* game)
 {
 
-	if ((selectedCountries.size() == 3) || selectedAction > 0)
-	{
+
 		for (GraphWorld::Country* c : selectedCountries)
 		{
 			toPlay->PlaceNewArmies(1, c);
 		
 		}
 		
-	}
+	
 
 }
 
@@ -447,7 +501,7 @@ void GameplayState::handleAndOrAction(Game* game)
 
 void GameplayState::handleIgnore(Game* game)
 {
-	cout << "Card ignored\n";
+	cout << "\nCard Ignored\n";
 }
 
 
@@ -457,11 +511,12 @@ void GameplayState::handleIgnore(Game* game)
 void GameplayState::nextMove(Game* game)
 {
 	toPlay->computeScore(gameMap);
-	selectedAction = 0;
+	selectedAction = -1;
 	selectedCountries.clear();
 	destroyArmyAction = false;
 	gameMessages.clear();
-	toPlay->setCardToPlay(toPlay->getCardsToPlay() - 1);
+	toPlay->setHand(nullptr);
+	toPlay->setCardToPlay(toPlay->getCardsToPlay() - 1); 
 
 	if (game->players().at(numPlayers - 1)->getCardsToPlay() == 0)
 	{
@@ -478,7 +533,10 @@ void GameplayState::nextMove(Game* game)
 
 	toPlay = game->players().at(playerMove);
 	gameMessages.clear();
-	gameMessages = toPlay->getName() + " turn to move\n";
+	cout << "Next Hand..." << endl << gameMessages << endl;
+	game->hand()->printHand();
+	cout << "------------------------------------------------------------\n";
+	gameMessages = toPlay->getName() + " turn to move. Select a card by pressing (1-6) on the keyboard. 'Enter' to confirm move.\n";
 	cout << gameMessages;
 }
 
@@ -551,6 +609,7 @@ void GameplayState::draw(Game* game)
 	countryHoverLabel->drawLabel(renderer);
 	playerInfoLabel->drawLabel(renderer);
 	gameMessagesLabel->drawLabel(renderer);
+	cardsLabel->drawLabel(renderer);
 	SDL_RenderPresent(renderer);
 
 }
@@ -562,6 +621,7 @@ void GameplayState::update(Game* game)
 	countryHoverLabel->destroyLabelTexture();
 	playerInfoLabel->destroyLabelTexture();
 	gameMessagesLabel->destroyLabelTexture();
+	cardsLabel->destroyLabelTexture();
 
 	for (Player* p : game->players())
 		ss << *p;
@@ -576,6 +636,11 @@ void GameplayState::update(Game* game)
 		countryHoverLabel->setLabelText(renderer, screen, ss.str(), ui.getFont("arial"));
 
 	}
+	ss.clear();
 	gameMessagesLabel->setLabelText(renderer, screen, gameMessages, ui.getFont("arialN"));
+
+	cardsLabel->setLabelText(renderer, screen, "1\n2\n3\n4\n5\n6\n", ui.getFont("unispace bd"));
+
+
 
 }

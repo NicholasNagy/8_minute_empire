@@ -18,7 +18,7 @@ public:
 		cout << "Card: Goods = " << *good << ", ";
 		action->printAction();
 	}
-
+	Action* getAction();
 private:
 	int* good;
 	Action* action;

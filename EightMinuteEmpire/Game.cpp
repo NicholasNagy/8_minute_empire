@@ -125,6 +125,26 @@ void Game::setMap(GraphWorld::Map* map)
 	this->map = map;
 }
 
+void Game::setDeck(Deck* d)
+{
+	mDeck = d;
+}
+
+void Game::setHand(Hand* h)
+{
+	mHand = h;
+}
+
+Deck* Game::deck()
+{
+	return mDeck;
+}
+
+Hand* Game::hand()
+{
+	return mHand;
+}
+
 std::vector<Player*>& Game::players()
 {
 	return mPlayers;

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <unordered_map>
 #include "Map.h"
+#include "Cards.h"
 using namespace std;
 
 class Holdings
@@ -52,6 +53,8 @@ public:
 	void updateGoodsPoints(int points);
 	void updateContinentPoints(int points);
 	void setCardToPlay(int cardsToPlay);
+	void setHand(Card*);
+	Card* getHand();
 	int getCardsToPlay();
 	int getVictoryPoints();
 	int getNumArmies();
@@ -72,6 +75,7 @@ private:
 	int sumVictoryPoints();
 	int mArmies;
 	int mCities;
+	Card* hand;
 
 
 

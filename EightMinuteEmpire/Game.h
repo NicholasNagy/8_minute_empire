@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "MapLoader.h"
 #include <vector>
+#include "Cards.h"
 
 extern int WINDOW_X;
 extern int WINDOW_X_SMALL;
@@ -30,6 +31,10 @@ public:
 	void popState();
 	void pushState(GameState* state);
 	void setMap(GraphWorld::Map* map);
+	void setDeck(Deck*);
+	void setHand(Hand*);
+	Deck* deck();
+	Hand* hand();
 	std::vector<Player*>& players(); //get vector of players
 	GraphWorld::Map* getMap();
 	MapLoader* getMapLoader();
@@ -43,6 +48,8 @@ private:
 	std::vector<GameState*> states;
 	MapLoader* mapLoader;
 	GraphWorld::Map* map;
+	Deck* mDeck;
+	Hand* mHand;
 	std::vector<Player*> mPlayers;
 
 

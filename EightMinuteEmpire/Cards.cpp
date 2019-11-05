@@ -30,6 +30,11 @@ Card::~Card() {
 	delete action;
 }
 
+Action* Card::getAction()
+{
+	return action;
+}
+
 
 
 //############################### Deck Class ###############################
@@ -127,6 +132,7 @@ Card* Deck::draw()
 void Deck::shuffleDeck()
 {
 	// To obtain a time-based seed 
+	cout << "Suffling Deck..." << endl;
 	unsigned seed = chrono::system_clock::now().time_since_epoch().count();
 	shuffle(cardsDeck->begin(), cardsDeck->end(), default_random_engine(seed));
 	cout << "Deck has been shuffled" << endl;

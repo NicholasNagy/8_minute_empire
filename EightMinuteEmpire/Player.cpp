@@ -31,6 +31,7 @@ Player::Player()
 	age = new int(rand() % 100 + 1);
 	mArmies = 14;
 	mCities = 3;
+	hand = nullptr;
 }
 
 Player::Player(std::string* name, int age)
@@ -40,6 +41,7 @@ Player::Player(std::string* name, int age)
 	this->age = new int(age);
 	mArmies = 14;
 	mCities = 3;
+	hand = nullptr;
 }
 
 Player::Player(int theMoney, int theOwnedCountries[], int theOwnedCities[]) {
@@ -52,6 +54,7 @@ Player::Player(int theMoney, int theOwnedCountries[], int theOwnedCities[]) {
 	age = new int(rand() % 100 + 1);
 	mArmies = 14;
 	mCities = 3;
+	hand = nullptr;
 }
 
 Player::Player(std::string* name, int age, int theMoney, int theOwnedCountries[], int theOwnedCities[])
@@ -63,6 +66,7 @@ Player::Player(std::string* name, int age, int theMoney, int theOwnedCountries[]
 	ownedCountries = theOwnedCountries;
 	mArmies = 14;
 	mCities = 3;
+	hand = nullptr;
 }
 
 Player::~Player()
@@ -284,6 +288,16 @@ void Player::updateContinentPoints(int points)
 void Player::setCardToPlay(int n)
 {
 	cardsToPlay = n;
+}
+
+void Player::setHand(Card* h)
+{
+	hand = h;
+}
+
+Card* Player::getHand()
+{
+	return hand;
 }
 
 int Player::getCardsToPlay()

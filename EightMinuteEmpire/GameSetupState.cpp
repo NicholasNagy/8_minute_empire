@@ -10,6 +10,7 @@
 #include "Player.h"
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_sdl.h"
+#include "Cards.h"
 
 GameSetupState GameSetupState::mGameSetupState;
 SDL_Renderer* GameSetupState::renderer = nullptr;
@@ -22,7 +23,7 @@ const int THREE_PLAYER_COIN_PURSE = 11;
 const int FOUR_PLAYER_COIN_PURSE = 9;
 const int FIVE_PLAYER_COIN_PURSE = 8;
 
-const int TWO_PLAYER_CARDS = 1;
+const int TWO_PLAYER_CARDS = 13;
 const int THREE_PLAYER_CARDS = 10;
 const int FOUR_PLAYER_CARDS = 8;
 const int FIVE_PLAYER_CARDS = 7;
@@ -277,8 +278,21 @@ void GameSetupState::handleGameStart(Game* game)
 	ImGui::End();
 	if (select)
 	{
+		//Creating a deck
+		Deck* deck = new Deck();
+		game->setDeck(deck);
+		deck->printDeck();
 
 		setupPlayers(game);
+
+		std::cout << endl << "--Plyer Hands--\n";
+		for (Player* p : game->players())
+		{
+			if (!p->getHand())
+				std::cout << p->getName() << " - Hand: " << "Empty" << endl;
+		}
+
+
 		game->changeState(GameplayState::Instance());
 	}
 
