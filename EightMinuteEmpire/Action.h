@@ -10,7 +10,7 @@ public:
 	Action(int id, int multiplicity, bool isWaterMovementAllowed, int firstActionID, int secondActionID, int secondActionMultiplicity, bool secondActionIsWaterMovementAllowed);
 	int getID() { return id; }
 	int getMultiplicity() { return multiplicity; }
-	bool isWaterMovementAllowed() { return isWaterMovementAllowed; }
+	bool isWaterMovementAllowed() { return mIsWaterMovementAllowed; }
 	int getFirstActionID() { return firstActionID; }
 	int getSecondActionID() { return secondActionID; }
 	int getSecondActionMultiplicity() { return secondActionMultiplicity; }
@@ -19,7 +19,7 @@ public:
 private:
 	int id;
 	int multiplicity;
-	bool isWaterMovementAllowed;
+	bool mIsWaterMovementAllowed;
 	int firstActionID;
 	int secondActionID;
 	int secondActionMultiplicity;

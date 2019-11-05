@@ -22,7 +22,7 @@ const int THREE_PLAYER_COIN_PURSE = 11;
 const int FOUR_PLAYER_COIN_PURSE = 9;
 const int FIVE_PLAYER_COIN_PURSE = 8;
 
-const int TWO_PLAYER_CARDS = 13;
+const int TWO_PLAYER_CARDS = 1;
 const int THREE_PLAYER_CARDS = 10;
 const int FOUR_PLAYER_CARDS = 8;
 const int FIVE_PLAYER_CARDS = 7;

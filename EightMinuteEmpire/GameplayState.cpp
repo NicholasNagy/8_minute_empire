@@ -9,6 +9,7 @@
 #include "Map.h"
 #include "Bid.h"
 #include "GameOverlay.h"
+#include "Action.h"
 
 GameplayState GameplayState::mGameplayState;
 SDL_Renderer* GameplayState::renderer = nullptr;
@@ -22,22 +23,30 @@ bool mouseActive = false;
 bool mouseHover = false;
 bool mouseClick = false;
 bool bid = false;
-bool nextAction = false;
+
 
 GraphWorld::Map* gameMap;
 GraphWorld::Country* hoveredCountry = nullptr;
 GraphWorld::Country* srcCountry = nullptr;
 GraphWorld::Country* destCountry = nullptr;
 GraphWorld::Country* startingCountry = nullptr;
+
+std::vector<GraphWorld::Country*> selectedCountries; //the countries selected by the use
+int selectedAction;  // the action id;
+ 
 int numCountries;
 int numPlayers;
 Player* toPlay;
 
+bool destroyArmyAction = false;
+Player* toDestroy;
+
 GameOverlay ui;
 Label* countryHoverLabel;
 Label* playerInfoLabel;
-bool armyMove = false;
-
+Label* gameMessagesLabel;
+std::string gameMessages;
+Label* cards;
 
 int playerMove;  //The current player's turn
 
@@ -54,9 +63,10 @@ void GameplayState::init(Game* game)
 
 	playerMove = Bid::initiateBidding(game);
 	bid = true;
-	toPlay = game->players().at(playerMove);
 	placeStartingArmies(game);
-
+	toPlay = game->players().at(playerMove);
+	gameMessages =  toPlay->getName() + " turn to move\n";
+	cout << gameMessages;
 }
 
 void GameplayState::initWindow(Game* game)
@@ -92,20 +102,28 @@ void GameplayState::initUI(Game* game)
 		exit(2);
 	}
 	string bidding = "Biding initiated in console!";
-	ui.addFonts("assets/Fonts/unispace bd.ttf", "unispace bd", 12);
+	ui.addFonts("assets/Fonts/unispace bd.ttf", "unispace bd", 10);
 	ui.addFonts("assets/Fonts/arial.ttf", "arial", 22);
+	ui.addFonts("assets/Fonts/ARIALN.TTF", "arialN", 30);
+
+
 	SDL_Color black = { 0,0,0,0 };
 	countryHoverLabel = new Label(bidding, "arial", 0, 0, black);
 	countryHoverLabel->setLabelText(renderer,screen, bidding, ui.getFont("arial"));
 	countryHoverLabel->drawLabel(renderer);
+
 	playerInfoLabel = new Label("", "unispace bd", 1040, 10, black);
 	playerInfoLabel->setLabelText(renderer,screen, "", ui.getFont("unispace bd"));
 	playerInfoLabel->drawLabel(renderer);
+
+	gameMessagesLabel = new Label("", "arialN", 5, 585, black);
+	gameMessagesLabel->setLabelText(renderer, screen, "", ui.getFont("arialN"));
+	gameMessagesLabel->drawLabel(renderer);
+
 	SDL_RenderPresent(renderer);
 	countryHoverLabel->destroyLabelTexture();
 	playerInfoLabel->destroyLabelTexture();
-
-
+	gameMessagesLabel->destroyLabelTexture();
 
 }
 
@@ -144,10 +162,13 @@ void GameplayState::handleEvents(Game* game)
 
 		if (bid)
 		{
-			getCursorCountry();
-			mouseClick = true;
-		}
 
+			if (selectedAction > 0) // && ACTION ID == place new armies
+			{
+				getClickedCountry(false);
+			}
+		
+		}
 		break;
 	case SDL_MOUSEMOTION:
 		cursor.x = cursorShadow.x = (event.motion.x / GRID_CELL_SIZE) * GRID_CELL_SIZE;
@@ -156,7 +177,7 @@ void GameplayState::handleEvents(Game* game)
 		if (!mouseActive)
 			mouseActive = true;
 		if (bid)
-			getCursorCountry();
+			getHoveredCountry();
 		break;
 	case SDL_WINDOWEVENT:
 		if (event.window.event == SDL_WINDOWEVENT_ENTER && !mouseHover)
@@ -172,47 +193,92 @@ void GameplayState::handleEvents(Game* game)
 			{
 
 			case SDLK_1:
-				cout << "Card 1 \n\n";
+				if (!destroyArmyAction)
+				{
+					cout << "Handslot 1 \n\n";
+					selectedAction = 1;
 
+				}
+				else if (numPlayers <= 5)
+				{
+					toDestroy = game->players().at(0);
+					cout << "Selected Player " << 1 << endl;
+				}
+					
 				//get type of card
 				//card.Action
-				armyMove = true;
-				if (srcCountry && destCountry)
-				{
-					toPlay->MoveArmies(gameMap, srcCountry, destCountry);
-					srcCountry = nullptr;
-					destCountry = nullptr;
-					toPlay->computeScore(gameMap);
-				}
-				nextMove(game);
+				
 				break;
 
 			case SDLK_2:
-				cout << "Card 2 \n\n";
-				toPlay->BuildCity(startingCountry);
-				toPlay->computeScore(gameMap);
-				nextMove(game);
+				if (!destroyArmyAction)
+				{
+					cout << "Handslot 2 \n\n";
+					selectedAction = 2;
+				}
+				else if (numPlayers <= 5)
+				{
+					toDestroy = game->players().at(1);
+					cout << "Selected Player " << 2 << endl;
+				}
+					
 				break;
 			case SDLK_3:
-				cout << "Card 3 \n\n";
-				toPlay->DestroyArmy(startingCountry);
-				toPlay->computeScore(gameMap);
-				nextMove(game);
+				if (!destroyArmyAction)
+				{
+					cout << "Handslot 3 \n\n";
+					selectedAction = 3;
+				}
+				else if (numPlayers <= 5 && numPlayers >=3 )
+				{
+					toDestroy = game->players().at(2);
+					cout << "Selected Player " << 3 << endl;
+				}
+					
 				break;
 			case SDLK_4:
-				cout << "Card 4 \n\n";
-				toPlay->PlaceNewArmies(69, gameMap->getCountry(15));
-				toPlay->computeScore(gameMap);
-				nextMove(game);
+				if (!destroyArmyAction)
+				{
+					cout << "Handslot 4 \n\n";
+					selectedAction = 4;
+					destroyArmyAction = true;
+				}
+				else if (numPlayers == 4 || numPlayers == 5)
+				{
+					toDestroy = game->players().at(3);
+					cout << "Selected Player " << 4 << endl;
+				}
+
 				break;
 
 			case SDLK_5:
-				cout << "Card 5 \n\n";
-				nextMove(game);
+				if (!destroyArmyAction)
+				{
+					cout << "Handslot 5 \n\n";
+					selectedAction = 5;
+				}
+				else if (numPlayers == 5)
+				{
+				toDestroy = game->players().at(4);
+				cout << "Selected Player " << 5 << endl;
+				}
 				break;
 			case SDLK_6:
-				cout << "Card 6 \n\n";
-				nextMove(game);
+				if (!destroyArmyAction)
+				{
+					cout << "Handslot 6 \n\n";
+					selectedAction = 6;
+				}
+				break;
+			case SDLK_RETURN:
+
+				if (selectedAction > 0)
+				{
+					handlePlayerAction(game);
+					nextMove(game);
+				}
+
+
 				break;
 			default:
 				break;
@@ -227,7 +293,7 @@ void GameplayState::handleEvents(Game* game)
 
 }
 
-void GameplayState::getCursorCountry()
+void GameplayState::getHoveredCountry()
 {
 
 	//Find out type of tile clicked
@@ -243,41 +309,177 @@ void GameplayState::getCursorCountry()
 		type = gameMap->getTileMap()->tiles[typeRow][typeCol];
 		if (type < numCountries && type >= 0)
 			hoveredCountry = gameMap->getCountry(type);
-		if (srcCountry && mouseClick)
-		{
-			destCountry = gameMap->getCountry(type);
-			std::cout << "Selected Country (to move): " << destCountry->getID() << std::endl;
-			mouseClick = false;
+
+	}
+
+}
+
+void GameplayState::getClickedCountry(bool armyMove)
+{
+	//Find out type of tile clicked
+	static int typeCol;
+	static int typeRow;
+	static int type;
+
+	typeCol = cursor.x / GRID_CELL_SIZE;
+	typeRow = cursor.y / GRID_CELL_SIZE;
+
+	if (cursor.x < MAP_WIDTH * GRID_CELL_SIZE)
+	{
+		type = gameMap->getTileMap()->tiles[typeRow][typeCol];
+		GraphWorld::Country* clickedON = nullptr;
+		if (type < numCountries && type >= 0)
+			clickedON = gameMap->getCountry(type);
+
+
+		if (!armyMove)
+		{		
+			selectedCountries.push_back(clickedON);
+			std::cout << "Selected Country: " << clickedON->getID() << std::endl;
+			
 		}
-		if (mouseClick && armyMove)
+		else
 		{
-			srcCountry = gameMap->getCountry(type);
-			std::cout << "Selected Country (source): " << srcCountry->getID() << std::endl;
-			mouseClick = false;
-			armyMove = false;
+
+			switch (selectedCountries.size())
+			{
+			case 0:
+				selectedCountries.push_back(clickedON);
+				std::cout << "Selected Country To Move From: " << clickedON->getID() << std::endl;
+				break;
+			case 1:
+				selectedCountries.push_back(clickedON);
+				std::cout << "Selected Country To Move To: " << clickedON->getID() << std::endl;
+				break;
+			case 2:
+				selectedCountries.at(1) = clickedON;
+				std::cout << "Selected Country To Move To: " << clickedON->getID() << std::endl;
+				break;
+			}
+			
+		
+			
+
 		}
+
 
 
 	}
+
 
 }
 
 void GameplayState::handlePlayerAction(Game* game)
 {
 
-	
+	//switch
+
+	switch (selectedAction)
+	{
+	case 1:
+		handlePlaceNewArmies(game);
+		break;
+	case 2:
+		handleMoveArmies(game);
+		break;
+	case 3:
+		handleBuildCity(game);
+		break;
+	case 4:
+		handleDestroyArmy(game);
+		break;
+	case 5:
+		break;
+	case 6:
+		handleIgnore(game);
+		break;
+	default:
+		break;
+	}
 
 }
 
+void GameplayState::handlePlaceNewArmies(Game* game)
+{
+
+	if ((selectedCountries.size() == 3) || selectedAction > 0)
+	{
+		for (GraphWorld::Country* c : selectedCountries)
+		{
+			toPlay->PlaceNewArmies(1, c);
+		
+		}
+		
+	}
+
+}
+
+void GameplayState::handleMoveArmies(Game* game)
+{
+
+	if (selectedCountries.size() == 2)
+	{
+		toPlay->MoveArmies(gameMap, selectedCountries[0], selectedCountries[1]);
+	}
+
+
+}
+
+void GameplayState::handleBuildCity(Game* game)
+{
+	if (selectedCountries[0])
+	{
+		toPlay->BuildCity(selectedCountries.back());
+	}
+
+
+}
+
+void GameplayState::handleDestroyArmy(Game* game)
+{
+	if(toDestroy)
+	toPlay->DestroyArmy(toDestroy, selectedCountries.back());
+}
+
+void GameplayState::handleAndOrAction(Game* game)
+{
+}
+
+void GameplayState::handleIgnore(Game* game)
+{
+	cout << "Card ignored\n";
+}
+
+
+
+
+
 void GameplayState::nextMove(Game* game)
 {
-	playerMove++;
+	toPlay->computeScore(gameMap);
+	selectedAction = 0;
+	selectedCountries.clear();
+	destroyArmyAction = false;
+	gameMessages.clear();
+	toPlay->setCardToPlay(toPlay->getCardsToPlay() - 1);
 
+	if (game->players().at(numPlayers - 1)->getCardsToPlay() == 0)
+	{
+
+		cout << "Game Over!" << endl;
+		computeFinalScore(game);
+		return;
+	}
+
+
+	playerMove++;
 	if (playerMove == numPlayers)
 		playerMove = 0;
 
 	toPlay = game->players().at(playerMove);
-	cout << toPlay->getName() << " turn to move\n";
+	gameMessages.clear();
+	gameMessages = toPlay->getName() + " turn to move\n";
+	cout << gameMessages;
 }
 
 void GameplayState::placeStartingArmies(Game* game)
@@ -288,13 +490,6 @@ void GameplayState::placeStartingArmies(Game* game)
 		startingCountry->updateOccupyingPlayerScore(3, p);
 		p->holdings().emplace(startingCountry->getID(), new Holdings());	
 		p->PlaceNewArmies(3, startingCountry);
-
-
-		/*for (int i = 0; i < numCountries; i++)
-		{
-			cout << p->getName();
-
-		}*/
 
 	}
 	cout << "\n------------------------------------------------------------\n";
@@ -318,15 +513,29 @@ void GameplayState::initPlayerHoldings(Game* game)
 
 }
 
-
-void choseMove()
+Player* GameplayState::computeFinalScore(Game* game)
 {
-	// PlaceNewArmies():Place new armies on the board.
-	//MoveOverLand() and MoveOverWater():Move over land and/or water
-	//BuildCity() :Build a city.
-	//DestroyArmy():Destroy army.
-	//AndOrAction(): “And/Or” actions. 
-	// Ignore() : Player may take the card and ignore the action
+	std::vector<int> playerScores;
+	for (Player* p : game->players())
+	{
+		playerScores.push_back(p->getVictoryPoints());
+
+	}
+	std::sort(playerScores.begin(), playerScores.end(), std::greater<int>());
+
+	if (playerScores.at(0) > playerScores.at(1))
+	{
+		gameMessages = "Game Over -" + game->players().at(0)->getName() + " won!\n";
+		return game->players().at(0);
+	}
+	else
+	{
+		gameMessages = "Game Over - TIE GAME !";
+		return nullptr;
+	}
+	
+
+	
 }
 
 void GameplayState::draw(Game* game)
@@ -341,6 +550,7 @@ void GameplayState::draw(Game* game)
 
 	countryHoverLabel->drawLabel(renderer);
 	playerInfoLabel->drawLabel(renderer);
+	gameMessagesLabel->drawLabel(renderer);
 	SDL_RenderPresent(renderer);
 
 }
@@ -351,6 +561,7 @@ void GameplayState::update(Game* game)
 	std::stringstream ss;
 	countryHoverLabel->destroyLabelTexture();
 	playerInfoLabel->destroyLabelTexture();
+	gameMessagesLabel->destroyLabelTexture();
 
 	for (Player* p : game->players())
 		ss << *p;
@@ -365,5 +576,6 @@ void GameplayState::update(Game* game)
 		countryHoverLabel->setLabelText(renderer, screen, ss.str(), ui.getFont("arial"));
 
 	}
+	gameMessagesLabel->setLabelText(renderer, screen, gameMessages, ui.getFont("arialN"));
 
 }

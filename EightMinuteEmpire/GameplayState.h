@@ -2,7 +2,6 @@
 #include "SDL.h"
 #include "GameState.h"
 
-
 class GameplayState : public GameState
 {
 public:
@@ -30,14 +29,18 @@ private:
 	void initWindow(Game* game);
 	void initMap(Game* game);
 	void initUI(Game* game);
-	void getCursorCountry();
+	void getHoveredCountry();
+	void getClickedCountry(bool isArmyBeingMoved);
 	void handlePlayerAction(Game* game);
+	void handlePlaceNewArmies(Game* game);
+	void handleMoveArmies(Game* game);
+	void handleBuildCity(Game* game);
+	void handleDestroyArmy(Game* game);
+	void handleAndOrAction(Game* game);
+	void handleIgnore(Game* game);
 
 	void nextMove(Game* game);
 	void placeStartingArmies(Game* game);
 	void initPlayerHoldings(Game* game); // Initilizes each players'holdings to default values 0 cities and 0 armies)
-
-
-
-
+	Player* computeFinalScore(Game* game); //returns winner if there is no tie
 };

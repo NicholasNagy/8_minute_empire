@@ -29,6 +29,8 @@ Player::Player()
 	ownedCountries = nullptr;
 	srand(time(NULL));
 	age = new int(rand() % 100 + 1);
+	mArmies = 14;
+	mCities = 3;
 }
 
 Player::Player(std::string* name, int age)
@@ -36,6 +38,8 @@ Player::Player(std::string* name, int age)
 	money = new int(20);
 	this->name = std::string(*name);
 	this->age = new int(age);
+	mArmies = 14;
+	mCities = 3;
 }
 
 Player::Player(int theMoney, int theOwnedCountries[], int theOwnedCities[]) {
@@ -46,6 +50,8 @@ Player::Player(int theMoney, int theOwnedCountries[], int theOwnedCities[]) {
 	ownedCountries = theOwnedCountries;
 	srand(time(NULL));
 	age = new int(rand() % 100 + 1);
+	mArmies = 14;
+	mCities = 3;
 }
 
 Player::Player(std::string* name, int age, int theMoney, int theOwnedCountries[], int theOwnedCities[])
@@ -55,6 +61,8 @@ Player::Player(std::string* name, int age, int theMoney, int theOwnedCountries[]
 	money = new int(theMoney);
 	ownedCities = theOwnedCities;
 	ownedCountries = theOwnedCountries;
+	mArmies = 14;
+	mCities = 3;
 }
 
 Player::~Player()
@@ -107,6 +115,11 @@ void Player::PlaceNewArmies(int numberOfArmies,GraphWorld::Country* country) {
 
 	string messageFail = "Cannot place a new army on country " + to_string(country->getID());
 
+	if (mArmies == 0)
+	{
+		cout << "No more armies left to place.\n";
+		return;
+	}
 
 	Holdings* playerHoldings = mHoldings.at(country->getID());
 
@@ -118,8 +131,9 @@ void Player::PlaceNewArmies(int numberOfArmies,GraphWorld::Country* country) {
 		return;
 	}
 	playerHoldings->mNumArmies += numberOfArmies;
-	cout << "Added " << numberOfArmies << " Armies to Country: " << country->getID() << " For player: " << this->getName() << endl;
+	cout << "Added " << numberOfArmies << " Army to Country: " << country->getID() << " For player: " << this->getName() << endl;
 	country->updateOccupyingPlayerScore(playerHoldings->mNumArmies + playerHoldings->mNumCities, this);
+	mArmies -= numberOfArmies;
 
 }
 
@@ -165,27 +179,34 @@ bool isValidMovement(int startPosition, int endPosition) {
 
 void Player::BuildCity(GraphWorld::Country* country) 
 {
-	//TODO: check if the player still has any armies left to place (if numCountries > 0 )
+	if (mCities == 0)
+	{
+		cout << "No more cities left to place.\n";
+		return;
+	}
+
+
 	Holdings* countryHoldings = getHoldings(country);
 	countryHoldings->mNumCities++;
 	cout << "Built " << 1 << " City on Country: " << country->getID() << endl;
 	country->updateOccupyingPlayerScore(countryHoldings->mNumArmies + countryHoldings->mNumCities, this);
+	mCities--;
 }
 
 
-void Player::DestroyArmy(GraphWorld::Country* country)
+void Player::DestroyArmy(Player* playerToDestroy, GraphWorld::Country* country)
 {
-	Holdings* countryHoldings = getHoldings(country);
+	Holdings* countryHoldings = playerToDestroy->getHoldings(country);
 	int armies = countryHoldings->mNumArmies;
 
 	if (armies != 0)
 	{
-		getHoldings(country)->mNumArmies--;
+		playerToDestroy->getHoldings(country)->mNumArmies--;
 	cout << "Destroyed " << 1 << " Army on Country: " << country->getID() << endl;
-	country->updateOccupyingPlayerScore(countryHoldings->mNumArmies + countryHoldings->mNumCities, this);
+	country->updateOccupyingPlayerScore(countryHoldings->mNumArmies + countryHoldings->mNumCities, playerToDestroy);
 	}
 	else
-		cout << "No armies to Destroy!\n" << endl;
+		cout << playerToDestroy <<" Has no armies to Destroy on this Country!\n" << endl;
 
 	
 }
@@ -270,6 +291,31 @@ int Player::getCardsToPlay()
 	return cardsToPlay;
 }
 
+int Player::getVictoryPoints()
+{
+	return totalVictoryPoints;
+}
+
+int Player::getNumArmies()
+{
+	return mArmies;
+}
+
+int Player::getNumCities()
+{
+	return mCities;
+}
+
+int Player::setArmies(int n )
+{
+	return mArmies = n;
+}
+
+int Player::setCities(int n)
+{
+	return mCities = n;
+}
+
 int Player::sumVictoryPoints()
 {
 	return totalVictoryPoints = countryVictoryPoints + continentVictoryPoints + goodsVictoryPoints;;
@@ -287,11 +333,12 @@ std::ostream& operator<<(std::ostream& s, const Player& player)
 	return  s << "--" << player.name << "--\n" <<
 		"Coins: " << *player.money << std::endl <<
 		"Cards Left to play: " << player.cardsToPlay << std::endl <<
+		"Armies Left: " << player.mArmies << endl <<
+		"Cities Left: " << player.mCities << endl <<
 		"Victory Points: " << player.totalVictoryPoints << endl <<
 		"Goods: " << player.goodsVictoryPoints << endl <<
 		"Countries: " << player.countryVictoryPoints << endl <<
 		"Countinents: " << player.continentVictoryPoints << endl << endl;
-		;
 
 }
 
