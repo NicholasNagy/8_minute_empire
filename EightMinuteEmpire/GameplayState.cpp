@@ -183,6 +183,8 @@ void GameplayState::handleEvents(Game* game)
 
 		if (bid)
 		{
+			if (selectedAction ==3)
+				destroyArmyAction = true;
 
 			if (selectedAction >= 0 && selectedAction != 1)
 			{
@@ -247,7 +249,6 @@ void GameplayState::handleEvents(Game* game)
 						toPlay->setCoinPurse(toPlay->getMoney() - game->hand()->getCardCostAtPosition(2));
 						selectedAction = toPlay->getHand()->getAction()->getID();
 						toPlay->getHand()->printCard();
-						cout << "selectedAction: " << selectedAction << endl;
 					}
 					else
 						cout << "\nCannot afford the cost of this card. Please select another card.\n";
@@ -291,7 +292,6 @@ void GameplayState::handleEvents(Game* game)
 					{
 						toPlay->setHand(game->hand()->getCardAtPosition(4, game->deck()));
 						toPlay->setCoinPurse(toPlay->getMoney() - game->hand()->getCardCostAtPosition(4));
-						destroyArmyAction = true;
 						toPlay->getHand()->printCard();
 						selectedAction = toPlay->getHand()->getAction()->getID();
 					}
@@ -340,7 +340,7 @@ void GameplayState::handleEvents(Game* game)
 						selectedAction = toPlay->getHand()->getAction()->getID();
 					}
 					else
-						cout << "Cannot afford the cost of this card. Please select another card.\n";
+						cout << "\nCannot afford the cost of this card. Please select another card.\n";
 				}
 				break;
 			case SDLK_RETURN:
