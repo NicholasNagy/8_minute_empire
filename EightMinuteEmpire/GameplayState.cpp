@@ -271,7 +271,6 @@ void GameplayState::handleEvents(Game* game)
 					toPlay->setCoinPurse(toPlay->getMoney() - game->hand()->getCardCostAtPosition(3));
 					selectedAction = toPlay->getHand()->getAction()->getID();
 					toPlay->getHand()->printCard();
-					cout << "selectedAction: " << selectedAction << endl;
 					}
 					else
 						cout << "\nCannot afford the cost of this card. Please select another card.\n";
@@ -533,7 +532,7 @@ void GameplayState::nextMove(Game* game)
 
 	toPlay = game->players().at(playerMove);
 	gameMessages.clear();
-	cout << "Next Hand..." << endl << gameMessages << endl;
+	cout << "\nNext Hand..." << endl << gameMessages << endl;
 	game->hand()->printHand();
 	cout << "------------------------------------------------------------\n";
 	gameMessages = toPlay->getName() + " turn to move. Select a card by pressing (1-6) on the keyboard. 'Enter' to confirm move.\n";
@@ -583,8 +582,15 @@ Player* GameplayState::computeFinalScore(Game* game)
 
 	if (playerScores.at(0) > playerScores.at(1))
 	{
-		gameMessages = "Game Over -" + game->players().at(0)->getName() + " won!\n";
-		return game->players().at(0);
+		for (int i = 0; i < game->players().size(); i++)
+		{
+			if (game->players().at(i)->getVictoryPoints() == playerScores.at(0))
+			{
+				gameMessages = "Game Over -" + game->players().at(i)->getName() + " won!\n";
+				return game->players().at(i);
+			}
+				
+		}		
 	}
 	else
 	{
