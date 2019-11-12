@@ -370,7 +370,7 @@ void GameSetupState::assignCoins(Game* game)
 
 		game->players().at(0)->setCardToPlay(THREE_PLAYER_CARDS);
 		game->players().at(1)->setCardToPlay(THREE_PLAYER_CARDS);
-		game->players().at(3)->setCardToPlay(THREE_PLAYER_CARDS);
+		game->players().at(2)->setCardToPlay(THREE_PLAYER_CARDS);
 
 		break;
 	case 4:
@@ -381,8 +381,8 @@ void GameSetupState::assignCoins(Game* game)
 
 		game->players().at(0)->setCardToPlay(FOUR_PLAYER_CARDS);
 		game->players().at(1)->setCardToPlay(FOUR_PLAYER_CARDS);
+		game->players().at(2)->setCardToPlay(FOUR_PLAYER_CARDS);
 		game->players().at(3)->setCardToPlay(FOUR_PLAYER_CARDS);
-		game->players().at(4)->setCardToPlay(FOUR_PLAYER_CARDS);
 		break;
 	case 5:
 		game->players().at(0)->setCoinPurse(FIVE_PLAYER_COIN_PURSE);
