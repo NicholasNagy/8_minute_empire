@@ -21,6 +21,7 @@ public:
 	}
 
 	static SDL_Renderer* renderer;
+	static 	SDL_Event event;
 protected:
 	GameplayState() {}
 
@@ -31,14 +32,8 @@ private:
 	void initMap(Game* game);
 	void initUI(Game* game);
 	void getHoveredCountry();
-	void getClickedCountry(bool isArmyBeingMoved);
+	void handleCardSelection(Game* game, int position);
 	void handlePlayerAction(Game* game);
-	void handlePlaceNewArmies(Game* game);
-	void handleMoveArmies(Game* game);
-	void handleBuildCity(Game* game);
-	void handleDestroyArmy(Game* game);
-	void handleAndOrAction(Game* game);
-	void handleIgnore(Game* game);
 
 	void nextMove(Game* game);
 	void placeStartingArmies(Game* game);

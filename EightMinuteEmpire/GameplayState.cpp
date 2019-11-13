@@ -10,18 +10,20 @@
 #include "Bid.h"
 #include "GameOverlay.h"
 #include "Action.h"
+#include "ActionState.h"
 
 GameplayState GameplayState::mGameplayState;
+SDL_Event GameplayState::event;
 SDL_Renderer* GameplayState::renderer = nullptr;
 
 SDL_Texture* texture = nullptr;
 SDL_Surface* screen;
-SDL_Rect cursor;
-SDL_Rect cursorShadow = { cursor.x, cursor.y, GRID_CELL_SIZE, GRID_CELL_SIZE };
+SDL_Rect mouse;
+SDL_Rect cursorShadow = { mouse.x, mouse.y, GRID_CELL_SIZE, GRID_CELL_SIZE };
 SDL_Color cursorShadowColor = { 107, 107, 107, 107 };
 bool mouseActive = false;
 bool mouseHover = false;
-bool mouseClick = false;
+bool inActionState = false;
 bool bid = false;
 
 
@@ -31,14 +33,11 @@ GraphWorld::Country* srcCountry = nullptr;
 GraphWorld::Country* destCountry = nullptr;
 GraphWorld::Country* startingCountry = nullptr;
 
-std::vector<GraphWorld::Country*> selectedCountries; //the countries selected by the use
 int selectedAction = -1;  // the action id;
  
 int numCountries;
 int numPlayers;
-Player* toPlay;
 
-bool destroyArmyAction = false;
 Player* toDestroy;
 
 GameOverlay ui;
@@ -49,9 +48,11 @@ std::string gameMessages;
 Label* cardsLabel;
 
 int playerMove;  //The current player's turn
+Game* nextM;
 
 void GameplayState::init(Game* game)
 {
+	nextM = game;
 	std::cout << "\nGame Started\n\n-------------------------------------------------\n\n";
 	numPlayers = game->players().size();
 
@@ -72,8 +73,8 @@ void GameplayState::init(Game* game)
 	game->deck()->shuffleDeck();
 	game->deck()->printDeck();
 	
-	toPlay = game->players().at(playerMove);
-	gameMessages =  toPlay->getName() + " turn to move. Select a card by pressing (1-6) on the keyboard. 'Enter' to confirm move.\n";
+	ActionState::toPlay = game->players().at(playerMove);
+	gameMessages = ActionState::toPlay->getName() + " turn to move. Select a card by pressing (1-6) on the keyboard. 'Enter' to confirm move.\n";
 
 	Hand* hand = new Hand(game->deck()); cout << "\n------------------------------------------------------------\n";
 	game->setHand(hand);
@@ -151,12 +152,13 @@ void GameplayState::initUI(Game* game)
 void GameplayState::pause()
 {
 
-	printf("Game paused");
+	printf("\nInitiated Card Action State");
 }
 
 void GameplayState::resume()
 {
-	printf("Game resumed");
+	printf("\nGameplay State Resumed");
+	nextMove(nextM);
 }
 
 void GameplayState::clean(Game* game)
@@ -169,36 +171,15 @@ void GameplayState::clean(Game* game)
 
 void GameplayState::handleEvents(Game* game)
 {
-
-	SDL_Event event;
-	SDL_PollEvent(&event);
+	SDL_WaitEvent(&event);
 	switch (event.type)
 	{
 	case SDL_QUIT:
 		game->setRunning(false);
 		break;
-	case SDL_MOUSEBUTTONDOWN:
-		cursor.x = (event.motion.x / GRID_CELL_SIZE) * GRID_CELL_SIZE;
-		cursor.y = (event.motion.y / GRID_CELL_SIZE) * GRID_CELL_SIZE;
-
-		if (bid)
-		{
-			if (selectedAction ==3)
-				destroyArmyAction = true;
-
-			if (selectedAction >= 0 && selectedAction != 1)
-			{
-				getClickedCountry(false);
-			}
-			else if (selectedAction == 1)
-			{
-				getClickedCountry(true);
-			}
-		}
-		break;
 	case SDL_MOUSEMOTION:
-		cursor.x = cursorShadow.x = (event.motion.x / GRID_CELL_SIZE) * GRID_CELL_SIZE;
-		cursor.y = cursorShadow.y = (event.motion.y / GRID_CELL_SIZE) * GRID_CELL_SIZE;
+		mouse.x = cursorShadow.x = (event.motion.x / GRID_CELL_SIZE) * GRID_CELL_SIZE;
+		mouse.y = cursorShadow.y = (event.motion.y / GRID_CELL_SIZE) * GRID_CELL_SIZE;
 		//std::cout << "x: " << cursor.x << " y: " << cursor.y << std::endl;
 		if (!mouseActive)
 			mouseActive = true;
@@ -212,154 +193,47 @@ void GameplayState::handleEvents(Game* game)
 			mouseHover = false;
 		break;
 
+if (!inActionState)
 	case SDL_KEYDOWN:
 		{
-
 			switch (event.key.keysym.sym)
 			{
 
 			case SDLK_1:
-				if (!destroyArmyAction)
-				{
-					 cout << " -- Selected Handslot 1 -- \n";
-					 if (toPlay->getMoney() >= game->hand()->getCardCostAtPosition(1))
-					 {
-						 toPlay->setHand(game->hand()->getCardAtPosition(1, game->deck()));
-						 toPlay->setCoinPurse(toPlay->getMoney() - game->hand()->getCardCostAtPosition(1));
-						 toPlay->getHand()->printCard();
-						 selectedAction = toPlay->getHand()->getAction()->getID();
-					 }
-					 else
-						 cout << "\nCannot afford the cost of this card. Please select another card.\n";
-				}
-				else if (numPlayers <= 5)
-				{
-					toDestroy = game->players().at(0);
-					cout << "Selected Player " << 1 << endl;
-				}
+				
+				handleCardSelection(game, 1);		
+				
 				break;
 
 			case SDLK_2:
-				if (!destroyArmyAction)
-				{
-					cout << "-- Selected Handslot 2 -- \n";
-					if (toPlay->getMoney() >= game->hand()->getCardCostAtPosition(2))
-					{
-						toPlay->setHand(game->hand()->getCardAtPosition(2, game->deck()));
-						toPlay->setCoinPurse(toPlay->getMoney() - game->hand()->getCardCostAtPosition(2));
-						selectedAction = toPlay->getHand()->getAction()->getID();
-						toPlay->getHand()->printCard();
-					}
-					else
-						cout << "\nCannot afford the cost of this card. Please select another card.\n";
+				handleCardSelection(game, 2);
 
-				}
-				else if (numPlayers <= 5)
-				{
-					toDestroy = game->players().at(1);
-					cout << "Selected Player " << 2 << endl;
-				}
-					
 				break;
 			case SDLK_3:
-				if (!destroyArmyAction)
-				{
-					cout << "-- Selected Handslot 3 -- \n";
-					if (toPlay->getMoney() >= game->hand()->getCardCostAtPosition(3))
-					{
-					toPlay->setHand(game->hand()->getCardAtPosition(3, game->deck()));
-					toPlay->setCoinPurse(toPlay->getMoney() - game->hand()->getCardCostAtPosition(3));
-					selectedAction = toPlay->getHand()->getAction()->getID();
-					toPlay->getHand()->printCard();
-					}
-					else
-						cout << "\nCannot afford the cost of this card. Please select another card.\n";
-					
-				}
-				else if (numPlayers <= 5 && numPlayers >=3 )
-				{
-					toDestroy = game->players().at(2);
-					cout << "Selected Player " << 3 << endl;
-				}
-					
+				handleCardSelection(game, 3);				
 				break;
 			case SDLK_4:
-				if (!destroyArmyAction)
-				{
-					cout << "-- Selected Handslot 4 -- \n";
-					if (toPlay->getMoney() >= game->hand()->getCardCostAtPosition(4))
-					{
-						toPlay->setHand(game->hand()->getCardAtPosition(4, game->deck()));
-						toPlay->setCoinPurse(toPlay->getMoney() - game->hand()->getCardCostAtPosition(4));
-						toPlay->getHand()->printCard();
-						selectedAction = toPlay->getHand()->getAction()->getID();
-					}
-					else
-						cout << "\nCannot afford the cost of this card. Please select another card.\n";
-
-				}
-				else if (numPlayers == 4 || numPlayers == 5)
-				{
-					toDestroy = game->players().at(3);
-					cout << "Selected Player " << 4 << endl;
-				}
-
+				handleCardSelection(game, 4);
 				break;
 
 			case SDLK_5:
-				if (!destroyArmyAction)
-				{
-					cout << "-- Selected Handslot 5 -- \n";
-					if (toPlay->getMoney() >= game->hand()->getCardCostAtPosition(5))
-					{
-						toPlay->setHand(game->hand()->getCardAtPosition(5, game->deck()));
-						toPlay->setCoinPurse(toPlay->getMoney() - game->hand()->getCardCostAtPosition(5));
-						toPlay->getHand()->printCard();
-						selectedAction = toPlay->getHand()->getAction()->getID();
-					}
-					else
-						cout << "\nCannot afford the cost of this card. Please select another card.\n";
-
-				}
-				else if (numPlayers == 5)
-				{
-				toDestroy = game->players().at(4);
-				cout << "Selected Player " << 5 << endl;
-				}
+				handleCardSelection(game, 5);
 				break;
 			case SDLK_6:
-				if (!destroyArmyAction)
-				{
-					cout << "-- Selected Handslot 6 -- \n";
-					if (toPlay->getMoney() >= game->hand()->getCardCostAtPosition(6))
-					{
-						toPlay->setHand(game->hand()->getCardAtPosition(6, game->deck()));
-						toPlay->setCoinPurse(toPlay->getMoney() - game->hand()->getCardCostAtPosition(6));
-						toPlay->getHand()->printCard();
-						selectedAction = toPlay->getHand()->getAction()->getID();
-					}
-					else
-						cout << "\nCannot afford the cost of this card. Please select another card.\n";
-				}
+				handleCardSelection(game, 6);			
 				break;
 			case SDLK_RETURN:
-
-				if (selectedAction >= 0)
-				{
-					handlePlayerAction(game);
-					nextMove(game);
-				}
-
+		
 				break;
 			default:
 				break;
 			}
 		}
 
-	default:
-		break;
+		default:
+			break;
+	
 	}
-
 }
 
 void GameplayState::getHoveredCountry()
@@ -367,10 +241,10 @@ void GameplayState::getHoveredCountry()
 	static int typeCol;
 	static int typeRow;
 	static int type;
-	typeCol = cursor.x / GRID_CELL_SIZE;
-	typeRow = cursor.y / GRID_CELL_SIZE;
+	typeCol = mouse.x / GRID_CELL_SIZE;
+	typeRow = mouse.y / GRID_CELL_SIZE;
 
-	if (cursor.x < MAP_WIDTH * GRID_CELL_SIZE)
+	if (mouse.x < MAP_WIDTH * GRID_CELL_SIZE)
 	{
 		type = gameMap->getTileMap()->tiles[typeRow][typeCol];
 		if (type < numCountries && type >= 0)
@@ -378,47 +252,15 @@ void GameplayState::getHoveredCountry()
 	}
 }
 
-void GameplayState::getClickedCountry(bool armyMove)
+void GameplayState::handleCardSelection(Game* game, int position)
 {
-	//Find out type of tile clicked
-	static int typeCol;
-	static int typeRow;
-	static int type;
+	inActionState = true;
+	cout << " -- Selected Handslot " << position << " -- \n";
+	ActionState::toPlay->setHand(game->hand()->getCardAtPosition(position, game->deck()));
+	selectedAction = ActionState::toPlay->getHand()->getAction()->getID();
+	ActionState::toPlay->getHand()->printCard();
+	handlePlayerAction(game);
 
-	typeCol = cursor.x / GRID_CELL_SIZE;
-	typeRow = cursor.y / GRID_CELL_SIZE;
-
-	if (cursor.x < MAP_WIDTH * GRID_CELL_SIZE)
-	{
-		type = gameMap->getTileMap()->tiles[typeRow][typeCol];
-		GraphWorld::Country* clickedON = nullptr;
-		if (type < numCountries && type >= 0)
-			clickedON = gameMap->getCountry(type);
-
-		if (!armyMove)
-		{		
-			selectedCountries.push_back(clickedON);
-			std::cout << "\nSelected Country: " << clickedON->getID() << std::endl;			
-		}
-		else
-		{
-			switch (selectedCountries.size())
-			{
-			case 0:
-				selectedCountries.push_back(clickedON);
-				std::cout << "\nSelected Country To Move From: " << clickedON->getID() << std::endl;
-				break;
-			case 1:
-				selectedCountries.push_back(clickedON);
-				std::cout << "\nSelected Country To Move To: " << clickedON->getID() << std::endl;
-				break;
-			case 2:
-				selectedCountries.at(1) = clickedON;
-				std::cout << "\nSelected Country To Move To: " << clickedON->getID() << std::endl;
-				break;
-			}			
-		}
-	}
 }
 
 void GameplayState::handlePlayerAction(Game* game)
@@ -427,25 +269,25 @@ void GameplayState::handlePlayerAction(Game* game)
 	switch (selectedAction)
 	{
 	case 0:
-		handlePlaceNewArmies(game);
+		game->pushState(PlaceNewArmiesState::Instance());
 		break;
 	case 1:
-		handleMoveArmies(game);
+		game->pushState(PlaceNewArmiesState::Instance());
 		break;
 	case 2:
-		handleBuildCity(game);
+		game->pushState(PlaceNewArmiesState::Instance());
 		break;
 	case 3:
-		handleDestroyArmy(game);
+		game->pushState(PlaceNewArmiesState::Instance());
 		break;
 	case 4: //and
-		handleAndOrAction(game);
+		game->pushState(PlaceNewArmiesState::Instance());
 		break;
 	case 5:  //or
-		handleAndOrAction(game);
+		game->pushState(PlaceNewArmiesState::Instance());
 		break;
 	case 6:
-		handleIgnore(game);
+		game->pushState(PlaceNewArmiesState::Instance());
 		break;
 	default:
 		break;
@@ -453,69 +295,15 @@ void GameplayState::handlePlayerAction(Game* game)
 
 }
 
-void GameplayState::handlePlaceNewArmies(Game* game)
-{
-
-
-		for (GraphWorld::Country* c : selectedCountries)
-		{
-			toPlay->PlaceNewArmies(1, c);
-		
-		}
-		
-	
-
-}
-
-void GameplayState::handleMoveArmies(Game* game)
-{
-
-	if (selectedCountries.size() == 2)
-	{
-		toPlay->MoveArmies(gameMap, selectedCountries[0], selectedCountries[1]);
-	}
-
-
-}
-
-void GameplayState::handleBuildCity(Game* game)
-{
-	if (selectedCountries[0])
-	{
-		toPlay->BuildCity(selectedCountries.back());
-	}
-
-
-}
-
-void GameplayState::handleDestroyArmy(Game* game)
-{
-	if(toDestroy)
-	toPlay->DestroyArmy(toDestroy, selectedCountries.back());
-}
-
-void GameplayState::handleAndOrAction(Game* game)
-{
-}
-
-void GameplayState::handleIgnore(Game* game)
-{
-	cout << "\nCard Ignored\n";
-}
-
-
-
-
 
 void GameplayState::nextMove(Game* game)
 {
-	toPlay->computeScore(gameMap);
+	inActionState = false;
+	ActionState::toPlay->computeScore(gameMap);
 	selectedAction = -1;
-	selectedCountries.clear();
-	destroyArmyAction = false;
 	gameMessages.clear();
-	toPlay->setHand(nullptr);
-	toPlay->setCardToPlay(toPlay->getCardsToPlay() - 1); 
+	ActionState::toPlay->setHand(nullptr);
+	ActionState::toPlay->setCardToPlay(ActionState::toPlay->getCardsToPlay() - 1);
 
 	if (game->players().at(numPlayers - 1)->getCardsToPlay() == 0)
 	{
@@ -530,12 +318,12 @@ void GameplayState::nextMove(Game* game)
 	if (playerMove == numPlayers)
 		playerMove = 0;
 
-	toPlay = game->players().at(playerMove);
+	ActionState::toPlay = game->players().at(playerMove);
 	gameMessages.clear();
 	cout << "\nNext Hand..." << endl << gameMessages << endl;
 	game->hand()->printHand();
 	cout << "------------------------------------------------------------\n";
-	gameMessages = toPlay->getName() + " turn to move. Select a card by pressing (1-6) on the keyboard. 'Enter' to confirm move.\n";
+	gameMessages = ActionState::toPlay->getName() + " turn to move. Select a card by pressing (1-6) on the keyboard. 'Enter' to confirm move.\n";
 	cout << gameMessages;
 }
 
@@ -638,7 +426,7 @@ void GameplayState::update(Game* game)
 	if (hoveredCountry)
 	{
 		std::stringstream ss;
-		ss << *hoveredCountry << *toPlay->getHoldings(hoveredCountry);
+		ss << *hoveredCountry << *ActionState::toPlay->getHoldings(hoveredCountry);
 		countryHoverLabel->setLabelText(renderer, screen, ss.str(), ui.getFont("arial"));
 
 	}
