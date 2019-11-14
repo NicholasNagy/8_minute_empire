@@ -73,7 +73,7 @@ void MainMenuState::handleEvents(Game* game)
 	io.MouseDown[0] = buttons & SDL_BUTTON(SDL_BUTTON_LEFT);
 	io.MouseDown[1] = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
 	ImGui::NewFrame();
-	//ImGui::ShowDemoWindow();
+	ImGui::ShowDemoWindow();
 	handleButtons(game);
 
 }

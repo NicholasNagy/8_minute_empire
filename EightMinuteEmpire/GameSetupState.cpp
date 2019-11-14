@@ -11,10 +11,12 @@
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_sdl.h"
 #include "Cards.h"
+#include "PlayerStrategies.h"
 
 GameSetupState GameSetupState::mGameSetupState;
 SDL_Renderer* GameSetupState::renderer = nullptr;
 std::vector<bool> GameSetupState::players = { true, true, false, false, false };
+std::vector<int> GameSetupState::strategies = { 0, 0, 0, 0, 0 };  // 0 = human, 1 = moderate cpu , 2 = greedy cpu
 std::vector<int> GameSetupState::ages = { 18, 18, 18, 18, 18 };
 bool GameSetupState::mapLoaded = false;
 
@@ -167,6 +169,10 @@ void GameSetupState::handlePlayerPicker(Game* game)
 	ImGui::PopStyleColor(3);
 	static int age1 = ages[0];
 	ImGui::SliderInt("age1", &age1, 0, 100);
+	static int e1 = 0;
+	ImGui::RadioButton("Human", &e1, 0);
+	ImGui::RadioButton("Moderate CPU", &e1, 1); 
+	ImGui::RadioButton("Greedy CPU", &e1, 2);
 	ImGui::Text("");
 	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Player 1 playing");
 	ImGui::NextColumn();
@@ -179,6 +185,10 @@ void GameSetupState::handlePlayerPicker(Game* game)
 	ImGui::PopStyleColor(3);
 	static int age2 = ages[1];
 	ImGui::SliderInt("age2", &age2, 0, 100);
+	static int e2 = 0;
+	ImGui::RadioButton("Human ", &e2, 0);
+	ImGui::RadioButton("Moderate CPU ", &e2, 1);
+	ImGui::RadioButton("Greedy CPU ", &e2, 2);
 	ImGui::Text("");
 	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Player 2 playing");
 	ImGui::NextColumn();
@@ -190,6 +200,10 @@ void GameSetupState::handlePlayerPicker(Game* game)
 	static int age3 = ages[2];
 	ImGui::PopStyleColor(3);
 	ImGui::SliderInt("age3", &age3, 0, 100);
+	static int e3 = 0;
+	ImGui::RadioButton("Human  ", &e3, 0);
+	ImGui::RadioButton("Moderate CPU  ", &e3, 1);
+	ImGui::RadioButton("Greedy CPU  ", &e3, 2);
 	static bool status3 = players[2];
 	if (ImGui::Button("Add/Remove Player 3"))
 	{
@@ -213,6 +227,10 @@ void GameSetupState::handlePlayerPicker(Game* game)
 	ImGui::PopStyleColor(3);
 	static int age4 = ages[3];
 	ImGui::SliderInt("age4", &age4, 0, 100);
+	static int e4 = 0;
+	ImGui::RadioButton("Human   ", &e4, 0);
+	ImGui::RadioButton("Moderate CPU   ", &e4, 1);
+	ImGui::RadioButton("Greedy CPU   ", &e4, 2);
 	static bool status4 = players[3];
 	if (ImGui::Button("Add/Remove Player 4"))
 	{
@@ -229,6 +247,10 @@ void GameSetupState::handlePlayerPicker(Game* game)
 	ImGui::Button("Player 5");
 	static int age5 = ages[4];
 	ImGui::SliderInt("age5", &age5, 0, 100);
+	static int e5 = 0;
+	ImGui::RadioButton("Human    ", &e5, 0);
+	ImGui::RadioButton("Moderate CPU    ", &e5, 1);
+	ImGui::RadioButton("Greedy CPU    ", &e5, 2);
 	static bool status5 = players[4];
 	if (ImGui::Button("Add/Remove Player 5"))
 	{
@@ -251,7 +273,11 @@ void GameSetupState::handlePlayerPicker(Game* game)
 	ages[3] = age4;
 	ages[4] = age5;
 
-
+	strategies[0] = e1;
+	strategies[1] = e2;
+	strategies[2] = e3;
+	strategies[3] = e4;
+	strategies[4] = e5;
 
 	ImGui::End();
 }
@@ -339,6 +365,15 @@ void GameSetupState::setupPlayers(Game* game)
 		if (players[i])
 		{
 			Player* p = new Player(&name, ages[i]);
+
+	//Setting the Strategy 
+			if (strategies[i] == 0)
+				p->setStrategy(new Human());
+			else if (strategies[i] == 1)
+				p->setStrategy(new ModerateCPU());
+			else if (strategies[i] == 2)
+				p->setStrategy(new GreedyCPU());
+
 			game->players().push_back(p);
 			x++;
 		}

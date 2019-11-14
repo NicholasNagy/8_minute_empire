@@ -1,7 +1,7 @@
 #include "Player.h"
 #include <random>
 #include <ctime>
-
+#include <typeinfo>
 
 
 Holdings::Holdings() : mNumArmies(0), mNumCities(0){}
@@ -32,6 +32,22 @@ Player::Player()
 	mArmies = 14;
 	mCities = 3;
 	hand = nullptr;
+}
+
+Player::Player(PlayerStrategies* newStrategy)
+{
+	strategy = newStrategy;
+	name = "Default";
+	money = new int(20);
+	//totalNumberOfCountries = 30;
+	ownedCities = nullptr;
+	ownedCountries = nullptr;
+	srand(time(NULL));
+	age = new int(rand() % 100 + 1);
+	mArmies = 14;
+	mCities = 3;
+	hand = nullptr;
+
 }
 
 Player::Player(std::string* name, int age)
@@ -290,6 +306,13 @@ void Player::setCardToPlay(int n)
 	cardsToPlay = n;
 }
 
+string Player::getStrategy()
+{
+	string s = typeid(*strategy).name();
+	return s;
+}
+
+
 void Player::setHand(Card* h)
 {
 	hand = h;
@@ -328,6 +351,16 @@ int Player::setArmies(int n )
 int Player::setCities(int n)
 {
 	return mCities = n;
+}
+
+void Player::setStrategy(PlayerStrategies* newStrategy)
+{
+	strategy = newStrategy;
+}
+
+int Player::pickCard()
+{
+	return strategy->pickCard();
 }
 
 int Player::sumVictoryPoints()

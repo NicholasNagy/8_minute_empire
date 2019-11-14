@@ -3,6 +3,8 @@
 #include <unordered_map>
 #include "Map.h"
 #include "Cards.h"
+#include "PlayerStrategies.h"
+
 using namespace std;
 
 class Holdings
@@ -28,6 +30,7 @@ class Player
 {
 public:
 	Player();
+	Player(PlayerStrategies* newStrategy);
 	Player(std::string* name, int age);
 	Player(int money, int ownedCountries[], int ownedCities[]);
 	Player(std::string* name, int age, int money, int ownedCountries[], int ownedCities[]);
@@ -53,6 +56,7 @@ public:
 	void updateGoodsPoints(int points);
 	void updateContinentPoints(int points);
 	void setCardToPlay(int cardsToPlay);
+	string getStrategy();
 	void setHand(Card*);
 	Card* getHand();
 	int getCardsToPlay();
@@ -61,6 +65,8 @@ public:
 	int getNumCities();
 	int setArmies(int);
 	int setCities(int);
+	void setStrategy(PlayerStrategies* newStrategy);
+	int pickCard();
 
 private:
 	std::unordered_map<int, Holdings*> mHoldings;  // How much the player holds on each country (key is the country id, could use country pointers as keys as well)
@@ -77,7 +83,7 @@ private:
 	int mCities;
 	Card* hand;
 
-
+	PlayerStrategies* strategy;
 
 	const static int totalNumberOfCountries = 30;
 	int* ownedCountries; //Pointer to an array of Countries
