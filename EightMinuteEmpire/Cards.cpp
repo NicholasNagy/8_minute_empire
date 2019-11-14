@@ -35,6 +35,11 @@ Action* Card::getAction()
 	return action;
 }
 
+int Card::getGood()
+{
+	return *good;
+}
+
 
 
 //############################### Deck Class ###############################
@@ -67,19 +72,19 @@ Deck::Deck()
 
 	// Instantiate 5 cards with MoveArmies Action with land & water movement
 	for (int i = 25; i < 30; i++) {
-		int good = dist3(rng); // ranges betweeb (1,3)
+		int good = dist3(rng); // ranges between (1,3)
 		int multiplicity = dist3(rng); // ranges between (1,3)
 		cardsDeck->at(i) = new Card(good, Action(1, multiplicity, true));
 	}
 
 	// Instantiate 5 cards with BuildCity Action
-	for (int i = 30; i < 35; i++) {
+	for (int i = 30; i < 31; i++) {
 		int good = dist3(rng); // ranges betweeb (1,3)
 		cardsDeck->at(i) = new Card(good, Action(2));
 	}
 
 	// Instantiate 4 cards with DestoyArmy Action
-	for (int i = 35; i < 39; i++) {
+	for (int i = 31; i < 39; i++) {
 		int good = dist3(rng); // ranges betweeb (1,3)
 		int multiplicity = dist3(rng); // ranges between (1,3)
 		cardsDeck->at(i) = new Card(good, Action(3, multiplicity));

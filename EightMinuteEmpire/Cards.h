@@ -19,6 +19,7 @@ public:
 		action->printAction();
 	}
 	Action* getAction();
+	int getGood();
 private:
 	int* good;
 	Action* action;
