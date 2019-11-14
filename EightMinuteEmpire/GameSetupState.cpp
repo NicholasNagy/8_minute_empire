@@ -42,7 +42,7 @@ void GameSetupState::clean(Game* game)
 	ImGuiSDL::Deinitialize();
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(game->getWindow());
-	;	ImGui::DestroyContext();
+	ImGui::DestroyContext();
 	std::cout << "Game Setup State Cleaned\n";
 }
 

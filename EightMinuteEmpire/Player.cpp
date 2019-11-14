@@ -1,6 +1,7 @@
 #include "Player.h"
 #include <random>
 #include <ctime>
+#include <string>
 #include <typeinfo>
 
 
@@ -309,7 +310,7 @@ void Player::setCardToPlay(int n)
 string Player::getStrategy()
 {
 	string s = typeid(*strategy).name();
-	return s;
+	return s.substr(6);
 }
 
 
@@ -377,7 +378,10 @@ std::ostream& operator<<(std::ostream& s, const Holdings& holdings)
 
 std::ostream& operator<<(std::ostream& s, const Player& player)
 {
-	return  s << "--" << player.name << "--\n" <<
+
+	string strategy = typeid(*player.strategy).name();
+
+		return  s << "--" << player.name << " (" << strategy.substr(6) << ")--\n" <<
 		"Coins: " << *player.money << std::endl <<
 		"Cards Left to play: " << player.cardsToPlay << std::endl <<
 		"Armies Left: " << player.mArmies << endl <<

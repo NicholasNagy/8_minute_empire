@@ -254,7 +254,6 @@ void GameplayState::getHoveredCountry()
 
 void GameplayState::handleCardSelection(Game* game, int position)
 {
-	cout << "HEEEELO !!!!!! " << ActionState::toPlay->getStrategy() << "\n";
 	inActionState = true;
 	cout << " -- Selected Handslot " << position << " -- \n";
 	ActionState::toPlay->setHand(game->hand()->getCardAtPosition(position, game->deck()));
