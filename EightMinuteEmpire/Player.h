@@ -3,9 +3,13 @@
 #include <unordered_map>
 #include "Map.h"
 #include "Cards.h"
-#include "PlayerStrategies.h"
+
+
+class Game;
+class PlayerStrategies;
 
 using namespace std;
+
 
 class Holdings
 {
@@ -66,7 +70,7 @@ public:
 	int setArmies(int);
 	int setCities(int);
 	void setStrategy(PlayerStrategies* newStrategy);
-	int pickCard();
+	int pickCard(Game* game);
 
 private:
 	std::unordered_map<int, Holdings*> mHoldings;  // How much the player holds on each country (key is the country id, could use country pointers as keys as well)

@@ -245,3 +245,8 @@ void Hand::moveCards(int postionOfTheRemovedCard, Deck* deck) {
 	// Todo: delete the card at the postion so no memorey leak happens
 	// delete cardsHand->at(postionInVector);
 }
+
+vector<Card* > Hand::cardsInHand()
+{
+	return *cardsHand;
+}

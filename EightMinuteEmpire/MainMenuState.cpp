@@ -19,8 +19,6 @@ void MainMenuState::init(Game* game)
 	ImGui::CreateContext();
 	ImGuiSDL::Initialize(renderer, WINDOW_X_SMALL, WINDOW_Y);
 	logoTexture = TextureLoader::loadTexutre("assets/logo.png", renderer);
-
-	
 }
 
 void MainMenuState::clean(Game* game)
@@ -73,7 +71,7 @@ void MainMenuState::handleEvents(Game* game)
 	io.MouseDown[0] = buttons & SDL_BUTTON(SDL_BUTTON_LEFT);
 	io.MouseDown[1] = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
 	ImGui::NewFrame();
-	ImGui::ShowDemoWindow();
+	//ImGui::ShowDemoWindow();
 	handleButtons(game);
 
 }

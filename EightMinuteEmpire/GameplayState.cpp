@@ -74,7 +74,7 @@ void GameplayState::init(Game* game)
 	game->deck()->printDeck();
 	
 	ActionState::toPlay = game->players().at(playerMove);
-	gameMessages = ActionState::toPlay->getName() + " turn to move. Select a card by pressing (1-6) on the keyboard. 'Enter' to confirm move.\n";
+	gameMessages = ActionState::toPlay->getName() + " (" + ActionState::toPlay->getStrategy() + ") turn to move. \n";
 
 	Hand* hand = new Hand(game->deck()); cout << "\n------------------------------------------------------------\n";
 	game->setHand(hand);
@@ -82,6 +82,10 @@ void GameplayState::init(Game* game)
 	hand->printHand();
 	cout << "\n------------------------------------------------------------\n";
 	cout << endl <<gameMessages;
+
+	if (ActionState::toPlay->getStrategy().compare("GreedyCPU") == 0 || ActionState::toPlay->getStrategy().compare("ModerateCPU") == 0)
+		handleCardSelection(game, 0);
+
 }
 
 void GameplayState::initWindow(Game* game)
@@ -222,9 +226,7 @@ if (!inActionState)
 			case SDLK_6:
 				handleCardSelection(game, 6);			
 				break;
-			case SDLK_RETURN:
 		
-				break;
 			default:
 				break;
 			}
@@ -254,6 +256,8 @@ void GameplayState::getHoveredCountry()
 
 void GameplayState::handleCardSelection(Game* game, int position)
 {
+	if (position == 0)
+	position = ActionState::toPlay->pickCard(game);
 	inActionState = true;
 	cout << " -- Selected Handslot " << position << " -- \n";
 	ActionState::toPlay->setHand(game->hand()->getCardAtPosition(position, game->deck()));
@@ -323,8 +327,15 @@ void GameplayState::nextMove(Game* game)
 	cout << "\nNext Hand..." << endl << gameMessages << endl;
 	game->hand()->printHand();
 	cout << "------------------------------------------------------------\n";
+	if (ActionState::toPlay->getStrategy().compare("GreedyCPU") == 0 || ActionState::toPlay->getStrategy().compare("ModerateCPU") == 0)
+	{
+		gameMessages = ActionState::toPlay->getName() + " (" + ActionState::toPlay->getStrategy() + ") turn to move. \n";;
+		handleCardSelection(game, 0);
+	}
+	else
 	gameMessages = ActionState::toPlay->getName() + " turn to move. Select a card by pressing (1-6) on the keyboard. 'Enter' to confirm move.\n";
 	cout << gameMessages;
+	
 }
 
 void GameplayState::placeStartingArmies(Game* game)

@@ -89,7 +89,7 @@ void PlaceNewArmiesState::resume()
 
 void PlaceNewArmiesState::clean(Game* game)
 {
-	ActionState::resume();
+	
 }
 
 void PlaceNewArmiesState::handleEvents(Game* game)

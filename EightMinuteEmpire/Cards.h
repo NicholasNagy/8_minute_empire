@@ -54,7 +54,7 @@ public:
 	int getCardCostAtPosition(int postion);
 	Card* getCardAtPosition(int postion, Deck* deck);
 	void moveCards(int postionOfTheRemovedCard, Deck* deck);
-
+	vector<Card* > cardsInHand();
 
 private:
 	vector<Card* >* cardsHand = new vector<Card* >(6);

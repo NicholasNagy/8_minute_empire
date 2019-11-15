@@ -1,28 +1,30 @@
 #pragma once
+#include "Game.h"
+#include "ActionState.h"
 class PlayerStrategies
 {
 
 public:
-	virtual int pickCard() = 0;
+	virtual int pickCard(Game* game) = 0;
 
 };
 
 
 class GreedyCPU : public PlayerStrategies
 {
-	int pickCard();
+	int pickCard(Game* game);
 
 
 };
 
 class ModerateCPU : public PlayerStrategies
 {
-	int pickCard();
+	int pickCard(Game* game);
 };
 
 
 class Human : public PlayerStrategies
 {
-	int pickCard();
+	int pickCard(Game* game);
 
 };

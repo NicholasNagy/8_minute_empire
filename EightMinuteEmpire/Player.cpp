@@ -3,7 +3,7 @@
 #include <ctime>
 #include <string>
 #include <typeinfo>
-
+#include "PlayerStrategies.h"
 
 Holdings::Holdings() : mNumArmies(0), mNumCities(0){}
 
@@ -359,9 +359,9 @@ void Player::setStrategy(PlayerStrategies* newStrategy)
 	strategy = newStrategy;
 }
 
-int Player::pickCard()
+int Player::pickCard(Game* game)
 {
-	return strategy->pickCard();
+	return strategy->pickCard(game);
 }
 
 int Player::sumVictoryPoints()
