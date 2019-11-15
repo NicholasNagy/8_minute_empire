@@ -70,7 +70,8 @@ public:
 	int setArmies(int);
 	int setCities(int);
 	void setStrategy(PlayerStrategies* newStrategy);
-	int pickCard(Game* game);
+	void pickCard(Game* game, int position);
+	void playCard(Game* game);
 
 private:
 	std::unordered_map<int, Holdings*> mHoldings;  // How much the player holds on each country (key is the country id, could use country pointers as keys as well)

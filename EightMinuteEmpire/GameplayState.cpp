@@ -33,7 +33,7 @@ GraphWorld::Country* srcCountry = nullptr;
 GraphWorld::Country* destCountry = nullptr;
 GraphWorld::Country* startingCountry = nullptr;
 
-int selectedAction = -1;  // the action id;
+int selectedCardPos = -1;  // the action id;
  
 int numCountries;
 int numPlayers;
@@ -256,13 +256,11 @@ void GameplayState::getHoveredCountry()
 
 void GameplayState::handleCardSelection(Game* game, int position)
 {
-	if (position == 0)
-	position = ActionState::toPlay->pickCard(game);
 	inActionState = true;
-	cout << " -- Selected Handslot " << position << " -- \n";
-	ActionState::toPlay->setHand(game->hand()->getCardAtPosition(position, game->deck()));
-	selectedAction = ActionState::toPlay->getHand()->getAction()->getID();
-	ActionState::toPlay->getHand()->printCard();
+
+	ActionState::toPlay->pickCard(game, position);
+	ActionState::toPlay->playCard(game);
+
 	handlePlayerAction(game);
 
 }
@@ -270,7 +268,7 @@ void GameplayState::handleCardSelection(Game* game, int position)
 void GameplayState::handlePlayerAction(Game* game)
 {
 
-	switch (selectedAction)
+	switch (ActionState::toPlay->getHand()->getAction()->getID())
 	{
 	case 0:
 		game->pushState(PlaceNewArmiesState::Instance());
@@ -303,8 +301,8 @@ void GameplayState::handlePlayerAction(Game* game)
 void GameplayState::nextMove(Game* game)
 {
 	inActionState = false;
+	bool cpu = false;
 	ActionState::toPlay->computeScore(gameMap);
-	selectedAction = -1;
 	gameMessages.clear();
 	ActionState::toPlay->setHand(nullptr);
 	ActionState::toPlay->setCardToPlay(ActionState::toPlay->getCardsToPlay() - 1);
@@ -329,12 +327,14 @@ void GameplayState::nextMove(Game* game)
 	cout << "------------------------------------------------------------\n";
 	if (ActionState::toPlay->getStrategy().compare("GreedyCPU") == 0 || ActionState::toPlay->getStrategy().compare("ModerateCPU") == 0)
 	{
+		cpu = true;
 		gameMessages = ActionState::toPlay->getName() + " (" + ActionState::toPlay->getStrategy() + ") turn to move. \n";;
-		handleCardSelection(game, 0);
 	}
 	else
 	gameMessages = ActionState::toPlay->getName() + " turn to move. Select a card by pressing (1-6) on the keyboard. 'Enter' to confirm move.\n";
 	cout << gameMessages;
+	if(cpu)
+		handleCardSelection(game, 0);
 	
 }
 

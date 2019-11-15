@@ -5,26 +5,26 @@ class PlayerStrategies
 {
 
 public:
-	virtual int pickCard(Game* game) = 0;
+	virtual void pickCard(Game* game, int position) = 0;
 
 };
 
 
 class GreedyCPU : public PlayerStrategies
 {
-	int pickCard(Game* game);
+	void pickCard(Game* game, int position);
 
 
 };
 
 class ModerateCPU : public PlayerStrategies
 {
-	int pickCard(Game* game);
+	void pickCard(Game* game, int position);
 };
 
 
 class Human : public PlayerStrategies
 {
-	int pickCard(Game* game);
+	void pickCard(Game* game, int position);
 
 };

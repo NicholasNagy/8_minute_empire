@@ -359,9 +359,13 @@ void Player::setStrategy(PlayerStrategies* newStrategy)
 	strategy = newStrategy;
 }
 
-int Player::pickCard(Game* game)
+void Player::pickCard(Game* game, int position)
 {
-	return strategy->pickCard(game);
+	strategy->pickCard(game, position);
+}
+
+void Player::playCard(Game* game)
+{
 }
 
 int Player::sumVictoryPoints()
