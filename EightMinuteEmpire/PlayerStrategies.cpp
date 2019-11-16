@@ -1,7 +1,6 @@
 #include "PlayerStrategies.h"
 
 
-
 	void GreedyCPU::pickCard(Game* game, int position)
 	{
 		Player* toPlay = ActionState::toPlay;
@@ -35,8 +34,6 @@
 		ActionState::toPlay->getHand()->printCard();
 	
 	}
-
-
 
 
 	void  ModerateCPU::pickCard(Game* game, int position)
@@ -130,6 +127,10 @@
 	{
 	}
 
+	void GreedyCPU::Ignore()
+	{
+	}
+
 	void ModerateCPU::playCard(Game* game)
 	{
 		switch (ActionState::toPlay->getHand()->getAction()->getID())
@@ -176,6 +177,10 @@
 	{
 	}
 
+	void ModerateCPU::Ignore()
+	{
+	}
+
 	void Human::playCard(Game* game)
 	{
 		ActionState::inActionState = true;
@@ -189,19 +194,19 @@
 			game->pushState(MoveArmiesState::Instance());
 			break;
 		case 2:
-			game->pushState(PlaceNewArmiesState::Instance());
+			game->pushState(BuildCityState::Instance());
 			break;
 		case 3:
-			game->pushState(PlaceNewArmiesState::Instance());
+			game->pushState(DestroyArmyState::Instance());
 			break;
-		case 4: //and
-			game->pushState(PlaceNewArmiesState::Instance());
+		case 4: //TODO: and
+			game->pushState(IgnoreState::Instance());
 			break;
-		case 5:  //or
-			game->pushState(PlaceNewArmiesState::Instance());
+		case 5:  //TODO: or
+			game->pushState(IgnoreState::Instance());
 			break;
-		case 6:
-			game->pushState(PlaceNewArmiesState::Instance());
+		case 6:  
+			game->pushState(IgnoreState::Instance());
 			break;
 		default:
 			break;
@@ -228,7 +233,7 @@
 			return;
 		}
 		playerHoldings->addArmies(numberOfArmies);
-		cout << "Added " << numberOfArmies << " Army to Country: " << country->getID() << " For player: " << ActionState::toPlay->getName() << endl;
+		cout << "Added " << numberOfArmies << " Army Unit(s) to Country: " << country->getID() << " For player: " << ActionState::toPlay->getName() << endl;
 		country->updateOccupyingPlayerScore(playerHoldings->numArmies() + playerHoldings->numCities(), ActionState::toPlay);
 		ActionState::toPlay->setArmies(ActionState::toPlay->getArmies()- numberOfArmies);
 
@@ -263,18 +268,46 @@
 		Holdings* holdingsOnDestCountry = ActionState::toPlay->holdings().at(destCountry->getID());
 		holdingsOnStartCountry->removeArmies(1);
 		holdingsOnDestCountry->addArmies(1);
-		cout << "Moved " << 1 << " Army from Country: " << srcCountry->getID() << " to Country: " << destCountry->getID() << endl;
+		cout << "\nMoved " << 1 << " Army from Country: " << srcCountry->getID() << " to Country: " << destCountry->getID() << endl;
 		srcCountry->updateOccupyingPlayerScore(holdingsOnStartCountry->numArmies() + holdingsOnStartCountry->numCities(), ActionState::toPlay);
 		destCountry->updateOccupyingPlayerScore(holdingsOnDestCountry->numArmies() + holdingsOnDestCountry->numCities(), ActionState::toPlay);
 	}
 
 	void Human::BuildCity(GraphWorld::Country* country)
 	{
+		if (ActionState::toPlay->getNumCities() == 0)
+		{
+			cout << "No more cities left to place.\n";
+			return;
+		}
 
-
+		Holdings* countryHoldings = ActionState::toPlay->getHoldings(country);
+		countryHoldings->addCities(1);
+		cout << "\nBuilt " << 1 << " City on Country: " << country->getID() << endl;
+		country->updateOccupyingPlayerScore(countryHoldings->numArmies() + countryHoldings->numCities(), ActionState::toPlay);
+		ActionState::toPlay->setCities(ActionState::toPlay->getNumCities() - 1);
 
 	}
 
-	void Human::DestroyArmy(Player* player, GraphWorld::Country* country)
+	void Human::DestroyArmy(Player* playerToDestroy, GraphWorld::Country* country)
 	{
+
+		Holdings* countryHoldings = playerToDestroy->getHoldings(country);
+		int armies = countryHoldings->numArmies();
+
+		if (armies != 0)
+		{
+			playerToDestroy->getHoldings(country)->removeArmies(1);
+			cout << "\nDestroyed " << playerToDestroy->getName() << "'s Army on Country: " << country->getID() << endl;
+			country->updateOccupyingPlayerScore(countryHoldings->numArmies() + countryHoldings->numCities(), playerToDestroy);
+		}
+		else
+			cout << playerToDestroy << " Has no armies to Destroy on this Country!\n" << endl;
+
+	}
+
+	void Human::Ignore()
+	{
+		cout << "Card ignored." << endl;
+
 	}

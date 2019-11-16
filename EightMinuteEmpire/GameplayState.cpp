@@ -23,20 +23,14 @@ SDL_Rect cursorShadow = { mouse.x, mouse.y, GRID_CELL_SIZE, GRID_CELL_SIZE };
 SDL_Color cursorShadowColor = { 107, 107, 107, 107 };
 bool mouseActive = false;
 bool mouseHover = false;
-bool inActionState = false;
 bool bid = false;
-
 
 GraphWorld::Map* gameMap;
 GraphWorld::Country* hoveredCountry = nullptr;
 GraphWorld::Country* startingCountry = nullptr;
-
-int selectedCardPos = -1;  // the action id;
  
 int numCountries;
 int numPlayers;
-
-Player* toDestroy;
 
 GameOverlay ui;
 Label* countryHoverLabel;
@@ -195,42 +189,47 @@ void GameplayState::handleEvents(Game* game)
 			mouseHover = false;
 		break;
 
-if (!inActionState)
+
 	case SDL_KEYDOWN:
 		{
 			switch (event.key.keysym.sym)
 			{
 
-			case SDLK_1:			
+			case SDLK_1:
+			if (!ActionState::inActionState)				
 				handleCardSelection(game, 1);		
 				break;
 
 			case SDLK_2:
+				if (!ActionState::inActionState)
 				handleCardSelection(game, 2);
 
 				break;
 			case SDLK_3:
+				if (!ActionState::inActionState)
 				handleCardSelection(game, 3);				
 				break;
 			case SDLK_4:
+				if (!ActionState::inActionState)
 				handleCardSelection(game, 4);
 				break;
 
 			case SDLK_5:
+				if (!ActionState::inActionState)
 				handleCardSelection(game, 5);
 				break;
 			case SDLK_6:
+				if (!ActionState::inActionState)
 				handleCardSelection(game, 6);			
 				break;
 		
 			default:
 				break;
 			}
+		
 		}
-
 		default:
-			break;
-	
+			break;	
 	}
 }
 
@@ -269,12 +268,10 @@ void GameplayState::nextMove(Game* game)
 
 	if (game->players().at(numPlayers - 1)->getCardsToPlay() == 0)
 	{
-
-		cout << "Game Over!" << endl;
+		cout << "\nGame Over!" << endl;
 		computeFinalScore(game);
 		return;
 	}
-
 
 	playerMove++;
 	if (playerMove == numPlayers)
@@ -282,17 +279,20 @@ void GameplayState::nextMove(Game* game)
 
 	ActionState::toPlay = game->players().at(playerMove);
 	gameMessages.clear();
+
 	cout << "\nNext Hand..." << endl << gameMessages << endl;
 	game->hand()->printHand();
 	cout << "------------------------------------------------------------\n";
+
 	if (ActionState::toPlay->getStrategy().compare("GreedyCPU") == 0 || ActionState::toPlay->getStrategy().compare("ModerateCPU") == 0)
 	{
 		cpu = true;
 		gameMessages = ActionState::toPlay->getName() + " (" + ActionState::toPlay->getStrategy() + ") turn to move. \n";;
 	}
 	else
-	gameMessages = ActionState::toPlay->getName() + " turn to move. Select a card by pressing (1-6) on the keyboard. 'Enter' to confirm move.\n";
-	cout << gameMessages;
+		gameMessages = ActionState::toPlay->getName() + " turn to move. Select a card by pressing (1-6) on the keyboard. 'Enter' to confirm move.\n";
+		cout << gameMessages;
+
 	if(cpu)
 		handleCardSelection(game, 0);
 	
@@ -309,9 +309,6 @@ void GameplayState::placeStartingArmies(Game* game)
 
 	}
 	cout << "\n------------------------------------------------------------\n";
-	
-
-
 }
 
 void GameplayState::initPlayerHoldings(Game* game)
@@ -322,11 +319,8 @@ void GameplayState::initPlayerHoldings(Game* game)
 		{
 			gameMap->getCountry(i)->updateOccupyingPlayerScore(0, p);
 			p->holdings().emplace(i, new Holdings());
-
 		}
-
 	}
-
 }
 
 Player* GameplayState::computeFinalScore(Game* game)
@@ -347,8 +341,7 @@ Player* GameplayState::computeFinalScore(Game* game)
 			{
 				gameMessages = "Game Over -" + game->players().at(i)->getName() + " won!\n";
 				return game->players().at(i);
-			}
-				
+			}				
 		}		
 	}
 	else
@@ -356,15 +349,14 @@ Player* GameplayState::computeFinalScore(Game* game)
 		gameMessages = "Game Over - TIE GAME !";
 		return nullptr;
 	}
-	
 
-	
 }
 
 void GameplayState::draw(Game* game)
 {
 	SDL_RenderClear(renderer);
 	gameMap->getTileMap()->drawTileMap(renderer, texture);
+
 	if (mouseActive && mouseHover)
 	{
 		SDL_SetRenderDrawColor(renderer, cursorShadowColor.r, cursorShadowColor.g, cursorShadowColor.b, cursorShadowColor.a);

@@ -171,36 +171,21 @@ bool isValidMovement(int startPosition, int endPosition) {
 
 void Player::BuildCity(GraphWorld::Country* country) 
 {
-	if (mCities == 0)
-	{
-		cout << "No more cities left to place.\n";
-		return;
-	}
+	strategy->BuildCity(country);
 
-
-	Holdings* countryHoldings = getHoldings(country);
-	countryHoldings->mNumCities++;
-	cout << "Built " << 1 << " City on Country: " << country->getID() << endl;
-	country->updateOccupyingPlayerScore(countryHoldings->mNumArmies + countryHoldings->mNumCities, this);
-	mCities--;
 }
 
 
 void Player::DestroyArmy(Player* playerToDestroy, GraphWorld::Country* country)
 {
-	Holdings* countryHoldings = playerToDestroy->getHoldings(country);
-	int armies = countryHoldings->mNumArmies;
 
-	if (armies != 0)
-	{
-		playerToDestroy->getHoldings(country)->mNumArmies--;
-	cout << "Destroyed " << 1 << " Army on Country: " << country->getID() << endl;
-	country->updateOccupyingPlayerScore(countryHoldings->mNumArmies + countryHoldings->mNumCities, playerToDestroy);
-	}
-	else
-		cout << playerToDestroy <<" Has no armies to Destroy on this Country!\n" << endl;
-
+	strategy->DestroyArmy(playerToDestroy, country);
 	
+}
+
+void Player::Ignore()
+{
+	strategy->Ignore();
 }
 
 Holdings* Player::getHoldings(GraphWorld::Country* country)
@@ -320,7 +305,7 @@ int Player::setArmies(int n )
 	if (n < 0)
 		mArmies = 0;
 
-	return mArmies;
+	return mArmies = n;
 }
 
 int Player::getArmies()
@@ -330,6 +315,9 @@ int Player::getArmies()
 
 int Player::setCities(int n)
 {
+	if (n < 0)
+		mCities = 0;
+
 	return mCities = n;
 }
 

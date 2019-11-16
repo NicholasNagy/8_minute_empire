@@ -12,8 +12,8 @@ public:
 	void clean(Game* game);
 	void handleEvents(Game* game);
 	void draw(Game* game);
-
 	void update(Game* game);
+	void nextMove(Game* game);
 
 	static GameplayState* Instance()
 	{
@@ -34,7 +34,6 @@ private:
 	void getHoveredCountry();
 	void handleCardSelection(Game* game, int position);
 
-	void nextMove(Game* game);
 	void placeStartingArmies(Game* game);
 	void initPlayerHoldings(Game* game); // Initilizes each players'holdings to default values 0 cities and 0 armies)
 	Player* computeFinalScore(Game* game); //returns winner if there is no tie

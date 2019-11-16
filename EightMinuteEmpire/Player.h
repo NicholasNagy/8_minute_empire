@@ -51,10 +51,6 @@ public:
 	void setAge(int age);
 	void PayCoin(int amount);
 	void setCoinPurse(int amount);
-	void PlaceNewArmies(int numberOfArmies, GraphWorld::Country* country);
-	void MoveArmies(GraphWorld::Map*, GraphWorld::Country* srcCountry, GraphWorld::Country* destCountry);
-	void BuildCity(GraphWorld::Country* country);
-	void DestroyArmy(Player* player , GraphWorld::Country* country);
 	Holdings* getHoldings(GraphWorld::Country*);
 	std::unordered_map<int, Holdings*>& holdings();
 	int computeScore(GraphWorld::Map*);
@@ -73,9 +69,18 @@ public:
 	int setArmies(int);
 	int getArmies();
 	int setCities(int);
+
+	//Function using strategy pattern -->
+
 	void setStrategy(PlayerStrategies* newStrategy);
 	void pickCard(Game* game, int position);
 	void playCard(Game* game);
+
+	void PlaceNewArmies(int numberOfArmies, GraphWorld::Country* country);
+	void MoveArmies(GraphWorld::Map*, GraphWorld::Country* srcCountry, GraphWorld::Country* destCountry);
+	void BuildCity(GraphWorld::Country* country);
+	void DestroyArmy(Player* player, GraphWorld::Country* country);
+	void Ignore();
 
 private:
 	std::unordered_map<int, Holdings*> mHoldings;  // How much the player holds on each country (key is the country id, could use country pointers as keys as well)

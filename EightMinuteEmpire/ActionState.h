@@ -19,9 +19,6 @@ public:
 
 protected:
 	ActionState() {}
-
-	void getSelectedCountry(Game* game);
-
 };
 
 class PlaceNewArmiesState : public ActionState
@@ -75,4 +72,86 @@ private:
 	void executeAction(Game* game);
 	void getSelectedCountry(Game* game);
 
+};
+
+
+class BuildCityState : public ActionState
+{
+
+public:
+	void init(Game* game);
+	void pause();
+	void resume();
+	void clean(Game* game);
+	void handleEvents(Game* game);
+	void draw(Game* game);
+	void update(Game* game);
+
+	static BuildCityState* Instance()
+	{
+		return &mBuildCityState;
+	}
+
+protected:
+	BuildCityState() {}
+
+private:
+	static BuildCityState mBuildCityState;
+	void executeAction(Game* game);
+	void getSelectedCountry(Game* game);
+
+};
+
+class DestroyArmyState : public ActionState
+{
+
+public:
+	void init(Game* game);
+	void pause();
+	void resume();
+	void clean(Game* game);
+	void handleEvents(Game* game);
+	void draw(Game* game);
+	void update(Game* game);
+
+	static DestroyArmyState* Instance()
+	{
+		return &mDestroyArmyState;
+	}
+
+protected:
+	DestroyArmyState() {}
+
+private:
+	static DestroyArmyState mDestroyArmyState;
+	void executeAction(Game* game);
+	void getSelectedCountry(Game* game);
+	void getSelectedPlayer(Game* game, int index);
+
+};
+
+
+class IgnoreState : public ActionState
+{
+
+public:
+	void init(Game* game);
+	void pause();
+	void resume();
+	void clean(Game* game);
+	void handleEvents(Game* game);
+	void draw(Game* game);
+	void update(Game* game);
+
+	static IgnoreState* Instance()
+	{
+		return &mIgnoreState;
+	}
+
+protected:
+	IgnoreState() {}
+
+private:
+	static IgnoreState mIgnoreState;
+	void executeAction(Game* game);
 };
