@@ -29,8 +29,6 @@ bool bid = false;
 
 GraphWorld::Map* gameMap;
 GraphWorld::Country* hoveredCountry = nullptr;
-GraphWorld::Country* srcCountry = nullptr;
-GraphWorld::Country* destCountry = nullptr;
 GraphWorld::Country* startingCountry = nullptr;
 
 int selectedCardPos = -1;  // the action id;
@@ -203,10 +201,8 @@ if (!inActionState)
 			switch (event.key.keysym.sym)
 			{
 
-			case SDLK_1:
-				
+			case SDLK_1:			
 				handleCardSelection(game, 1);		
-				
 				break;
 
 			case SDLK_2:
@@ -256,51 +252,15 @@ void GameplayState::getHoveredCountry()
 
 void GameplayState::handleCardSelection(Game* game, int position)
 {
-	inActionState = true;
-
 	ActionState::toPlay->pickCard(game, position);
 	ActionState::toPlay->playCard(game);
-
-	handlePlayerAction(game);
-
-}
-
-void GameplayState::handlePlayerAction(Game* game)
-{
-
-	switch (ActionState::toPlay->getHand()->getAction()->getID())
-	{
-	case 0:
-		game->pushState(PlaceNewArmiesState::Instance());
-		break;
-	case 1:
-		game->pushState(PlaceNewArmiesState::Instance());
-		break;
-	case 2:
-		game->pushState(PlaceNewArmiesState::Instance());
-		break;
-	case 3:
-		game->pushState(PlaceNewArmiesState::Instance());
-		break;
-	case 4: //and
-		game->pushState(PlaceNewArmiesState::Instance());
-		break;
-	case 5:  //or
-		game->pushState(PlaceNewArmiesState::Instance());
-		break;
-	case 6:
-		game->pushState(PlaceNewArmiesState::Instance());
-		break;
-	default:
-		break;
-	}
 
 }
 
 
 void GameplayState::nextMove(Game* game)
 {
-	inActionState = false;
+	ActionState::inActionState = false;
 	bool cpu = false;
 	ActionState::toPlay->computeScore(gameMap);
 	gameMessages.clear();
@@ -342,7 +302,7 @@ void GameplayState::placeStartingArmies(Game* game)
 {
 	for ( Player* p: game->players() )
 	{
-
+		ActionState::toPlay = p;
 		startingCountry->updateOccupyingPlayerScore(3, p);
 		p->holdings().emplace(startingCountry->getID(), new Holdings());	
 		p->PlaceNewArmies(3, startingCountry);

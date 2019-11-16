@@ -27,6 +27,9 @@ public:
 	friend std::ostream& operator<<(std::ostream&, const Holdings&);
 	int numArmies();
 	int numCities();
+	int addArmies(int n);
+	int addCities(int n);
+	int removeArmies(int n);
 
 };
 
@@ -68,6 +71,7 @@ public:
 	int getNumArmies();
 	int getNumCities();
 	int setArmies(int);
+	int getArmies();
 	int setCities(int);
 	void setStrategy(PlayerStrategies* newStrategy);
 	void pickCard(Game* game, int position);

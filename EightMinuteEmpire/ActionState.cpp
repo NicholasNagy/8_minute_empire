@@ -1,6 +1,8 @@
 #include "ActionState.h"
 
 PlaceNewArmiesState PlaceNewArmiesState::mPlaceNewArmiesState;
+MoveArmiesState MoveArmiesState::mMoveArmiesState;
+bool ActionState::inActionState = false;
 SDL_Rect cursor;
 
 
@@ -43,7 +45,7 @@ void ActionState::update(Game* game)
 	GameplayState::update(game);
 }
 
-void ActionState::getClickedCountry(Game* game)
+void ActionState::getSelectedCountry(Game* game)
 {
 	//Find out type of tile clicked
 	static int typeCol;
@@ -75,6 +77,7 @@ void ActionState::getClickedCountry(Game* game)
 void PlaceNewArmiesState::init(Game* game)
 {
 	cout << "\nSelected Place New Armies Action\n";
+	cout << "\nSelect a country with an owned city to place your armies. \n";
 }
 
 void PlaceNewArmiesState::pause()
@@ -89,7 +92,6 @@ void PlaceNewArmiesState::resume()
 
 void PlaceNewArmiesState::clean(Game* game)
 {
-	
 }
 
 void PlaceNewArmiesState::handleEvents(Game* game)
@@ -100,7 +102,7 @@ void PlaceNewArmiesState::handleEvents(Game* game)
 	case SDL_MOUSEBUTTONDOWN:
 		cursor.x = (GameplayState::event.motion.x / GRID_CELL_SIZE) * GRID_CELL_SIZE;
 		cursor.y = (GameplayState::event.motion.y / GRID_CELL_SIZE) * GRID_CELL_SIZE;
-		ActionState::getClickedCountry(game);
+		PlaceNewArmiesState::getSelectedCountry(game);
 		break;
 
 	case SDL_KEYDOWN:
@@ -108,9 +110,12 @@ void PlaceNewArmiesState::handleEvents(Game* game)
 		switch (GameplayState::event.key.keysym.sym)
 		{
 		case SDLK_RETURN:
+			if (!selectedCountries.empty())
+			{
 			executeAction();
 			game->popState();
 			selectedCountries.clear();
+			}
 			break;
 		default:
 			break;
@@ -135,11 +140,166 @@ void PlaceNewArmiesState::update(Game* game)
 
 void PlaceNewArmiesState::executeAction()
 {
-	for (GraphWorld::Country* c : selectedCountries)
-	{
-		ActionState::toPlay->PlaceNewArmies(1, c);
+	//Places all the armies on the last selected country
+		ActionState::toPlay->PlaceNewArmies(ActionState::toPlay->getHand()->getAction()->getMultiplicity(), selectedCountries.back());
 
+}
+
+void PlaceNewArmiesState::getSelectedCountry(Game* game)
+{
+
+	//Find out type of tile clicked
+	static int typeCol;
+	static int typeRow;
+	static int type;
+
+	typeCol = cursor.x / GRID_CELL_SIZE;
+	typeRow = cursor.y / GRID_CELL_SIZE;
+
+	if (cursor.x < MAP_WIDTH * GRID_CELL_SIZE)
+	{
+		type = game->getMap()->getTileMap()->tiles[typeRow][typeCol];
+		GraphWorld::Country* clickedON = nullptr;
+		if (type < game->getMap()->getNumCountries() && type >= 0)
+		{
+			clickedON = game->getMap()->getCountry(type);
+			if (ActionState::toPlay->getHoldings(clickedON)->numCities() == 0 && !clickedON->isStartCountry())
+			{
+				std::cout << "Cannot place a New Army on this Country. Player does not own a city here." << std::endl;
+				std::cout << "Please select another Country " << std::endl;
+			}
+			else
+			{
+				selectedCountries.push_back(clickedON);
+				std::cout << "\nSelected Country: " << clickedON->getID() << std::endl;
+				std::cout << "Press 'ENTER' To confirm move\n" << std::endl;
+			}
+
+
+		}
 	}
 
 }
 
+//Move Armies Action State
+GraphWorld::Country* srcCountry = nullptr;
+GraphWorld::Country* destCountry = nullptr;
+
+void MoveArmiesState::init(Game* game)
+{
+	cout << "\nSelected Move Armies Action\n\n";
+	cout << "Please select a country to move your armies from: \n";
+}
+
+void MoveArmiesState::pause()
+{
+	ActionState::pause();
+}
+
+void MoveArmiesState::resume()
+{
+	ActionState::resume();
+}
+
+void MoveArmiesState::clean(Game* game)
+{
+
+}
+
+void MoveArmiesState::handleEvents(Game* game)
+{
+	ActionState::handleEvents(game);
+	switch (GameplayState::event.type)
+	{
+	case SDL_MOUSEBUTTONDOWN:
+		cursor.x = (GameplayState::event.motion.x / GRID_CELL_SIZE) * GRID_CELL_SIZE;
+		cursor.y = (GameplayState::event.motion.y / GRID_CELL_SIZE) * GRID_CELL_SIZE;
+		MoveArmiesState::getSelectedCountry(game);
+		break;
+
+	case SDL_KEYDOWN:
+	{
+		switch (GameplayState::event.key.keysym.sym)
+		{
+		case SDLK_RETURN:
+			if (srcCountry && destCountry)
+			{
+				executeAction(game);
+				game->popState();
+				srcCountry = destCountry = nullptr;
+
+			}
+
+			break;
+		default:
+			break;
+		}
+	}
+
+	default:
+		break;
+	}
+}
+
+void MoveArmiesState::draw(Game* game)
+{
+	ActionState::draw(game);
+}
+
+void MoveArmiesState::update(Game* game)
+{
+	ActionState::update(game);
+}
+
+void MoveArmiesState::getSelectedCountry(Game* game)
+{
+	//Find out type of tile clicked
+	static int typeCol;
+	static int typeRow;
+	static int type;
+
+	typeCol = cursor.x / GRID_CELL_SIZE;
+	typeRow = cursor.y / GRID_CELL_SIZE;
+
+	if (cursor.x < MAP_WIDTH * GRID_CELL_SIZE)
+	{
+		type = game->getMap()->getTileMap()->tiles[typeRow][typeCol];
+
+		if (type < game->getMap()->getNumCountries() && type >= 0)
+		{
+			if (srcCountry)
+			{
+				destCountry = game->getMap()->getCountry(type);
+				std::cout << "\nSELECTED ARMY MOVE FROM {COUNTRY " << srcCountry->getID()
+						  << "} TO {COUNTRY " << destCountry->getID() << "}" << std::endl;
+				std::cout << "Press 'ENTER' To confirm move" << std::endl;
+
+			}
+			else
+				srcCountry = game->getMap()->getCountry(type);
+
+			//Check if the player has any armies on this country 
+			if (ActionState::toPlay->getHoldings(srcCountry)->numArmies() > 0)
+			{
+				if (!destCountry)
+				{
+					std::cout << "\nWILL MOVE ARMIES FROM COUNTRY " << srcCountry->getID() << std::endl;
+					std::cout << "Select a country to move to: " << std::endl;
+
+				}
+			
+			}
+			else
+			{
+				std::cout << "No Armies to Move on Country " << srcCountry->getID() << std::endl;
+				std::cout << "\nPlease select another Country " << std::endl;
+				srcCountry = nullptr;
+			}
+		}
+	}
+}
+
+void MoveArmiesState::executeAction(Game* game)
+{
+	toPlay->MoveArmies(game->getMap(), srcCountry, destCountry);
+}

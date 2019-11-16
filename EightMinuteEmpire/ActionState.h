@@ -15,11 +15,12 @@ public:
 	void draw(Game* game);
 	void update(Game* game);
 	static Player* toPlay;
+	static bool inActionState;
 
 protected:
 	ActionState() {}
 
-	void getClickedCountry(Game* game);
+	void getSelectedCountry(Game* game);
 
 };
 
@@ -46,6 +47,32 @@ protected:
 private:
 	static PlaceNewArmiesState mPlaceNewArmiesState;
 	void executeAction();
-
+	void getSelectedCountry(Game* game);
 };
 
+class MoveArmiesState : public ActionState
+{
+
+public:
+	void init(Game* game);
+	void pause();
+	void resume();
+	void clean(Game* game);
+	void handleEvents(Game* game);
+	void draw(Game* game);
+	void update(Game* game);
+
+	static MoveArmiesState* Instance()
+	{
+		return &mMoveArmiesState;
+	}
+
+protected:
+	MoveArmiesState() {}
+
+private:
+	static MoveArmiesState mMoveArmiesState;
+	void executeAction(Game* game);
+	void getSelectedCountry(Game* game);
+
+};

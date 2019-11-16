@@ -33,7 +33,6 @@ private:
 	void initUI(Game* game);
 	void getHoveredCountry();
 	void handleCardSelection(Game* game, int position);
-	void handlePlayerAction(Game* game);
 
 	void nextMove(Game* game);
 	void placeStartingArmies(Game* game);
