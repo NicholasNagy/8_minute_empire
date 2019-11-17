@@ -102,7 +102,7 @@ Deck::Deck()
 	cardsDeck->at(40) = new Card(good, Action(5, multiplicity, false, 0, 1, 1, true));
 
 	// Instantiate 1 cards with Ignore Action
-	good = dist3(rng); // ranges betweeb (1,3)
+	good = dist3(rng); // ranges between (1,3)
 	multiplicity = dist3(rng); // ranges between (1,3)
 	cardsDeck->at(41) = new Card(good, Action(6, multiplicity));
 	

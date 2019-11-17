@@ -5,6 +5,7 @@
 #include "MapLoader.h"
 #include <vector>
 #include "Cards.h"
+#include "GameObservers.h"
 
 extern int WINDOW_X;
 extern int WINDOW_X_SMALL;
@@ -15,7 +16,8 @@ extern int MAP_HEIGHT; //number of rows
 
 class GameState;
 
-class Game
+
+class Game 
 {
 public:
 	Game();
@@ -35,6 +37,7 @@ public:
 	void setHand(Hand*);
 	Deck* deck();
 	Hand* hand();
+	PhaseObserver* phaseObserver();
 	std::vector<Player*>& players(); //get vector of players
 	GraphWorld::Map* getMap();
 	MapLoader* getMapLoader();
@@ -51,7 +54,6 @@ private:
 	Deck* mDeck;
 	Hand* mHand;
 	std::vector<Player*> mPlayers;
-
-
+	PhaseObserver* mPhaseObserver;
 };
 

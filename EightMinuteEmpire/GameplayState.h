@@ -2,8 +2,9 @@
 #include "SDL.h"
 #include "GameState.h"
 #include "Cards.h"
+#include "Observable.h"
 
-class GameplayState : public GameState
+class GameplayState : public GameState, public Observable
 {
 public:
 	void init(Game* game);
@@ -14,6 +15,8 @@ public:
 	void draw(Game* game);
 	void update(Game* game);
 	void nextMove(Game* game);
+
+
 
 	static GameplayState* Instance()
 	{
