@@ -2,6 +2,7 @@
 #include "Game.h"
 #include "GameState.h"
 
+
 /*To learn the GUI SDL2 and inspiration for the game state stack architecture I used these as references
 
 https://gamedevelopment.tutsplus.com/articles/how-to-build-a-jrpg-a-primer-for-game-developers--gamedev-6676#state
@@ -26,13 +27,14 @@ Game::~Game()
 
 void Game::init(const char* title, int initialX, int initialY, int width, int height, Uint32 flags)
 {
-
+	
 	SDL_Init(SDL_INIT_EVERYTHING);
 	window = SDL_CreateWindow(title, initialX, initialY, width, height, flags);
 	if (window)
 		mIsRunning = true;
 	else
 		mIsRunning = false;
+
 
 }
 
@@ -143,6 +145,11 @@ Deck* Game::deck()
 Hand* Game::hand()
 {
 	return mHand;
+}
+
+PhaseObserver* Game::phaseObserver()
+{
+	return mPhaseObserver;
 }
 
 std::vector<Player*>& Game::players()

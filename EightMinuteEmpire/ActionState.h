@@ -16,9 +16,15 @@ public:
 	void update(Game* game);
 	static Player* toPlay;
 	static bool inActionState;
+	//string getStatus() { return status; }
+	//string startNewStatus(string newStatus) { status = newStatus; notify(); }
+	//string updateStatus(string addStatus) { status = status + "\n" + addStatus; notify();}
 
 protected:
 	ActionState() {}
+
+private: 
+	//string status;
 };
 
 class PlaceNewArmiesState : public ActionState

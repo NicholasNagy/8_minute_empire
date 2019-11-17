@@ -39,14 +39,18 @@ Label* gameMessagesLabel;
 std::string gameMessages;
 Label* cardsLabel;
 
+
 int playerMove;  //The current player's turn
 Game* nextM;
+
 
 void GameplayState::init(Game* game)
 {
 	nextM = game;
 	std::cout << "\nGame Started\n\n-------------------------------------------------\n\n";
 	numPlayers = game->players().size();
+
+
 
 	GameplayState::initWindow(game);
 
@@ -65,8 +69,12 @@ void GameplayState::init(Game* game)
 	game->deck()->shuffleDeck();
 	game->deck()->printDeck();
 	
+	
 	ActionState::toPlay = game->players().at(playerMove);
 	gameMessages = ActionState::toPlay->getName() + " (" + ActionState::toPlay->getStrategy() + ") turn to move. \n";
+
+	// start a new gameplay status
+	startNewStatus(ActionState::toPlay->getName() + " (" + ActionState::toPlay->getStrategy() + ") turn to move. \n");
 
 	Hand* hand = new Hand(game->deck()); cout << "\n------------------------------------------------------------\n";
 	game->setHand(hand);
@@ -77,6 +85,7 @@ void GameplayState::init(Game* game)
 
 	if (ActionState::toPlay->getStrategy().compare("GreedyCPU") == 0 || ActionState::toPlay->getStrategy().compare("ModerateCPU") == 0)
 		handleCardSelection(game, 0);
+
 
 }
 
@@ -252,7 +261,14 @@ void GameplayState::getHoveredCountry()
 void GameplayState::handleCardSelection(Game* game, int position)
 {
 	ActionState::toPlay->pickCard(game, position);
+	//int selectedActionID = ActionState::toPlay->getHand()->getAction()->getID();
+	updateStatus("the selected card has goods = " + ActionState::toPlay->getHand()->getGood());
+
+
 	ActionState::toPlay->playCard(game);
+
+
+	//status = status + " the card picked was "
 
 }
 
@@ -288,6 +304,7 @@ void GameplayState::nextMove(Game* game)
 	{
 		cpu = true;
 		gameMessages = ActionState::toPlay->getName() + " (" + ActionState::toPlay->getStrategy() + ") turn to move. \n";;
+		startNewStatus(ActionState::toPlay->getName() + " (" + ActionState::toPlay->getStrategy() + ") turn to move. \n");
 	}
 	else
 		gameMessages = ActionState::toPlay->getName() + " turn to move. Select a card by pressing (1-6) on the keyboard. 'Enter' to confirm move.\n";
@@ -394,10 +411,12 @@ void GameplayState::update(Game* game)
 
 	}
 	ss.clear();
-	gameMessagesLabel->setLabelText(renderer, screen, gameMessages, ui.getFont("arialN"));
+	//gameMessagesLabel->setLabelText(renderer, screen, gameMessages, ui.getFont("arialN"));
+	gameMessagesLabel->setLabelText(renderer, screen, game->phaseObserver()->getStatus(), ui.getFont("arialN"));
 
 	cardsLabel->setLabelText(renderer, screen, "1\n2\n3\n4\n5\n6\n", ui.getFont("unispace bd"));
 
 
 
 }
+
