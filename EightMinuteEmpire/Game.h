@@ -37,6 +37,7 @@ public:
 	Hand* hand();
 	std::vector<Player*>& players(); //get vector of players
 	GraphWorld::Map* getMap();
+	
 	MapLoader* getMapLoader();
 	void setMapLoader(MapLoader*);
 	SDL_Window* getWindow();

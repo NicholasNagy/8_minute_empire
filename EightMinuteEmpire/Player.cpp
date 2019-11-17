@@ -321,6 +321,11 @@ int Player::setCities(int n)
 	return mCities = n;
 }
 
+std::vector<GraphWorld::Country*>& Player::countriesWithCities()
+{
+	return mCountriesWithCities;
+}
+
 void Player::setStrategy(PlayerStrategies* newStrategy)
 {
 	strategy = newStrategy;

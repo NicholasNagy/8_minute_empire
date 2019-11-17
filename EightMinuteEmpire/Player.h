@@ -69,6 +69,7 @@ public:
 	int setArmies(int);
 	int getArmies();
 	int setCities(int);
+	std::vector<GraphWorld::Country*>& countriesWithCities();
 
 	//Function using strategy pattern -->
 
@@ -84,6 +85,7 @@ public:
 
 private:
 	std::unordered_map<int, Holdings*> mHoldings;  // How much the player holds on each country (key is the country id, could use country pointers as keys as well)
+	std::vector<GraphWorld::Country*> mCountriesWithCities;
 	std::string name;
 	int* money; //Amount of money that the player holds
 	int* age;

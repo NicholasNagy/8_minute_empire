@@ -80,6 +80,7 @@ void MainMenuState::update(Game* game)
 {
 }
 
+
 void MainMenuState::draw(Game* game)
 {
 

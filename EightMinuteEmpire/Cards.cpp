@@ -227,7 +227,6 @@ Card* Hand::getCardAtPosition(int postion, Deck* deck) {
 	return cardptr;
 }
 
-
 // After a card is taken from the handslot in the hand, move the cards in the successor handslots backward
 // and draw another card from the deck which will be placed at the end of the Hand (the 6th handslot). 
 void Hand::moveCards(int postionOfTheRemovedCard, Deck* deck) {

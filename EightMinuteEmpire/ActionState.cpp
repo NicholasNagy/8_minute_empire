@@ -418,15 +418,6 @@ void DestroyArmyState::init(Game* game)
 			hasArmiesOnCountry = false;
 	}
 
-	//for (int f = 0; f < opposingArmies.size(); ++f)
-	//{
-	//for (Player * px :	opposingArmies.at(game->getMap()->getStartingCountry()))
-	//	{
-	//		cout << "FFF:" << px->getName() << endl;
-	//	}
-	//}
-
-
 	cout << "\nSelect a country with enemy armies you wish to destroy. \n";
 }
 
