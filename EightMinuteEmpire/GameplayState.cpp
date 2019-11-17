@@ -74,7 +74,7 @@ void GameplayState::init(Game* game)
 	gameMessages = ActionState::toPlay->getName() + " (" + ActionState::toPlay->getStrategy() + ") turn to move. \n";
 
 	// start a new gameplay status
-	startNewStatus(ActionState::toPlay->getName() + " (" + ActionState::toPlay->getStrategy() + ") turn to move. \n");
+	//startNewStatus(ActionState::toPlay->getName() + " (" + ActionState::toPlay->getStrategy() + ") turn to move. \n");
 
 	Hand* hand = new Hand(game->deck()); cout << "\n------------------------------------------------------------\n";
 	game->setHand(hand);
@@ -262,7 +262,7 @@ void GameplayState::handleCardSelection(Game* game, int position)
 {
 	ActionState::toPlay->pickCard(game, position);
 	//int selectedActionID = ActionState::toPlay->getHand()->getAction()->getID();
-	updateStatus("the selected card has goods = " + ActionState::toPlay->getHand()->getGood());
+	//updateStatus("the selected card has goods = " + ActionState::toPlay->getHand()->getGood());
 
 
 	ActionState::toPlay->playCard(game);
@@ -411,8 +411,8 @@ void GameplayState::update(Game* game)
 
 	}
 	ss.clear();
-	//gameMessagesLabel->setLabelText(renderer, screen, gameMessages, ui.getFont("arialN"));
-	gameMessagesLabel->setLabelText(renderer, screen, game->phaseObserver()->getStatus(), ui.getFont("arialN"));
+	gameMessagesLabel->setLabelText(renderer, screen, gameMessages, ui.getFont("arialN"));
+	//gameMessagesLabel->setLabelText(renderer, screen, game->phaseObserver()->getStatus(), ui.getFont("arialN"));
 
 	cardsLabel->setLabelText(renderer, screen, "1\n2\n3\n4\n5\n6\n", ui.getFont("unispace bd"));
 

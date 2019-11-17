@@ -20,7 +20,7 @@ PhaseObserver::~PhaseObserver()
 
 void PhaseObserver::setObservableGameplayState(Observable* gameplayState)
 {
-	std::cout << "in set ObservableGameplayState";
+	std::cout << "in set ObservableGameplayState\n";
 	observableGameplayState = gameplayState;
 	observableGameplayState->attach(this); //add the PhaseObserver to the list of observers of the game
 }

@@ -11,7 +11,7 @@
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_sdl.h"
 #include "Cards.h"
-#include "PlayerStrategies.h"
+#include "PlayerStrategies.h" 
 
 GameSetupState GameSetupState::mGameSetupState;
 SDL_Renderer* GameSetupState::renderer = nullptr;
@@ -322,7 +322,7 @@ void GameSetupState::handleGameStart(Game* game)
 		game->changeState(GameplayState::Instance());
 
 		// Set the phaseObserver to observer the GameplayState
-		game->phaseObserver()->setObservableGameplayState(GameplayState::Instance());
+		//game->phaseObserver()->setObservableGameplayState(GameplayState::Instance());
 	}
 
 }
