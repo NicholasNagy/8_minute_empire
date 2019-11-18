@@ -3,6 +3,8 @@
 #include "Singleton.h"
 #include "Map.h"
 
+SingletonClass* SingletonClass::_instance;
+
 SingletonClass::SingletonClass()
 {
 	map = nullptr;
