@@ -1,4 +1,5 @@
 #include "PlayerStrategies.h"
+#include <sstream>
 
 std::unordered_map<GraphWorld::Country*, vector<Player*>> opposingArmiesToDestroy;
 Player* selectedPlayerToDestroyArmies = nullptr;
@@ -96,13 +97,16 @@ Player* selectedPlayerToDestroyArmies = nullptr;
 
 	void Human::pickCard(Game* game, int position)
 	{
-		Player* toPlay = ActionState::toPlay;
-		//Take the passed position (that was clicked)
-		cout << " --- " << toPlay->getName() << " Has Selected Handslot " << position << " --- \n";
-		cout << toPlay->getName() << " has paid the cost of " << game->hand()->getCardCostAtPosition(position) << " coins. \n";
+
+		//Take the passed position (that was clicked)	
 		ActionState::toPlay->setCoinPurse(ActionState::toPlay->getMoney() - game->hand()->getCardCostAtPosition(position));
 		ActionState::toPlay->setHand(game->hand()->getCardAtPosition(position, game->deck()));
 		ActionState::toPlay->getHand()->printCard();
+
+		//Update Observer Status
+		GameplayState::Instance()->updateStatus(ActionState::toPlay->getName() + " has selected handslot " + to_string(position));
+		GameplayState::Instance()->updateStatus(to_string(game->hand()->getCardCostAtPosition(position)) + " coins have been deducted from " + ActionState::toPlay->getName());
+		GameplayState::Instance()->updateStatus("Card " + ActionState::toPlay->getHand()->getAction()->printAction().str());
 	}
 
 	void GreedyCPU::playCard(Game* game)

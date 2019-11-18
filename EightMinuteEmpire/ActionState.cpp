@@ -58,7 +58,10 @@ void ActionState::update(Game* game)
 void PlaceNewArmiesState::init(Game* game)
 {
 	cout << "\nSelected Place New Armies Action\n";
-	cout << "\nSelect a country with an owned city to place your armies. \n";
+	string userMessage = "Select a country with an owned city to place your armies";
+	GameplayState::Instance()->updateStatus(userMessage);
+	cout << endl << userMessage << endl;
+
 }
 
 void PlaceNewArmiesState::pause()
@@ -146,14 +149,20 @@ void PlaceNewArmiesState::getSelectedCountry(Game* game)
 			clickedON = game->getMap()->getCountry(type);
 			if (ActionState::toPlay->getHoldings(clickedON)->numCities() == 0 && !clickedON->isStartCountry())
 			{
-				std::cout << "Cannot place a New Army on this Country. Player does not own a city here." << std::endl;
-				std::cout << "Please select another Country " << std::endl;
+				string userMessage = "Cannot place a New Army here. No owned city. Please select another country";
+				GameplayState::Instance()->updateStatus(userMessage);
+				cout  << endl << userMessage << endl;
 			}
 			else
 			{
 				selectedCountries.push_back(clickedON);
-				std::cout << "\nSelected Country: " << clickedON->getID() << std::endl;
-				std::cout << "Press 'ENTER' To confirm move\n" << std::endl;
+
+				string userMessage = "SELECTED TO PLACE NEW ARMIES ON {COUNTRY " + to_string(clickedON->getID()) + "}";
+				GameplayState::Instance()->updateStatus(userMessage);
+				cout << endl << userMessage << endl;
+				userMessage = "Press 'ENTER' To confirm 'Place New Armies' action";
+				GameplayState::Instance()->updateStatus(userMessage);
+				cout << userMessage << endl;
 			}
 		}
 	}
@@ -166,7 +175,9 @@ GraphWorld::Country* destCountry = nullptr;
 void MoveArmiesState::init(Game* game)
 {
 	cout << "\nSelected Move Armies Action\n\n";
-	cout << "Please select a country to move your armies from: \n";
+	string userMessage = "Please select a country to move your armies from";
+	GameplayState::Instance()->updateStatus(userMessage);
+	cout << endl << userMessage << endl;
 }
 
 void MoveArmiesState::pause()
@@ -248,9 +259,14 @@ void MoveArmiesState::getSelectedCountry(Game* game)
 			if (srcCountry)
 			{
 				destCountry = game->getMap()->getCountry(type);
-				std::cout << "\nSELECTED ARMY MOVE FROM {COUNTRY " << srcCountry->getID()
-						  << "} TO {COUNTRY " << destCountry->getID() << "}" << std::endl;
-				std::cout << "Press 'ENTER' To confirm move" << std::endl;
+				string userMessage = "SELECTED ARMY MOVE FROM {COUNTRY " + to_string(srcCountry->getID())
+					+ "} TO {COUNTRY " + to_string(destCountry->getID()) + "}";
+				GameplayState::Instance()->updateStatus(userMessage);
+				cout << endl << userMessage << endl;
+
+				userMessage = "Press 'ENTER' To confirm 'Move Armies' action";
+				GameplayState::Instance()->updateStatus(userMessage);
+				cout << userMessage << endl;
 
 			}
 			else
@@ -261,14 +277,26 @@ void MoveArmiesState::getSelectedCountry(Game* game)
 			{
 				if (!destCountry)
 				{
-					std::cout << "\nWILL MOVE ARMIES FROM COUNTRY " << srcCountry->getID() << std::endl;
-					std::cout << "Select a country to move to: " << std::endl;
+					string userMessage = "Selected to move armies from COUNTRY " + to_string(srcCountry->getID());
+					GameplayState::Instance()->updateStatus(userMessage);
+					cout << endl << userMessage << endl;
+
+					userMessage = "Select a country to move to";
+					GameplayState::Instance()->updateStatus(userMessage);
+					cout << userMessage << endl;
 				}		
 			}
 			else
 			{
-				std::cout << "No Armies to Move on Country " << srcCountry->getID() << std::endl;
-				std::cout << "\nPlease select another Country " << std::endl;
+
+				string userMessage = "No Armies to Move on COUNTRY " + to_string(srcCountry->getID());
+				GameplayState::Instance()->updateStatus(userMessage);
+				cout << userMessage << endl;
+
+				userMessage = "Please select another Country";
+				GameplayState::Instance()->updateStatus(userMessage);
+				cout << endl << userMessage << endl;
+
 				srcCountry = nullptr;
 			}
 		}
@@ -285,7 +313,9 @@ void MoveArmiesState::executeAction(Game* game)
 void BuildCityState::init(Game* game)
 {
 	cout << "\nSelected Build City Action\n";
-	cout << "\nSelect a country to build your city. \n";
+	string userMessage = "Select a country to build your city on";
+	GameplayState::Instance()->updateStatus(userMessage);
+	cout << endl << userMessage << endl;
 }
 
 void BuildCityState::pause()
@@ -362,9 +392,13 @@ void BuildCityState::getSelectedCountry(Game* game)
 		if (type < game->getMap()->getNumCountries() && type >= 0)
 		{
 			clickedON = game->getMap()->getCountry(type);
-			selectedCountries.push_back(clickedON);
-			std::cout << "\nSelected Country: " << clickedON->getID() << std::endl;
-			std::cout << "Press 'ENTER' To confirm move" << std::endl;
+
+			string userMessage = "SELECTED TO BUILD A CITY ON {COUNTRY " + to_string(clickedON->getID()) + "}";
+			GameplayState::Instance()->updateStatus(userMessage);
+			cout << endl << userMessage << endl;
+			userMessage = "Press 'ENTER' To confirm 'Place New Armies' action";
+			GameplayState::Instance()->updateStatus(userMessage);
+			cout << userMessage << endl;
 
 		}
 	}
@@ -418,7 +452,9 @@ void DestroyArmyState::init(Game* game)
 			hasArmiesOnCountry = false;
 	}
 
-	cout << "\nSelect a country with enemy armies you wish to destroy. \n";
+	string userMessage = "Select a country with enemy armies you wish to destroy";
+	GameplayState::Instance()->updateStatus(userMessage);
+	cout << endl << userMessage << endl;
 }
 
 void DestroyArmyState::pause()
@@ -513,15 +549,24 @@ void DestroyArmyState::getSelectedCountry(Game* game)
 			if (opposingArmies.count(clickedON))
 			{
 				selectedCountries.push_back(clickedON);
-				std::cout << "\nSelected Country: " << clickedON->getID() << std::endl;
-				std::cout << "Enemy Armies on this country: " << std::endl;
+
+				string userMessage = "SELECTED {COUNTRY " + to_string(clickedON->getID()) + "}";
+				GameplayState::Instance()->updateStatus(userMessage);
+				cout << endl << userMessage << endl;
+				userMessage = "Enemy Armies on this country (shown in console)";
+				GameplayState::Instance()->updateStatus(userMessage);
+				cout << "Enemy Armies on this country: " << endl;
+
 				int n = 1;
 				for (Player* p : opposingArmies.at(clickedON))
 				{				
 					cout << n << ". " << p->getName() <<": Number of Armies: " << p->getHoldings(clickedON)->numArmies() << std::endl;
 					n++;
 				}
-					std::cout << "\nSelect the number representing the player to destroy their army" << std::endl;
+
+					userMessage = "Select the number representing the player to destroy their army";
+					GameplayState::Instance()->updateStatus(userMessage);
+					cout << endl << userMessage << endl;
 			}
 		}
 	}
@@ -533,13 +578,23 @@ void DestroyArmyState::getSelectedPlayer(Game* game, int index)
 	{
 		if (index >= opposingArmies.at(selectedCountries.back()).size())
 		{
-			std::cout << "No armies for that player on this country." << std::endl;
+			string userMessage = "No armies for that player on this country";
+			GameplayState::Instance()->updateStatus(userMessage);
+			cout  << userMessage << endl;
 		}
 		else 
 		{
 			selectedPlayer = opposingArmies.at(selectedCountries.back()).at(index);
-			std::cout << "\nWILL DESTROY ARMIES OF {" << selectedPlayer->getName() << "} ON {COUNTRY: "<< selectedCountries.back()->getID() << "}" << std::endl;
-			std::cout << "Press 'ENTER' To confirm move" << std::endl;
+
+			string userMessage = "WILL DESTROY ARMIES OF {" + selectedPlayer->getName()
+				+ "} ON {COUNTRY " + to_string(selectedCountries.back()->getID()) + "}";
+			GameplayState::Instance()->updateStatus(userMessage);
+			cout << endl << userMessage << endl;
+
+
+			userMessage = "Press 'ENTER' To confirm 'Destroy Armies' action";
+			GameplayState::Instance()->updateStatus(userMessage);
+			cout << userMessage << endl;
 		}
 	}
 }
@@ -554,7 +609,9 @@ void DestroyArmyState::executeAction(Game* game)
 
 void IgnoreState::init(Game* game)
 {
-	std::cout << "\nPress 'ENTER' To Ignore card and go to the next turn" << std::endl;
+	string userMessage = "Press 'ENTER' To Ignore card and go to the next turn";
+	GameplayState::Instance()->updateStatus(userMessage);
+	cout << endl << userMessage << endl;
 }
 
 void IgnoreState::pause()

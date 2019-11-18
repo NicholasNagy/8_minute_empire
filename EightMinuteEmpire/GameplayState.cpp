@@ -50,8 +50,6 @@ void GameplayState::init(Game* game)
 	std::cout << "\nGame Started\n\n-------------------------------------------------\n\n";
 	numPlayers = game->players().size();
 
-
-
 	GameplayState::initWindow(game);
 
 	GameplayState::initMap(game);
@@ -71,17 +69,22 @@ void GameplayState::init(Game* game)
 	
 	
 	ActionState::toPlay = game->players().at(playerMove);
-	gameMessages = ActionState::toPlay->getName() + " (" + ActionState::toPlay->getStrategy() + ") turn to move. \n";
+	gameMessages = ActionState::toPlay->getName() + " (" + ActionState::toPlay->getStrategy() + ") turn to move.";
+
+	// Set the phaseObserver to observer the GameplayState
+	PhaseObserver* phaseObserver = new PhaseObserver(GameplayState::Instance());
+	game->setPhaseObserver(phaseObserver);
 
 	// start a new gameplay status
-	//startNewStatus(ActionState::toPlay->getName() + " (" + ActionState::toPlay->getStrategy() + ") turn to move. \n");
+	startNewStatus(gameMessages);
+	
 
 	Hand* hand = new Hand(game->deck()); cout << "\n------------------------------------------------------------\n";
 	game->setHand(hand);
 
 	hand->printHand();
 	cout << "\n------------------------------------------------------------\n";
-	cout << endl <<gameMessages;
+	cout << endl <<gameMessages <<endl;
 
 	if (ActionState::toPlay->getStrategy().compare("GreedyCPU") == 0 || ActionState::toPlay->getStrategy().compare("ModerateCPU") == 0)
 		handleCardSelection(game, 0);
@@ -124,7 +127,7 @@ void GameplayState::initUI(Game* game)
 	string bidding = "Biding initiated in console!";
 	ui.addFonts("assets/Fonts/unispace bd.ttf", "unispace bd", 9);
 	ui.addFonts("assets/Fonts/arial.ttf", "arial", 22);
-	ui.addFonts("assets/Fonts/ARIALN.TTF", "arialN", 26);
+	ui.addFonts("assets/Fonts/BRITANIC.TTF", "BRITANIC", 22);
 
 
 	SDL_Color black = { 0,0,0,0 };
@@ -138,8 +141,8 @@ void GameplayState::initUI(Game* game)
 	playerInfoLabel->setLabelText(renderer,screen, "", ui.getFont("unispace bd"));
 	playerInfoLabel->drawLabel(renderer);
 
-	gameMessagesLabel = new Label("", "arialN", 5, 585, black);
-	gameMessagesLabel->setLabelText(renderer, screen, "", ui.getFont("arialN"));
+	gameMessagesLabel = new Label("", "arialN", 5, 545, black);
+	gameMessagesLabel->setLabelText(renderer, screen, "", ui.getFont("BRITANIC"));
 	gameMessagesLabel->drawLabel(renderer);
 
 	cardsLabel = new Label("", "unispace bd", 1035, 565, r);
@@ -262,13 +265,8 @@ void GameplayState::handleCardSelection(Game* game, int position)
 {
 	ActionState::toPlay->pickCard(game, position);
 	//int selectedActionID = ActionState::toPlay->getHand()->getAction()->getID();
-	//updateStatus("the selected card has goods = " + ActionState::toPlay->getHand()->getGood());
-
-
+	//startNewStatus(ActionState::toPlay->getName() + " Has Selected Handslot " + to_string(position)  + "\n");
 	ActionState::toPlay->playCard(game);
-
-
-	//status = status + " the card picked was "
 
 }
 
@@ -303,12 +301,13 @@ void GameplayState::nextMove(Game* game)
 	if (ActionState::toPlay->getStrategy().compare("GreedyCPU") == 0 || ActionState::toPlay->getStrategy().compare("ModerateCPU") == 0)
 	{
 		cpu = true;
-		gameMessages = ActionState::toPlay->getName() + " (" + ActionState::toPlay->getStrategy() + ") turn to move. \n";;
-		startNewStatus(ActionState::toPlay->getName() + " (" + ActionState::toPlay->getStrategy() + ") turn to move. \n");
+		gameMessages = ActionState::toPlay->getName() + " (" + ActionState::toPlay->getStrategy() + ") turn to move.";;
+		startNewStatus(ActionState::toPlay->getName() + " (" + ActionState::toPlay->getStrategy() + ") turn to move.");
 	}
 	else
-		gameMessages = ActionState::toPlay->getName() + " turn to move. Select a card by pressing (1-6) on the keyboard. 'Enter' to confirm move.\n";
-		cout << gameMessages;
+		gameMessages = ActionState::toPlay->getName() + " turn to move. Select a card by pressing (1-6) on the keyboard. 'Enter' to confirm move.";
+	cout << gameMessages << endl;
+		startNewStatus(gameMessages);
 
 	if(cpu)
 		handleCardSelection(game, 0);
@@ -410,9 +409,9 @@ void GameplayState::update(Game* game)
 		countryHoverLabel->setLabelText(renderer, screen, ss.str(), ui.getFont("arial"));
 
 	}
-	ss.clear();
-	gameMessagesLabel->setLabelText(renderer, screen, gameMessages, ui.getFont("arialN"));
-	//gameMessagesLabel->setLabelText(renderer, screen, game->phaseObserver()->getStatus(), ui.getFont("arialN"));
+	//cout << "\nObservable status: " << GameplayState::Instance()->getStatus() << "\nObserver Status: " << game->phaseObserver()->getStatus() << endl;
+
+	gameMessagesLabel->setLabelText(renderer, screen, game->phaseObserver()->getStatus(), ui.getFont("BRITANIC"));
 
 	cardsLabel->setLabelText(renderer, screen, "1\n2\n3\n4\n5\n6\n", ui.getFont("unispace bd"));
 

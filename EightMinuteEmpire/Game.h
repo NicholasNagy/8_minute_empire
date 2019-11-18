@@ -38,6 +38,7 @@ public:
 	Deck* deck();
 	Hand* hand();
 	PhaseObserver* phaseObserver();
+	void setPhaseObserver(PhaseObserver*);
 	std::vector<Player*>& players(); //get vector of players
 	GraphWorld::Map* getMap();
 	

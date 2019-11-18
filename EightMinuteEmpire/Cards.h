@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>  
 #include <iostream>  
+#include <sstream>
 #include "Action.h"
 using namespace std;
 
@@ -13,6 +14,7 @@ public:
 	Card(const int myGood, const Action& myAction);
 	Card(const Card& c); // Copy constructor
 	Card & operator=(const Card& c); // Overload assignment operator
+	friend ostream& operator<<(ostream& os, const Card& card);
 	~Card();
 	void printCard() { 
 		cout << "Card: Goods = " << *good << ", ";

@@ -1,6 +1,7 @@
 #include "GameObservers.h"
 #include <iostream>
 
+Observable* PhaseObserver::observableGameplayState = nullptr;
 
 PhaseObserver::PhaseObserver()
 {
@@ -20,14 +21,14 @@ PhaseObserver::~PhaseObserver()
 
 void PhaseObserver::setObservableGameplayState(Observable* gameplayState)
 {
-	std::cout << "in set ObservableGameplayState\n";
 	observableGameplayState = gameplayState;
 	observableGameplayState->attach(this); //add the PhaseObserver to the list of observers of the game
 }
 
 void PhaseObserver::update()
 {
-	currentStatus = observableGameplayState->getStatus();
+	if (observableGameplayState)
+	currentStatus = PhaseObserver::observableGameplayState->getStatus();
 }
 
 

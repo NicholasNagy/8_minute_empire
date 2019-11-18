@@ -321,8 +321,7 @@ void GameSetupState::handleGameStart(Game* game)
 
 		game->changeState(GameplayState::Instance());
 
-		// Set the phaseObserver to observer the GameplayState
-		//game->phaseObserver()->setObservableGameplayState(GameplayState::Instance());
+
 	}
 
 }

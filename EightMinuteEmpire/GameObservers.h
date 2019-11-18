@@ -13,8 +13,9 @@ class PhaseObserver : public Observer
 private:
 	// we need the game as a subject so when it notifies the PhaseObserver of a change
 	// the phase observer will call gmae.getState() and display the changes.
-	Observable* observableGameplayState;
+	static Observable* observableGameplayState;
 	std::string currentStatus; // Stores the current game status
+
 public:
 	PhaseObserver();
 	PhaseObserver(Observable* gameplayState); // the passed game will set the subject data member

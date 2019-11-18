@@ -152,6 +152,11 @@ PhaseObserver* Game::phaseObserver()
 	return mPhaseObserver;
 }
 
+void Game::setPhaseObserver(PhaseObserver* po)
+{
+	mPhaseObserver = po;
+}
+
 std::vector<Player*>& Game::players()
 {
 	return mPlayers;

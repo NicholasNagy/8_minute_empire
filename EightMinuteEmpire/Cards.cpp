@@ -249,3 +249,9 @@ vector<Card* > Hand::cardsInHand()
 {
 	return *cardsHand;
 }
+
+ostream& operator<<(ostream& os, const Card& card)
+{
+	return os << "Card: Goods = " << *card.good << ", " <<
+				  card.action->printAction().str();
+}
