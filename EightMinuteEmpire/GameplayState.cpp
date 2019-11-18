@@ -418,13 +418,14 @@ void GameplayState::update(Game* game)
 	//Displaying Cards
 	stringstream cards;
 	int pos = 0;
-	cards << "-----CARDS IN HAND-----" << endl;
+	cards << "---------------CARDS IN HAND--------------" << endl;
 	for (Card* card : game->hand()->cardsInHand())
 	{
 		cards << (pos + 1) << ".G=" << game->hand()->cardsInHand().at(pos)->getGood() << " " << 
 			  game->hand()->cardsInHand().at(pos)->getAction()->actionString(false) << endl;
 		pos++;
 	}
+	cards << "------------------------------------------";
 	cardsLabel->setLabelText(renderer, screen, cards.str(), ui.getFont("unispace bd"));
 
 
