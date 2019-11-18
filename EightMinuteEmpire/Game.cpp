@@ -1,6 +1,7 @@
 #include "SDL.h"
 #include "Game.h"
 #include "GameState.h"
+#include "Singleton.h"
 
 /*To learn the GUI SDL2 and inspiration for the game state stack architecture I used these as references
 
@@ -18,7 +19,7 @@ int GRID_CELL_SIZE = 32;
 int MAP_WIDTH = 32;
 int MAP_HEIGHT = 20;
 
-Game::Game() : mIsRunning(false), window(nullptr), map(nullptr) {}
+Game::Game() : mIsRunning(false), window(nullptr) {}
 
 Game::~Game()
 {
@@ -120,10 +121,12 @@ void Game::pushState(GameState* state)
 
 }
 
+/*
 void Game::setMap(GraphWorld::Map* map)
 {
 	this->map = map;
 }
+*/
 
 void Game::setDeck(Deck* d)
 {
@@ -150,10 +153,12 @@ std::vector<Player*>& Game::players()
 	return mPlayers;
 }
 
+/*
 GraphWorld::Map* Game::getMap()
 {
 	return map;
 }
+*/
 
 MapLoader* Game::getMapLoader()
 {

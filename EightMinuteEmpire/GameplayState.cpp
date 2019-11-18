@@ -10,6 +10,7 @@
 #include "Bid.h"
 #include "GameOverlay.h"
 #include "Action.h"
+#include "Singleton.h"
 
 GameplayState GameplayState::mGameplayState;
 SDL_Renderer* GameplayState::renderer = nullptr;
@@ -99,12 +100,12 @@ void GameplayState::initWindow(Game* game)
 
 void GameplayState::initMap(Game* game)
 {
-	gameMap = game->getMap();
+	//gameMap = game->getMap();
 	string path = game->getMapLoader()->getTileSetPath();
 	texture = TextureLoader::loadTexutre(path.c_str(), renderer);
-	numCountries = gameMap->getNumCountries();
-	gameMap->getTileMap()->drawTileMap(renderer, texture);
-	startingCountry = gameMap->getStartingCountry();
+	numCountries = SingletonClass::instance()->getNumCountries();
+	SingletonClass::instance()->getTileMap()->drawTileMap(renderer, texture);
+	startingCountry = SingletonClass::instance()->getStartingCountry();
 	initPlayerHoldings(game);
 }
 
