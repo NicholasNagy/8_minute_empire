@@ -18,7 +18,7 @@ public:
 	~Card();
 	void printCard() { 
 		cout << "Card: Goods = " << *good << ", ";
-		action->printAction();
+		action->actionString(true);
 	}
 	Action* getAction();
 	int getGood();
@@ -57,6 +57,7 @@ public:
 	Card* getCardAtPosition(int postion, Deck* deck);
 	void moveCards(int postionOfTheRemovedCard, Deck* deck);
 	vector<Card* > cardsInHand();
+	
 
 private:
 	vector<Card* >* cardsHand = new vector<Card* >(6);

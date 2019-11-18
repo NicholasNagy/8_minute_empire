@@ -95,7 +95,7 @@ Action::~Action() {
 
 
 
-std::stringstream Action::printAction() {
+std::string Action::actionString(bool printToConsole) {
 
 	std::stringstream ss;
 	int actionID = *id;
@@ -105,25 +105,30 @@ std::stringstream Action::printAction() {
 		switch (actionID)
 		{
 		case 0:
-			ss << "Action = PlaceNewArmies with " << *multiplicity << " armies. ";
+			ss << "PlaceNewArmies with " << *multiplicity << " armies. ";
+			if (printToConsole)
 			cout << ss.str();
-			return ss;
+			return ss.str();
 		case 1:
-			ss << "Action = MoveArmies with " << *multiplicity << " armies and Water movement is " << *isWaterMovementAllowed;
+			ss << "MoveArmies with " << *multiplicity << " armies and Water movement is " << *isWaterMovementAllowed;
+			if (printToConsole)
 			cout << ss.str();
-			return ss;
+			return ss.str();
 		case 2:
-			ss << "Action = BuildCity";
+			ss << "BuildCity";
+			if (printToConsole)
 			cout << ss.str();
-			return ss;
+			return ss.str();
 		case 3:
-			ss << "Action = DestroyArmy ";
+			ss << "DestroyArmy ";
+			if (printToConsole)
 			cout << ss.str();
-			return ss;
+			return ss.str();
 		case 6:
-			ss << "Action = Ignore ";
+			ss << "Ignore ";
+			if (printToConsole)
 			cout << ss.str();
-			return ss;
+			return ss.str();
 		}
 	}
 	else {
@@ -131,14 +136,14 @@ std::stringstream Action::printAction() {
 		switch (*id)
 		{
 		case 4:
-			ss << "Action = AND ";
+			ss << "AND ";
 			break;
 		case 5:
-			ss << "Action = OR ";
+			ss << "OR ";
 			break;
 		}
 
-		ss << " First Action = ";
+		ss << " 1st Action = ";
 		switch (*firstActionID)
 		{
 		case 0:
@@ -158,31 +163,37 @@ std::stringstream Action::printAction() {
 			break;
 		}
 
-		ss << ", Second Action = ";
+		ss << ", 2nd Action = ";
 		switch (*secondActionID)
 		{
 		case 0:
 			ss << "PlaceNewArmies with " << *secondActionMultiplicity << " armies. ";
+			if(printToConsole)
 			cout << ss.str();
-			return ss;
+			return ss.str();
 		case 1:
 			ss << "MoveArmies with " << *secondActionMultiplicity << " armies and Water movement is " << *secondActionIsWaterMovementAllowed;
+			if (printToConsole)
 			cout << ss.str();
-			return ss;
+			return ss.str();
 		case 2:
 			ss << "BuildCity ";
+			if (printToConsole)
 			cout << ss.str();
-			return ss;
+			return ss.str();
 		case 3:
 			ss << "DestroyArmy ";
+			if (printToConsole)
 			cout << ss.str();
-			return ss;
+			return ss.str();
 		case 6:
 			ss << "Ignore ";
+			if (printToConsole)
 			cout << ss.str();
-			return ss;
+			return ss.str();
 		}
 
 	}
+
 }
 

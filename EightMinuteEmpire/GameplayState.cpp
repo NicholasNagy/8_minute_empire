@@ -131,7 +131,7 @@ void GameplayState::initUI(Game* game)
 
 
 	SDL_Color black = { 0,0,0,0 };
-	SDL_Color r = {3,2,23,0 };
+	SDL_Color r = {100,0,0,0 };
 
 	countryHoverLabel = new Label(bidding, "arial", 0, 0, black);
 	countryHoverLabel->setLabelText(renderer,screen, bidding, ui.getFont("arial"));
@@ -145,7 +145,7 @@ void GameplayState::initUI(Game* game)
 	gameMessagesLabel->setLabelText(renderer, screen, "", ui.getFont("BRITANIC"));
 	gameMessagesLabel->drawLabel(renderer);
 
-	cardsLabel = new Label("", "unispace bd", 1035, 565, r);
+	cardsLabel = new Label("", "unispace bd", 1025, 555, r);
 	cardsLabel->setLabelText(renderer, screen, "", ui.getFont("unispace bd"));
 	cardsLabel->drawLabel(renderer);
 
@@ -389,7 +389,6 @@ void GameplayState::draw(Game* game)
 
 void GameplayState::update(Game* game)
 {
-
 	std::stringstream ss;
 	countryHoverLabel->destroyLabelTexture();
 	playerInfoLabel->destroyLabelTexture();
@@ -399,6 +398,7 @@ void GameplayState::update(Game* game)
 	for (Player* p : game->players())
 		ss << *p;
 
+	//Displaying player stats
 	playerInfoLabel->setLabelText(renderer, screen, ss.str(), ui.getFont("unispace bd"));
 
 	ss.clear();
@@ -411,9 +411,21 @@ void GameplayState::update(Game* game)
 	}
 	//cout << "\nObservable status: " << GameplayState::Instance()->getStatus() << "\nObserver Status: " << game->phaseObserver()->getStatus() << endl;
 
+	//Displaying game messages
 	gameMessagesLabel->setLabelText(renderer, screen, game->phaseObserver()->getStatus(), ui.getFont("BRITANIC"));
 
-	cardsLabel->setLabelText(renderer, screen, "1\n2\n3\n4\n5\n6\n", ui.getFont("unispace bd"));
+	
+	//Displaying Cards
+	stringstream cards;
+	int pos = 0;
+	cards << "-----CARDS IN HAND-----" << endl;
+	for (Card* card : game->hand()->cardsInHand())
+	{
+		cards << (pos + 1) << ".G=" << game->hand()->cardsInHand().at(pos)->getGood() << " " << 
+			  game->hand()->cardsInHand().at(pos)->getAction()->actionString(false) << endl;
+		pos++;
+	}
+	cardsLabel->setLabelText(renderer, screen, cards.str(), ui.getFont("unispace bd"));
 
 
 

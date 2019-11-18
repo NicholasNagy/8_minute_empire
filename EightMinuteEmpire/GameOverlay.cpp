@@ -38,6 +38,11 @@ void Label::setLabelText(SDL_Renderer* renderer, SDL_Surface* screen, std::strin
 	SDL_QueryTexture(texture, nullptr, nullptr, &position.w, &position.h);
 }
 
+void Label::setLabelColor(SDL_Color c)
+{
+	color = c;
+}
+
 void  Label::drawLabel(SDL_Renderer* renderer)
 {
 	TextureLoader::draw(renderer,texture, nullptr, &position);

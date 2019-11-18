@@ -43,6 +43,11 @@ class ModerateCPU : public PlayerStrategies
 	void BuildCity(GraphWorld::Country* country);
 	void DestroyArmy(Player* player, GraphWorld::Country* country);
 	void Ignore();
+
+	//helper functions
+	static GraphWorld::Country* determineCountryForArmyPlacement(Game* game);
+	static GraphWorld::Country* determineCountryForCityBuild(Game* game);
+	static GraphWorld::Country* determineArmiesToDestroy(Game* game);
 };
 
 

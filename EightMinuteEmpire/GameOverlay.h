@@ -26,6 +26,7 @@ public:
 	Label(std::string text, std::string font, int x, int y, SDL_Color& labelColor);
 	~Label();
 	void setLabelText(SDL_Renderer* renderer, SDL_Surface* screen, std::string text, TTF_Font* font);
+	void setLabelColor(SDL_Color color);
 	void drawLabel(SDL_Renderer* renderer);
 	void destroyLabelTexture();
 
