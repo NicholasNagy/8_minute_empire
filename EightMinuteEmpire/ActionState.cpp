@@ -392,7 +392,7 @@ void BuildCityState::getSelectedCountry(Game* game)
 		if (type < game->getMap()->getNumCountries() && type >= 0)
 		{
 			clickedON = game->getMap()->getCountry(type);
-
+			selectedCountries.push_back(clickedON);
 			string userMessage = "SELECTED TO BUILD A CITY ON {COUNTRY " + to_string(clickedON->getID()) + "}";
 			GameplayState::Instance()->updateStatus(userMessage);
 			cout << endl << userMessage << endl;
