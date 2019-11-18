@@ -23,14 +23,12 @@ Player* selectedPlayerToDestroyArmies = nullptr;
 				if (game->hand()->getCardCostAtPosition(cardPos) <= toPlay->getMoney())
 					cardsOfIntrest.push_back(cardPos);
 			}
-
 			cardPos++;
 		}
 
 		//Just pick the cheapest option for now.
 		if (cardsOfIntrest.size() > 0)
 			selectedCardPos = cardsOfIntrest.at(0);
-
 
 		cout << " --- " << toPlay->getName() <<  " Has Selected Handslot " << selectedCardPos << " --- \n";
 		ActionState::toPlay->setHand(game->hand()->getCardAtPosition(selectedCardPos, game->deck()));
@@ -39,7 +37,6 @@ Player* selectedPlayerToDestroyArmies = nullptr;
 		GameplayState::Instance()->updateStatus(ActionState::toPlay->getName() + " has selected handslot " + to_string(position));
 		GameplayState::Instance()->updateStatus(to_string(game->hand()->getCardCostAtPosition(position)) + " coins have been deducted from " + ActionState::toPlay->getName());
 		GameplayState::Instance()->updateStatus("Card " + ActionState::toPlay->getHand()->getAction()->actionString(false));
-
 	
 	}
 
@@ -142,7 +139,8 @@ Player* selectedPlayerToDestroyArmies = nullptr;
 		default:
 			break;
 		}
-		
+
+		GameplayState::Instance()->nextMove(game);
 	}
 
 	GraphWorld::Country* GreedyCPU::determineCountryForArmyPlacement(Game* game)
@@ -250,6 +248,12 @@ Player* selectedPlayerToDestroyArmies = nullptr;
 
 	void GreedyCPU::BuildCity(GraphWorld::Country* country)
 	{
+		Holdings* countryHoldings = ActionState::toPlay->getHoldings(country);
+		countryHoldings->addCities(1);
+		cout << "\nBuilt City on Country: " << country->getID() << endl;
+		country->updateOccupyingPlayerScore(countryHoldings->numArmies() + countryHoldings->numCities(), ActionState::toPlay);
+		ActionState::toPlay->setCities(ActionState::toPlay->getNumCities() - 1);
+		ActionState::toPlay->countriesWithCities().push_back(country);
 	}
 
 	void GreedyCPU::DestroyArmy(Player* player, GraphWorld::Country* country)
@@ -265,7 +269,7 @@ Player* selectedPlayerToDestroyArmies = nullptr;
 		switch (ActionState::toPlay->getHand()->getAction()->getID())
 		{
 		case 0:
-			ActionState::toPlay->PlaceNewArmies(1, determineCountryForArmyPlacement(game));
+			ActionState::toPlay->PlaceNewArmies(ActionState::toPlay->getHand()->getAction()->getMultiplicity(), determineCountryForArmyPlacement(game));
 			break;
 		case 1:
 			ActionState::toPlay->MoveArmies(game->getMap(), nullptr, nullptr);
@@ -274,7 +278,7 @@ Player* selectedPlayerToDestroyArmies = nullptr;
 			ActionState::toPlay->BuildCity(determineCountryForCityBuild(game));
 			break;
 		case 3:
-			ActionState::toPlay->DestroyArmy(nullptr, determineArmiesToDestroy(game));
+			ActionState::toPlay->DestroyArmy(nullptr, nullptr);
 			break;
 		case 4:
 			ActionState::toPlay->Ignore();
@@ -288,16 +292,15 @@ Player* selectedPlayerToDestroyArmies = nullptr;
 		default:
 			break;
 		}
+		GameplayState::Instance()->nextMove(game);
 	}
 
 	void ModerateCPU::PlaceNewArmies(int numberOfArmies, GraphWorld::Country* country)
 	{
 		Holdings* playerHoldings = ActionState::toPlay->holdings().at(country->getID());
 
-		//Check if the player has a city on the country or it is a starting country
-
 		playerHoldings->addArmies(numberOfArmies);
-		cout << "Added " << numberOfArmies << " Army Unit(s) to Country: " << country->getID() << " For player: " << ActionState::toPlay->getName() << endl;
+		cout << "\nAdded " << numberOfArmies << " Army Unit(s) to Country: " << country->getID() << " For player: " << ActionState::toPlay->getName() << endl;
 		country->updateOccupyingPlayerScore(playerHoldings->numArmies() + playerHoldings->numCities(), ActionState::toPlay);
 		ActionState::toPlay->setArmies(ActionState::toPlay->getArmies() - numberOfArmies);
 	}
@@ -308,6 +311,13 @@ Player* selectedPlayerToDestroyArmies = nullptr;
 
 	void ModerateCPU::BuildCity(GraphWorld::Country* country)
 	{
+
+		Holdings* countryHoldings = ActionState::toPlay->getHoldings(country);
+		countryHoldings->addCities(1);
+		cout << "\nBuilt City on Country: " << country->getID() << endl;
+		country->updateOccupyingPlayerScore(countryHoldings->numArmies() + countryHoldings->numCities(), ActionState::toPlay);
+		ActionState::toPlay->setCities(ActionState::toPlay->getNumCities() - 1);
+		ActionState::toPlay->countriesWithCities().push_back(country);
 	}
 
 	void ModerateCPU::DestroyArmy(Player* player, GraphWorld::Country* country)
@@ -413,14 +423,13 @@ Player* selectedPlayerToDestroyArmies = nullptr;
 		Holdings* playerHoldings = ActionState::toPlay->holdings().at(country->getID());
 
 		//Check if the player has a city on the country or it is a starting country
-
 		if (playerHoldings->numCities() == 0 && !country->isStartCountry())
 		{
 			cout << messageFail << endl;
 			return;
 		}
 		playerHoldings->addArmies(numberOfArmies);
-		cout << "Added " << numberOfArmies << " Army Unit(s) to Country: " << country->getID() << " For player: " << ActionState::toPlay->getName() << endl;
+		cout << "\nAdded " << numberOfArmies << " Army Unit(s) to Country: " << country->getID() << " For player: " << ActionState::toPlay->getName() << endl;
 		country->updateOccupyingPlayerScore(playerHoldings->numArmies() + playerHoldings->numCities(), ActionState::toPlay);
 		ActionState::toPlay->setArmies(ActionState::toPlay->getArmies()- numberOfArmies);
 

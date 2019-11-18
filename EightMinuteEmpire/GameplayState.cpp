@@ -305,7 +305,7 @@ void GameplayState::nextMove(Game* game)
 		startNewStatus(ActionState::toPlay->getName() + " (" + ActionState::toPlay->getStrategy() + ") turn to move.");
 	}
 	else
-		gameMessages = ActionState::toPlay->getName() + " turn to move. Select a card by pressing (1-6) on the keyboard. 'Enter' to confirm move.";
+		gameMessages = ActionState::toPlay->getName() + " turn to move. Select a card by pressing (1-6) on the keyboard.";
 	cout << gameMessages << endl;
 		startNewStatus(gameMessages);
 
