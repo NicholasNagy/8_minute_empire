@@ -389,19 +389,19 @@ void GameplayState::draw(Game* game)
 
 void GameplayState::update(Game* game)
 {
-	std::stringstream ss;
 	countryHoverLabel->destroyLabelTexture();
 	playerInfoLabel->destroyLabelTexture();
 	gameMessagesLabel->destroyLabelTexture();
 	cardsLabel->destroyLabelTexture();
 
+	//Player stats
+	std::stringstream ss;
 	for (Player* p : game->players())
 		ss << *p;
-
-	//Displaying player stats
 	playerInfoLabel->setLabelText(renderer, screen, ss.str(), ui.getFont("unispace bd"));
-
 	ss.clear();
+
+	//Hovered country
 	if (hoveredCountry)
 	{
 		std::stringstream ss;
@@ -409,12 +409,7 @@ void GameplayState::update(Game* game)
 		countryHoverLabel->setLabelText(renderer, screen, ss.str(), ui.getFont("arial"));
 
 	}
-	//cout << "\nObservable status: " << GameplayState::Instance()->getStatus() << "\nObserver Status: " << game->phaseObserver()->getStatus() << endl;
 
-	//Displaying game messages
-	gameMessagesLabel->setLabelText(renderer, screen, game->phaseObserver()->getStatus(), ui.getFont("BRITANIC"));
-
-	
 	//Displaying Cards
 	stringstream cards;
 	int pos = 0;
@@ -429,6 +424,10 @@ void GameplayState::update(Game* game)
 	cardsLabel->setLabelText(renderer, screen, cards.str(), ui.getFont("unispace bd"));
 
 
+	//cout << "\nObservable status: " << GameplayState::Instance()->getStatus() << "\nObserver Status: " << game->phaseObserver()->getStatus() << endl;
+
+	//Displaying game messages
+	gameMessagesLabel->setLabelText(renderer, screen, game->phaseObserver()->getStatus(), ui.getFont("BRITANIC"));
 
 }
 
