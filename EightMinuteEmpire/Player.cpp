@@ -4,6 +4,7 @@
 #include <string>
 #include <typeinfo>
 #include "PlayerStrategies.h"
+#include "Singleton.h"
 
 Holdings::Holdings() : mNumArmies(0), mNumCities(0){}
 
@@ -158,9 +159,9 @@ void Player::PlaceNewArmies(int numberOfArmies,GraphWorld::Country* country)
 
 }
 
-void Player::MoveArmies(GraphWorld::Map* map, GraphWorld::Country* start, GraphWorld::Country* destination)
+void Player::MoveArmies(GraphWorld::Country* start, GraphWorld::Country* destination)
 {
-	strategy->MoveArmies(map, start, destination);
+	strategy->MoveArmies(start, destination);
 	
 }
 
@@ -198,14 +199,14 @@ std::unordered_map<int, Holdings*>& Player::holdings()
 	return mHoldings;
 }
 
-int Player::computeScore(GraphWorld::Map* map)
+int Player::computeScore()
 {
 
 	GraphWorld::Country* country;
 	Player* countryOwner;
-	for (int i = 0; i < map->getNumCountries(); i++)
+	for (int i = 0; i < SingletonClass::instance()->getNumCountries(); i++)
 	{
-		country = map->getCountry(i);
+		country = SingletonClass::instance()->getCountry(i);
 		countryOwner = country->getCountryOwner();
 	auto it = country->occupyingPlayers().begin(); // Top element is the highest points, if tied with second there is no country owner
 	auto it2 = it;

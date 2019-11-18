@@ -32,7 +32,7 @@ public:
 	void changeState(GameState* state);
 	void popState();
 	void pushState(GameState* state);
-	void setMap(GraphWorld::Map* map);
+	//void setMap(GraphWorld::Map* map);
 	void setDeck(Deck*);
 	void setHand(Hand*);
 	Deck* deck();
@@ -40,7 +40,7 @@ public:
 	PhaseObserver* phaseObserver();
 	void setPhaseObserver(PhaseObserver*);
 	std::vector<Player*>& players(); //get vector of players
-	GraphWorld::Map* getMap();
+	//GraphWorld::Map* getMap();
 	
 	MapLoader* getMapLoader();
 	void setMapLoader(MapLoader*);
@@ -52,7 +52,7 @@ private:
 	SDL_Window* window;
 	std::vector<GameState*> states;
 	MapLoader* mapLoader;
-	GraphWorld::Map* map;
+	//GraphWorld::Map* map;
 	Deck* mDeck;
 	Hand* mHand;
 	std::vector<Player*> mPlayers;

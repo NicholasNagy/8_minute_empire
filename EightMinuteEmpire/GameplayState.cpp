@@ -11,6 +11,7 @@
 #include "GameOverlay.h"
 #include "Action.h"
 #include "ActionState.h"
+#include "Singleton.h"
 
 GameplayState GameplayState::mGameplayState;
 SDL_Event GameplayState::event;
@@ -25,7 +26,6 @@ bool mouseActive = false;
 bool mouseHover = false;
 bool bid = false;
 
-GraphWorld::Map* gameMap;
 GraphWorld::Country* hoveredCountry = nullptr;
 GraphWorld::Country* startingCountry = nullptr;
  
@@ -108,12 +108,11 @@ void GameplayState::initWindow(Game* game)
 
 void GameplayState::initMap(Game* game)
 {
-	gameMap = game->getMap();
 	string path = game->getMapLoader()->getTileSetPath();
 	texture = TextureLoader::loadTexutre(path.c_str(), renderer);
-	numCountries = gameMap->getNumCountries();
-	gameMap->getTileMap()->drawTileMap(renderer, texture);
-	startingCountry = gameMap->getStartingCountry();
+	numCountries = SingletonClass::instance()->getNumCountries();
+	SingletonClass::instance()->getTileMap()->drawTileMap(renderer, texture);
+	startingCountry = SingletonClass::instance()->getStartingCountry();
 	initPlayerHoldings(game);
 }
 
@@ -255,9 +254,9 @@ void GameplayState::getHoveredCountry()
 
 	if (mouse.x < MAP_WIDTH * GRID_CELL_SIZE)
 	{
-		type = gameMap->getTileMap()->tiles[typeRow][typeCol];
+		type = SingletonClass::instance()->getTileMap()->tiles[typeRow][typeCol];
 		if (type < numCountries && type >= 0)
-			hoveredCountry = gameMap->getCountry(type);
+			hoveredCountry = SingletonClass::instance()->getCountry(type);
 	}
 }
 
@@ -275,7 +274,7 @@ void GameplayState::nextMove(Game* game)
 {
 	ActionState::inActionState = false;
 	bool cpu = false;
-	ActionState::toPlay->computeScore(gameMap);
+	ActionState::toPlay->computeScore();
 	gameMessages.clear();
 	ActionState::toPlay->setHand(nullptr);
 	ActionState::toPlay->setCardToPlay(ActionState::toPlay->getCardsToPlay() - 1);
@@ -333,7 +332,7 @@ void GameplayState::initPlayerHoldings(Game* game)
 	{
 		for (Player* p : game->players())
 		{
-			gameMap->getCountry(i)->updateOccupyingPlayerScore(0, p);
+			SingletonClass::instance()->getCountry(i)->updateOccupyingPlayerScore(0, p);
 			p->holdings().emplace(i, new Holdings());
 		}
 	}
@@ -371,7 +370,7 @@ Player* GameplayState::computeFinalScore(Game* game)
 void GameplayState::draw(Game* game)
 {
 	SDL_RenderClear(renderer);
-	gameMap->getTileMap()->drawTileMap(renderer, texture);
+	SingletonClass::instance()->getTileMap()->drawTileMap(renderer, texture);
 
 	if (mouseActive && mouseHover)
 	{

@@ -2,6 +2,7 @@
 #include "Map.h"
 #include "Player.h"
 #include <sstream>
+#include "Singleton.h"
 
 PlaceNewArmiesState PlaceNewArmiesState::mPlaceNewArmiesState;
 MoveArmiesState MoveArmiesState::mMoveArmiesState;
@@ -142,11 +143,11 @@ void PlaceNewArmiesState::getSelectedCountry(Game* game)
 
 	if (cursor.x < MAP_WIDTH * GRID_CELL_SIZE)
 	{
-		type = game->getMap()->getTileMap()->tiles[typeRow][typeCol];
+		type = SingletonClass::instance()->getTileMap()->tiles[typeRow][typeCol];
 		GraphWorld::Country* clickedON = nullptr;
-		if (type < game->getMap()->getNumCountries() && type >= 0)
+		if (type < SingletonClass::instance()->getNumCountries() && type >= 0)
 		{
-			clickedON = game->getMap()->getCountry(type);
+			clickedON = SingletonClass::instance()->getCountry(type);
 			if (ActionState::toPlay->getHoldings(clickedON)->numCities() == 0 && !clickedON->isStartCountry())
 			{
 				string userMessage = "Cannot place a New Army here. No owned city. Please select another country";
@@ -252,13 +253,13 @@ void MoveArmiesState::getSelectedCountry(Game* game)
 
 	if (cursor.x < MAP_WIDTH * GRID_CELL_SIZE)
 	{
-		type = game->getMap()->getTileMap()->tiles[typeRow][typeCol];
+		type = SingletonClass::instance()->getTileMap()->tiles[typeRow][typeCol];
 
-		if (type < game->getMap()->getNumCountries() && type >= 0)
+		if (type < SingletonClass::instance()->getNumCountries() && type >= 0)
 		{
 			if (srcCountry)
 			{
-				destCountry = game->getMap()->getCountry(type);
+				destCountry = SingletonClass::instance()->getCountry(type);
 				string userMessage = "SELECTED ARMY MOVE FROM {COUNTRY " + to_string(srcCountry->getID())
 					+ "} TO {COUNTRY " + to_string(destCountry->getID()) + "}";
 				GameplayState::Instance()->updateStatus(userMessage);
@@ -270,7 +271,7 @@ void MoveArmiesState::getSelectedCountry(Game* game)
 
 			}
 			else
-				srcCountry = game->getMap()->getCountry(type);
+				srcCountry = SingletonClass::instance()->getCountry(type);
 
 			//Check if the player has any armies on this country 
 			if (ActionState::toPlay->getHoldings(srcCountry)->numArmies() > 0)
@@ -305,7 +306,7 @@ void MoveArmiesState::getSelectedCountry(Game* game)
 
 void MoveArmiesState::executeAction(Game* game)
 {
-	toPlay->MoveArmies(game->getMap(), srcCountry, destCountry);
+	toPlay->MoveArmies(srcCountry, destCountry);
 }
 
 //Build City Action State
@@ -387,12 +388,12 @@ void BuildCityState::getSelectedCountry(Game* game)
 
 	if (cursor.x < MAP_WIDTH * GRID_CELL_SIZE)
 	{
-		type = game->getMap()->getTileMap()->tiles[typeRow][typeCol];
+		type = SingletonClass::instance()->getTileMap()->tiles[typeRow][typeCol];
 		GraphWorld::Country* clickedON = nullptr;
-		if (type < game->getMap()->getNumCountries() && type >= 0)
+		if (type < SingletonClass::instance()->getNumCountries() && type >= 0)
 		{
-			clickedON = game->getMap()->getCountry(type);
-			selectedCountries.push_back(clickedON);
+			clickedON = SingletonClass::instance()->getCountry(type);
+
 			string userMessage = "SELECTED TO BUILD A CITY ON {COUNTRY " + to_string(clickedON->getID()) + "}";
 			GameplayState::Instance()->updateStatus(userMessage);
 			cout << endl << userMessage << endl;
@@ -422,9 +423,9 @@ void DestroyArmyState::init(Game* game)
 	bool hasArmiesOnCountry = false;
 	vector<Player*> otherPlayers;
 	std::cout << "\nCountries with enemy armies: " << std::endl;
-	for (int i = 0; i < game->getMap()->getNumCountries(); ++i)
+	for (int i = 0; i < SingletonClass::instance()->getNumCountries(); ++i)
 	{
-			GraphWorld::Country* c = game->getMap()->getCountry(i);
+			GraphWorld::Country* c = SingletonClass::instance()->getCountry(i);
 			
 			auto it = c->occupyingPlayers().begin();
 			for (int i = 0; i < c->occupyingPlayers().size(); ++i)
@@ -540,11 +541,11 @@ void DestroyArmyState::getSelectedCountry(Game* game)
 
 	if (cursor.x < MAP_WIDTH * GRID_CELL_SIZE)
 	{
-		type = game->getMap()->getTileMap()->tiles[typeRow][typeCol];
+		type = SingletonClass::instance()->getTileMap()->tiles[typeRow][typeCol];
 		GraphWorld::Country* clickedON = nullptr;
-		if (type < game->getMap()->getNumCountries() && type >= 0)
+		if (type < SingletonClass::instance()->getNumCountries() && type >= 0)
 		{
-			clickedON = game->getMap()->getCountry(type);
+			clickedON = SingletonClass::instance()->getCountry(type);
 			//If the clicked country has opposing armies on it
 			if (opposingArmies.count(clickedON))
 			{

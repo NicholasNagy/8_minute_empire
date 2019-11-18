@@ -53,7 +53,7 @@ public:
 	void setCoinPurse(int amount);
 	Holdings* getHoldings(GraphWorld::Country*);
 	std::unordered_map<int, Holdings*>& holdings();
-	int computeScore(GraphWorld::Map*);
+	int computeScore();
 	friend std::ostream& operator<<(std::ostream&, const Player&);
 	void updateCountryPoints(int points);
 	void updateGoodsPoints(int points);
@@ -78,7 +78,7 @@ public:
 	void playCard(Game* game);
 
 	void PlaceNewArmies(int numberOfArmies, GraphWorld::Country* country);
-	void MoveArmies(GraphWorld::Map*, GraphWorld::Country* srcCountry, GraphWorld::Country* destCountry);
+	void MoveArmies(GraphWorld::Country* srcCountry, GraphWorld::Country* destCountry);
 	void BuildCity(GraphWorld::Country* country);
 	void DestroyArmy(Player* player, GraphWorld::Country* country);
 	void Ignore();

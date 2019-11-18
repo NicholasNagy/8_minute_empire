@@ -19,7 +19,7 @@ int GRID_CELL_SIZE = 32;
 int MAP_WIDTH = 32;
 int MAP_HEIGHT = 20;
 
-Game::Game() : mIsRunning(false), window(nullptr), map(nullptr) {}
+Game::Game() : mIsRunning(false), window(nullptr) {}
 
 Game::~Game()
 {
@@ -122,11 +122,6 @@ void Game::pushState(GameState* state)
 
 }
 
-void Game::setMap(GraphWorld::Map* map)
-{
-	this->map = map;
-}
-
 void Game::setDeck(Deck* d)
 {
 	mDeck = d;
@@ -160,11 +155,6 @@ void Game::setPhaseObserver(PhaseObserver* po)
 std::vector<Player*>& Game::players()
 {
 	return mPlayers;
-}
-
-GraphWorld::Map* Game::getMap()
-{
-	return map;
 }
 
 MapLoader* Game::getMapLoader()

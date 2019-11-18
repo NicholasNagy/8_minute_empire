@@ -1,5 +1,6 @@
 #include "PlayerStrategies.h"
 #include <sstream>
+#include "Singleton.h"
 
 std::unordered_map<GraphWorld::Country*, vector<Player*>> opposingArmiesToDestroy;
 Player* selectedPlayerToDestroyArmies = nullptr;
@@ -119,13 +120,13 @@ Player* selectedPlayerToDestroyArmies = nullptr;
 			ActionState::toPlay->PlaceNewArmies(ActionState::toPlay->getHand()->getAction()->getMultiplicity(), determineCountryForArmyPlacement(game));
 			break;
 		case 1:
-			ActionState::toPlay->MoveArmies(game->getMap(), nullptr, nullptr);
+			ActionState::toPlay->MoveArmies(nullptr, nullptr);
 			break;
 		case 2:
 			ActionState::toPlay->BuildCity(determineCountryForCityBuild(game));
 			break;
 		case 3:
-			ActionState::toPlay->DestroyArmy(selectedPlayerToDestroyArmies, determineArmiesToDestroy(game));
+			ActionState::toPlay->DestroyArmy(nullptr, nullptr);
 			break;
 		case 4:
 			ActionState::toPlay->Ignore();
@@ -147,7 +148,7 @@ Player* selectedPlayerToDestroyArmies = nullptr;
 	{
 	//If no cities have been built, place on starting country.
 
-		GraphWorld::Country* toPlaceOn = game->getMap()->getStartingCountry();
+		GraphWorld::Country* toPlaceOn = SingletonClass::instance()->getStartingCountry();
 		if (!ActionState::toPlay->countriesWithCities().empty())
 		{
 			for (GraphWorld::Country* c : ActionState::toPlay->countriesWithCities())
@@ -165,11 +166,11 @@ Player* selectedPlayerToDestroyArmies = nullptr;
 
 	GraphWorld::Country* GreedyCPU::determineCountryForCityBuild(Game* game)
 	{
-		GraphWorld::Country* toBuildOn = game->getMap()->getStartingCountry();
-		std::string continent = game->getMap()->getStartingCountry()->getContinent();
-		for (int i = 0; i < game->getMap()->getNumCountries(); ++i)
+		GraphWorld::Country* toBuildOn = SingletonClass::instance()->getStartingCountry();
+		std::string continent = SingletonClass::instance()->getStartingCountry()->getContinent();
+		for (int i = 0; i < SingletonClass::instance()->getNumCountries(); ++i)
 		{
-			GraphWorld::Country* c = game->getMap()->getCountry(i);
+			GraphWorld::Country* c = SingletonClass::instance()->getCountry(i);
 			if (continent.compare(c->getContinent()) == 0)
 			{
 				if (!c->getCountryOwner())
@@ -192,13 +193,15 @@ Player* selectedPlayerToDestroyArmies = nullptr;
 
 	GraphWorld::Country* GreedyCPU::determineArmiesToDestroy(Game* game)
 	{
-
+		
+			//Print other player armies on the map.
 			bool hasArmiesOnCountry = false;
 			GraphWorld::Country* toDestroy = nullptr;
 			vector<Player*> otherPlayers;
-			for (int i = 0; i < game->getMap()->getNumCountries(); ++i)
+			std::cout << "\nCountries with enemy armies: " << std::endl;
+			for (int i = 0; i < SingletonClass::instance()->getNumCountries(); ++i)
 			{
-				GraphWorld::Country* c = game->getMap()->getCountry(i);
+				GraphWorld::Country* c = SingletonClass::instance()->getCountry(i);
 				if (c->getCountryOwner() == ActionState::toPlay)
 					continue;
 
@@ -223,14 +226,6 @@ Player* selectedPlayerToDestroyArmies = nullptr;
 				}
 				hasArmiesOnCountry = false;
 			}
-
-
-			for (unordered_map<GraphWorld::Country*, vector<Player*> >::const_iterator it = opposingArmiesToDestroy.begin(); it != opposingArmiesToDestroy.end(); ++it)
-			{
-				selectedPlayerToDestroyArmies = it->second[0];
-				toDestroy = it->first;
-			}
-
 			return toDestroy;
 	}
 
@@ -248,7 +243,7 @@ Player* selectedPlayerToDestroyArmies = nullptr;
 		ActionState::toPlay->setArmies(ActionState::toPlay->getArmies() - numberOfArmies);
 	}
 
-	void GreedyCPU::MoveArmies(GraphWorld::Map*, GraphWorld::Country* srcCountry, GraphWorld::Country* destCountry)
+	void GreedyCPU::MoveArmies(GraphWorld::Country* srcCountry, GraphWorld::Country* destCountry)
 	{
 	}
 
@@ -264,22 +259,10 @@ Player* selectedPlayerToDestroyArmies = nullptr;
 
 	void GreedyCPU::DestroyArmy(Player* player, GraphWorld::Country* country)
 	{
-		Holdings* countryHoldings = player->getHoldings(country);
-		int armies = countryHoldings->numArmies();
-
-		if (armies != 0)
-		{
-			player->getHoldings(country)->removeArmies(1);
-			cout << "\nDestroyed " << player->getName() << "'s Army on Country: " << country->getID() << endl;
-			country->updateOccupyingPlayerScore(countryHoldings->numArmies() + countryHoldings->numCities(), player);
-		}
-		else
-			cout << player->getName() << " Has no armies to Destroy on this Country!\n" << endl;
 	}
 
 	void GreedyCPU::Ignore()
 	{
-		cout << "Card Ignored." << endl;
 	}
 
 	void ModerateCPU::playCard(Game* game)
@@ -290,13 +273,13 @@ Player* selectedPlayerToDestroyArmies = nullptr;
 			ActionState::toPlay->PlaceNewArmies(ActionState::toPlay->getHand()->getAction()->getMultiplicity(), determineCountryForArmyPlacement(game));
 			break;
 		case 1:
-			ActionState::toPlay->MoveArmies(game->getMap(), nullptr, nullptr);
+			ActionState::toPlay->MoveArmies(nullptr, nullptr);
 			break;
 		case 2:
 			ActionState::toPlay->BuildCity(determineCountryForCityBuild(game));
 			break;
 		case 3:
-			ActionState::toPlay->DestroyArmy(selectedPlayerToDestroyArmies, determineArmiesToDestroy(game));
+			ActionState::toPlay->DestroyArmy(nullptr, nullptr);
 			break;
 		case 4:
 			ActionState::toPlay->Ignore();
@@ -323,10 +306,8 @@ Player* selectedPlayerToDestroyArmies = nullptr;
 		ActionState::toPlay->setArmies(ActionState::toPlay->getArmies() - numberOfArmies);
 	}
 
-	void ModerateCPU::MoveArmies(GraphWorld::Map*, GraphWorld::Country* srcCountry, GraphWorld::Country* destCountry)
+	void ModerateCPU::MoveArmies(GraphWorld::Country* srcCountry, GraphWorld::Country* destCountry)
 	{
-
-
 	}
 
 	void ModerateCPU::BuildCity(GraphWorld::Country* country)
@@ -342,27 +323,15 @@ Player* selectedPlayerToDestroyArmies = nullptr;
 
 	void ModerateCPU::DestroyArmy(Player* player, GraphWorld::Country* country)
 	{
-		Holdings* countryHoldings = player->getHoldings(country);
-		int armies = countryHoldings->numArmies();
-
-		if (armies != 0)
-		{
-			player->getHoldings(country)->removeArmies(1);
-			cout << "\nDestroyed " << player->getName() << "'s Army on Country: " << country->getID() << endl;
-			country->updateOccupyingPlayerScore(countryHoldings->numArmies() + countryHoldings->numCities(), player);
-		}
-		else
-			cout << player->getName() << " Has no armies to Destroy on this Country!\n" << endl;
 	}
 
 	void ModerateCPU::Ignore()
 	{
-		cout << "Card Ignored." << endl;
 	}
 
 	GraphWorld::Country* ModerateCPU::determineCountryForArmyPlacement(Game* game)
 	{
-		GraphWorld::Country* toPlaceOn = game->getMap()->getStartingCountry();
+		GraphWorld::Country* toPlaceOn = SingletonClass::instance()->getStartingCountry();
 		if (!ActionState::toPlay->countriesWithCities().empty())
 		{
 			for (GraphWorld::Country* c : ActionState::toPlay->countriesWithCities())
@@ -380,11 +349,11 @@ Player* selectedPlayerToDestroyArmies = nullptr;
 
 	GraphWorld::Country* ModerateCPU::determineCountryForCityBuild(Game* game)
 	{
-		GraphWorld::Country* toBuildOn = game->getMap()->getStartingCountry();
-		std::string continent = game->getMap()->getStartingCountry()->getContinent();
-		for (int i = 0; i < game->getMap()->getNumCountries(); ++i)
+		GraphWorld::Country* toBuildOn = SingletonClass::instance()->getStartingCountry();
+		std::string continent = SingletonClass::instance()->getStartingCountry()->getContinent();
+		for (int i = 0; i < SingletonClass::instance()->getNumCountries(); ++i)
 		{
-			GraphWorld::Country* c = game->getMap()->getCountry(i);
+			GraphWorld::Country* c = SingletonClass::instance()->getCountry(i);
 			if (continent.compare(c->getContinent()) == 0)
 			{
 				if (!c->getCountryOwner())
@@ -407,47 +376,7 @@ Player* selectedPlayerToDestroyArmies = nullptr;
 
 	GraphWorld::Country* ModerateCPU::determineArmiesToDestroy(Game* game)
 	{
-
-		bool hasArmiesOnCountry = false;
-		GraphWorld::Country* toDestroy = nullptr;
-		vector<Player*> otherPlayers;
-		std::cout << "\nCountries with enemy armies: " << std::endl;
-		for (int i = 0; i < game->getMap()->getNumCountries(); ++i)
-		{
-			GraphWorld::Country* c = game->getMap()->getCountry(i);
-			if (c->getCountryOwner() == ActionState::toPlay)
-				continue;
-
-			auto it = c->occupyingPlayers().begin();
-			for (int i = 0; i < c->occupyingPlayers().size(); ++i)
-			{
-
-				if (ActionState::toPlay != it->second)
-				{
-					if (it->second->getHoldings(c)->numArmies() > 0)
-					{
-						hasArmiesOnCountry = true;
-						otherPlayers.push_back(it->second);
-					}
-				}
-				++it;
-			}
-			if (hasArmiesOnCountry)
-			{
-				opposingArmiesToDestroy.try_emplace(c, otherPlayers);
-				otherPlayers.clear();
-			}
-			hasArmiesOnCountry = false;
-		}
-
-
-		for (unordered_map<GraphWorld::Country*, vector<Player*> >::const_iterator it = opposingArmiesToDestroy.begin(); it != opposingArmiesToDestroy.end(); ++it)
-		{
-			selectedPlayerToDestroyArmies = it->second[0];
-			toDestroy = it->first;
-		}
-
-		return toDestroy;
+		return nullptr;
 	}
 
 	void Human::playCard(Game* game)
@@ -507,7 +436,7 @@ Player* selectedPlayerToDestroyArmies = nullptr;
 
 	}
 
-	void Human::MoveArmies(GraphWorld::Map* map, GraphWorld::Country* srcCountry, GraphWorld::Country* destCountry)
+	void Human::MoveArmies(GraphWorld::Country* srcCountry, GraphWorld::Country* destCountry)
 	{
 		Holdings* holdingsOnStartCountry = ActionState::toPlay->holdings().at(srcCountry->getID());
 
@@ -519,7 +448,7 @@ Player* selectedPlayerToDestroyArmies = nullptr;
 		}
 
 		//Check if the start and destination countries are adjacent to each other
-		if (!map->getAdjacentList(srcCountry)->isAdjacent(destCountry))
+		if (!SingletonClass::instance()->getAdjacentList(srcCountry)->isAdjacent(destCountry))
 		{
 			cout << "Cannot move armies there." << endl;
 			return;
@@ -571,7 +500,7 @@ Player* selectedPlayerToDestroyArmies = nullptr;
 			country->updateOccupyingPlayerScore(countryHoldings->numArmies() + countryHoldings->numCities(), playerToDestroy);
 		}
 		else
-			cout << playerToDestroy->getName() << " Has no armies to Destroy on this Country!\n" << endl;
+			cout << playerToDestroy << " Has no armies to Destroy on this Country!\n" << endl;
 
 	}
 
