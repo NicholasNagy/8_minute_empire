@@ -44,7 +44,7 @@ Label* cardsLabel;
 int playerMove;  //The current player's turn
 Game* nextM;
 
-
+bool spacePress = false;
 void GameplayState::init(Game* game)
 {
 	nextM = game;
@@ -95,10 +95,8 @@ void GameplayState::init(Game* game)
 	cout << "\n------------------------------------------------------------\n";
 	cout << endl <<gameMessages <<endl;
 
-	if (ActionState::toPlay->getStrategy().compare("GreedyCPU") == 0 || ActionState::toPlay->getStrategy().compare("ModerateCPU") == 0)
-		handleCardSelection(game, 0);
 
-
+	
 }
 
 void GameplayState::initWindow(Game* game)
@@ -267,6 +265,10 @@ void GameplayState::handleEvents(Game* game)
 						GameplayState::Instance()->updateStatus(userMessage);
 						cout << endl << userMessage << endl;
 					}
+			case SDLK_SPACE:
+				spacePress = true;
+				if (ActionState::toPlay->getStrategy().compare("GreedyCPU") == 0 || ActionState::toPlay->getStrategy().compare("ModerateCPU") == 0)
+					handleCardSelection(game, 0);
 				break;
 			default:
 				break;
