@@ -82,7 +82,7 @@ void GameplayState::init(Game* game)
 
 	// start a new gameplay status
 	startNewStatus(gameMessages);
-
+	updateStatus("Press Space to engage card selection. '7' to change Strategy type");
 
 	// loop over all the players and update their list of owned countries after the end of each turn.
 	for (Player* player : game->players()) { player->updateListOfOwnedCountries(game); }
@@ -245,19 +245,19 @@ void GameplayState::handleEvents(Game* game)
 					
 					if (ActionState::toPlay->getStrategy().compare("Human") == 0)
 					{
-						cout << "In Moderate CPU click 7 and space press is: " + to_string(spacePress);
 						ActionState::toPlay->setStrategy(new  ModerateCPU());
 						string userMessage = ActionState::toPlay->getName() + " status changed form Human to ModerateCPU.";
-						GameplayState::Instance()->updateStatus(userMessage);
+						updateStatus(userMessage);
+						updateStatus("Press Space to engage card selection.");
 						cout << endl << userMessage << endl;
-						cout << "[After] In Moderate CPU click 7 and space press is: " + to_string(spacePress);
 
 					}
 					else if (ActionState::toPlay->getStrategy().compare("ModerateCPU") == 0)
 					{
 						ActionState::toPlay->setStrategy(new  GreedyCPU());
 						string userMessage = ActionState::toPlay->getName() + " status changed form ModerateCPU to GreedyCPU.";
-						GameplayState::Instance()->updateStatus(userMessage);
+						updateStatus(userMessage);
+						updateStatus("Press Space to engage card selection.");
 						cout << endl << userMessage << endl;
 
 
@@ -266,7 +266,8 @@ void GameplayState::handleEvents(Game* game)
 					{
 						ActionState::toPlay->setStrategy(new  Human());
 						string userMessage = ActionState::toPlay->getName() + " status changed form GreedyCPU to Human.";
-						GameplayState::Instance()->updateStatus(userMessage);
+						updateStatus(userMessage);
+						updateStatus("Press Space to engage card selection.");
 						cout << endl << userMessage << endl;
 					}
 				break;
@@ -275,6 +276,7 @@ void GameplayState::handleEvents(Game* game)
 				spacePress = true;
 				if (ActionState::toPlay->getStrategy().compare("GreedyCPU") == 0 || ActionState::toPlay->getStrategy().compare("ModerateCPU") == 0)
 					handleCardSelection(game, 0);
+				updateStatus("Engaged Card Selection. Pick a card by pressing 1-6 on the keyboard");
 				break;
 			default:
 				break;
@@ -318,7 +320,6 @@ void GameplayState::nextMove(Game* game)
 	
 	ActionState::inActionState = false;
 	spacePress = false;
-	bool cpu = false;
 	ActionState::toPlay->computeScore();
 
 	// loop over all the players and update their list of owned countries after the end of each turn.
@@ -349,18 +350,16 @@ void GameplayState::nextMove(Game* game)
 
 	if (ActionState::toPlay->getStrategy().compare("GreedyCPU") == 0 || ActionState::toPlay->getStrategy().compare("ModerateCPU") == 0)
 	{
-		cpu = true;
+
 		gameMessages = ActionState::toPlay->getName() + " (" + ActionState::toPlay->getStrategy() + ") turn to move.";;
-		startNewStatus(ActionState::toPlay->getName() + " (" + ActionState::toPlay->getStrategy() + ") turn to move.");
+		startNewStatus(gameMessages);
 	}
 	else
-		gameMessages = ActionState::toPlay->getName() + " turn to move. Select a card by pressing (1-6) on the keyboard.";
+		gameMessages = ActionState::toPlay->getName() + " turn to move.";
 	cout << gameMessages << endl;
 		startNewStatus(gameMessages);
 
-	//if(cpu)
-		//handleCardSelection(game, 0);
-	
+		updateStatus("Press Space to engage card selection. '7' to change Strategy type");
 }
 
 void GameplayState::placeStartingArmies(Game* game)
