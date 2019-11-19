@@ -214,30 +214,30 @@ void GameplayState::handleEvents(Game* game)
 			{
 
 			case SDLK_1:
-			if (!ActionState::inActionState)				
+			if (!ActionState::inActionState && spacePress)
 				handleCardSelection(game, 1);		
 				break;
 
 			case SDLK_2:
-				if (!ActionState::inActionState)
+				if (!ActionState::inActionState && spacePress)
 				handleCardSelection(game, 2);
 
 				break;
 			case SDLK_3:
-				if (!ActionState::inActionState)
+				if (!ActionState::inActionState && spacePress)
 				handleCardSelection(game, 3);				
 				break;
 			case SDLK_4:
-				if (!ActionState::inActionState)
+				if (!ActionState::inActionState && spacePress)
 				handleCardSelection(game, 4);
 				break;
 
 			case SDLK_5:
-				if (!ActionState::inActionState)
+				if (!ActionState::inActionState && spacePress)
 				handleCardSelection(game, 5);
 				break;
 			case SDLK_6:
-				if (!ActionState::inActionState)
+				if (!ActionState::inActionState && spacePress)
 				handleCardSelection(game, 6);			
 				break;
 			case SDLK_7:
@@ -299,9 +299,8 @@ void GameplayState::getHoveredCountry()
 void GameplayState::handleCardSelection(Game* game, int position)
 {
 	ActionState::toPlay->pickCard(game, position);
-	ActionState::toPlay->playCard(game);
 	ActionState::toPlay->updateGoodsPoints(ActionState::toPlay->getHand()->getGood());
-
+	ActionState::toPlay->playCard(game);
 
 }
 
@@ -312,6 +311,7 @@ void GameplayState::nextMove(Game* game)
 	
 	
 	ActionState::inActionState = false;
+	spacePress = false;
 	bool cpu = false;
 	ActionState::toPlay->computeScore();
 
@@ -352,8 +352,8 @@ void GameplayState::nextMove(Game* game)
 	cout << gameMessages << endl;
 		startNewStatus(gameMessages);
 
-	if(cpu)
-		handleCardSelection(game, 0);
+	//if(cpu)
+		//handleCardSelection(game, 0);
 	
 }
 
