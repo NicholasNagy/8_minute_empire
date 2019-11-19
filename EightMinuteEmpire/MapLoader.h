@@ -19,7 +19,7 @@ public:
 	void setTileSetPath(string* path);
 	std::string getTileSetPath();
 	static MapLoader* initiateMapPicker();
-	bool load( GraphWorld::Map* map, GraphWorld::TileMap* tileMap, int sizeX, int sizeY);
+	bool load(GraphWorld::TileMap* tileMap, int sizeX, int sizeY);
 	bool initMap(std::ifstream& inputMapFile);
 	static std::string getMapsDir();
 	static std::vector<std::string> getInstalledMaps();
@@ -38,7 +38,7 @@ private:
 	static bool isStartingCountrySet;
 
 	static bool fileExists(const std::string path);
-	bool loadTileMap(GraphWorld::Map* map, GraphWorld::TileMap* tileMap, int sizeX, int sizeY);
+	bool loadTileMap(GraphWorld::TileMap* tileMap, int sizeX, int sizeY);
 
 	class Parser 
 	{
@@ -47,11 +47,11 @@ private:
 	private:
 		static std::vector<string> vContinents; //Used to validate continents
 		static bool isFileStructureValid(std::ifstream& inputMapFile);
-		static  bool processCountries( std::ifstream& inputMapFile, GraphWorld::Map* map);
-		static  bool initCountry(std::string countryAttributes, GraphWorld::Map* map, const int countryIndex);
+		static  bool processCountries( std::ifstream& inputMapFile);
+		static  bool initCountry(std::string countryAttributes, const int countryIndex);
 		static std::vector<std::string> processAdjacency(std::string adjacentCountires, const int numContries);
-		static void initAdjacencyLists(const std::vector<std::vector<std::string>>& adjacentCountries, GraphWorld::Map* map);
-		static bool validateAdjacentCountries(const std::vector<std::vector<std::string>>& adjacentCountries, GraphWorld::Map* map);
+		static void initAdjacencyLists(const std::vector<std::vector<std::string>>& adjacentCountries);
+		static bool validateAdjacentCountries(const std::vector<std::vector<std::string>>& adjacentCountries);
 		static bool validateContinent(std::string continent, const int numContinents);
 		static void seekToStart(std::ifstream& inputMapFile);	
 		static int removeNavalSymbol(std::string);
