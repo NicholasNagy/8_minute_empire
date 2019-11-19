@@ -393,6 +393,7 @@ void BuildCityState::getSelectedCountry(Game* game)
 		if (type < SingletonClass::instance()->getNumCountries() && type >= 0)
 		{
 			clickedON = SingletonClass::instance()->getCountry(type);
+			selectedCountries.push_back(clickedON);
 
 			string userMessage = "SELECTED TO BUILD A CITY ON {COUNTRY " + to_string(clickedON->getID()) + "}";
 			GameplayState::Instance()->updateStatus(userMessage);

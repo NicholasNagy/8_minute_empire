@@ -11,6 +11,7 @@
 #include "GameOverlay.h"
 #include "Action.h"
 #include "ActionState.h"
+#include "PlayerStrategies.h"
 #include "Singleton.h"
 
 GameplayState GameplayState::mGameplayState;
@@ -233,7 +234,32 @@ void GameplayState::handleEvents(Game* game)
 				if (!ActionState::inActionState)
 				handleCardSelection(game, 6);			
 				break;
-		
+			case SDLK_7:
+				if (!ActionState::inActionState)
+					
+					if (ActionState::toPlay->getStrategy().compare("Human") == 0)
+					{
+						ActionState::toPlay->setStrategy(new  ModerateCPU());
+						string userMessage = ActionState::toPlay->getName() + " status changed form Human to ModerateCPU.";
+						GameplayState::Instance()->updateStatus(userMessage);
+						cout << endl << userMessage << endl;
+					}
+					else if (ActionState::toPlay->getStrategy().compare("ModerateCPU") == 0)
+					{
+						ActionState::toPlay->setStrategy(new  GreedyCPU());
+						string userMessage = ActionState::toPlay->getName() + " status changed form ModerateCPU to GreedyCPU.";
+						GameplayState::Instance()->updateStatus(userMessage);
+						cout << endl << userMessage << endl;
+
+					}
+					else if (ActionState::toPlay->getStrategy().compare("GreedyCPU") == 0)
+					{
+						ActionState::toPlay->setStrategy(new  Human());
+						string userMessage = ActionState::toPlay->getName() + " status changed form GreedyCPU to Human.";
+						GameplayState::Instance()->updateStatus(userMessage);
+						cout << endl << userMessage << endl;
+					}
+				break;
 			default:
 				break;
 			}

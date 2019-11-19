@@ -191,7 +191,7 @@ int Hand::getCardCostAtPosition(int postion) {
 	
 	// Postion of the slot has to be between 1 and 6
 	if (postion < 1 || postion > 6) {
-		cout << "Error: please enter a postion between 1 to 6";
+		cout << "\nError: please enter a postion between 1 to 6";
 		return -1;
 	}
 
@@ -218,7 +218,7 @@ Card* Hand::getCardAtPosition(int postion, Deck* deck) {
 
 	// Postion of the slot has to be between 1 and 6
 	if (postion < 1 || postion > 6) {
-		cout << "Error: please enter a postion between 1 to 6";
+		cout << "\nError: please enter a postion between 1 to 6";
 		return nullptr;
 	}
 

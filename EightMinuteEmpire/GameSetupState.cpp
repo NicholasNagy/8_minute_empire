@@ -312,7 +312,7 @@ void GameSetupState::handleGameStart(Game* game)
 
 		setupPlayers(game);
 
-		std::cout << endl << "--Plyer Hands--\n";
+		std::cout << endl << "--Player Hands--\n";
 		for (Player* p : game->players())
 		{
 			if (!p->getHand())
