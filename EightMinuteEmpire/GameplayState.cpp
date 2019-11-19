@@ -419,7 +419,7 @@ void GameplayState::updateStatistics(vector<Player*> players)
 	for (Player* p : players) {
 
 
-		statsBarGraph = statsBarGraph + p->getName() + "\n";
+		statsBarGraph = statsBarGraph + p->getName() + " (" + p->getStrategy() + ")" "\n";
 
 		if (p->getCardsToPlay() == 0)
 			statsBarGraph = statsBarGraph + "Congrats on finishing your turn" + "\n";
