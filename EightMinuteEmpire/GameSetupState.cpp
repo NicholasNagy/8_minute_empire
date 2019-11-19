@@ -341,7 +341,7 @@ bool GameSetupState::initMapLoader(Game* game)
 		SingletonClass::instance()->setTileMap(tileMap);
 		game->setMapLoader(mapLoader);
 
-		if (mapLoader->load(NULL, tileMap, MAP_HEIGHT, MAP_WIDTH))
+		if (mapLoader->load(tileMap, MAP_HEIGHT, MAP_WIDTH))
 		{
 			SingletonClass::instance()->printMap();
 			std::cout << "Map Successfully loaded." << std::endl;

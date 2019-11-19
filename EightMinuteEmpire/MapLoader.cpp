@@ -6,7 +6,8 @@
 #include <string>
 #include<vector>
 #include <regex>
-#include <sstream> 
+#include <sstream>
+#include "Singleton.h"
 
 bool MapLoader::isStartingCountrySet = false;
 std::vector<std::string> MapLoader::Parser::vContinents;
@@ -107,7 +108,7 @@ MapLoader* MapLoader::initiateMapPicker()
 	return mapLoader;
 }
 
- bool MapLoader::load(GraphWorld::Map* map, GraphWorld::TileMap* tileMap, int sizeX, int sizeY)
+ bool MapLoader::load(GraphWorld::TileMap* tileMap, int sizeX, int sizeY)
  {
 	 using namespace std;
 	 // Reset static variables
@@ -118,13 +119,13 @@ MapLoader* MapLoader::initiateMapPicker()
 	 ifstream inputMapFile;
 	 inputMapFile.open(mapPath);
 	 
-	 if (!MapLoader::Parser::processCountries(inputMapFile, map))
+	 if (!MapLoader::Parser::processCountries(inputMapFile))
 	 {
 		 inputMapFile.close();
 		 return false;
 	}
 	 inputMapFile.close();
-	 if (!loadTileMap(map, tileMap, sizeX, sizeY))
+	 if (!loadTileMap(tileMap, sizeX, sizeY))
 	 {
 		 return false;
 	 }
@@ -227,12 +228,12 @@ void MapLoader::selectMap()
 	 return fs.good();
  }
 
- bool MapLoader::loadTileMap(GraphWorld::Map* map, GraphWorld::TileMap* tileMap, int sizeRow, int sizeCol)
+ bool MapLoader::loadTileMap(GraphWorld::TileMap* tileMap, int sizeRow, int sizeCol)
  {
 	 using namespace std;
 
 	 
-	 string tileMapPath = tileMapDir + map->getMapName() + ".txt";
+	 string tileMapPath = tileMapDir + SingletonClass::instance()->getMapName() + ".txt";
 	 bool tileMapFileExits = fileExists(tileMapPath);
 
 	 if (!tileMapFileExits)
@@ -241,7 +242,7 @@ void MapLoader::selectMap()
 		 return false;
 	 }
 
-	 string tileSetPath = tileMapDir + map->getMapName() + "Set.png";
+	 string tileSetPath = tileMapDir + SingletonClass::instance()->getMapName() + "Set.png";
 	 bool tileSetFileExists = fileExists(tileSetPath);
 
 	 if (!tileSetFileExists)
@@ -253,7 +254,7 @@ void MapLoader::selectMap()
 		 this->setTileSetPath(&tileSetPath);
 		 fstream tileMapFile;
 		 tileMapFile.open(tileMapPath);
-		 cout << "Loading tile map for: " << map->getMapName() << endl;
+		 cout << "Loading tile map for: " << SingletonClass::instance()->getMapName() << endl;
 		 std::string tile;
 		 int tileID = 0;
 
@@ -332,7 +333,7 @@ void MapLoader::selectMap()
  }
 
 
-bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorld::Map* map )
+bool MapLoader::Parser::processCountries(std::ifstream& inputMapFile)
  {
 	 using namespace std;
 	 string line;
@@ -354,7 +355,7 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 		 if (line.compare("<eme_countries>") == 0)
 		 {
 			 //Start processing country lines
-			 for (int i = 0; i < map->getNumCountries(); i++)
+			 for (int i = 0; i < SingletonClass::instance()->getNumCountries(); i++)
 			 {
 				 n++;
 				 getline(inputMapFile, line);
@@ -364,14 +365,14 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 				 // Process country attributes
 				 if (std::regex_search(line, countryAttributesMatch, countryLineIdentifier))
 				 {			
-					 if (!initCountry(countryAttributesMatch[0].str(), map, i))
+					 if (!initCountry(countryAttributesMatch[0].str(), i))
 						 return false;
 
 				 //Process adjacent countries
 					 if (std::regex_search(line, adjacentCountiresMatch, adjacencyIdentifier))
 					 {
 
-						 adjs = processAdjacency(adjacentCountiresMatch[0].str(), map->getNumCountries());
+						 adjs = processAdjacency(adjacentCountiresMatch[0].str(), SingletonClass::instance()->getNumCountries());
 						 if (adjs.empty())
 							 return false;
 						 adjacentCountries.push_back(adjs);
@@ -389,9 +390,9 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 				 }					 
 			 }
 
-		 if (!validateAdjacentCountries(adjacentCountries, map))
+		 if (!validateAdjacentCountries(adjacentCountries))
 				 return false;
-		initAdjacencyLists(adjacentCountries, map);
+		initAdjacencyLists(adjacentCountries);
 		return true;
 		 }
 	 }
@@ -400,7 +401,7 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 	 return false;
  }
 
- bool MapLoader::Parser::initCountry(std::string countryAttributes, GraphWorld::Map* map, const int countryIndex)
+ bool MapLoader::Parser::initCountry(std::string countryAttributes, const int countryIndex)
  {
 	 using namespace std;
 
@@ -424,7 +425,7 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 	 // Getting continent of the country 
 	 std::regex_search(countryAttributes, continentMatch, continentID);
 	 continent = continentMatch[0].str().substr(1);
-	 if (!validateContinent(continent, map->getNumContinents()))
+	 if (!validateContinent(continent, SingletonClass::instance()->getNumContinents()))
 		 return false;
 
 	 //Getting naval status
@@ -444,9 +445,9 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 	 }
 
 	 GraphWorld::Country* country= new GraphWorld::Country(GraphWorld::Country(stoi(countryMatch[0].str()), startCountry, navalCountry, &continentMatch[0].str().substr(1)));
-	 map->addNode(country);
+	 SingletonClass::instance()->addNode(country);
 	 if (startCountry)	
-		 map->setStartingCountry(country);
+		 SingletonClass::instance()->setStartingCountry(country);
 	 return true;
  }
 
@@ -518,7 +519,7 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 	 return adjCountries;
  }
 
- bool MapLoader::Parser::validateAdjacentCountries(const std::vector<std::vector<std::string>>& adjacentCountries, GraphWorld::Map* map)
+ bool MapLoader::Parser::validateAdjacentCountries(const std::vector<std::vector<std::string>>& adjacentCountries)
  {
 	 int i = 0;
 	 bool check = false;
@@ -528,7 +529,7 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 	 std::string message = "Invalid adjacency list for country ";
 	 for (auto vec : adjacentCountries) 
 	 {		 
-		 isNaval = map->getCountry(i)->isNavalCountry();
+		 isNaval = SingletonClass::instance()->getCountry(i)->isNavalCountry();
 
 		 for (auto c1 : vec) 
 		 {		
@@ -568,7 +569,7 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 	 return true;
  }
 
- void MapLoader::Parser::initAdjacencyLists(const std::vector<std::vector<std::string>>& adjacentCountries, GraphWorld::Map* map)
+ void MapLoader::Parser::initAdjacencyLists(const std::vector<std::vector<std::string>>& adjacentCountries)
  {
 	 using namespace std;
 	 int temp; // Country ID
@@ -582,9 +583,9 @@ bool MapLoader::Parser::processCountries( std::ifstream& inputMapFile, GraphWorl
 			 temp = removeNavalSymbol(adjacentCountries[i][j]);
 			 //Check if the the adjacent country is naval (has a plus symbol next to it)
 			 //And that the node country is also a naval country
-			 if (adjacentCountries[i][j].find('+') != std::string::npos && map->getCountry(i)->isNavalCountry() && map->getCountry(temp)->isNavalCountry())
+			 if (adjacentCountries[i][j].find('+') != std::string::npos && SingletonClass::instance()->getCountry(i)->isNavalCountry() && SingletonClass::instance()->getCountry(temp)->isNavalCountry())
 				 naval = true;
-			map->addEdge(map->getCountry(i), map->getCountry( temp), naval);
+			 SingletonClass::instance()->addEdge(SingletonClass::instance()->getCountry(i), SingletonClass::instance()->getCountry( temp), naval);
 			naval = false;
 		 }
 	 }
