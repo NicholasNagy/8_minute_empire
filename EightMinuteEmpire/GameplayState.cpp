@@ -245,10 +245,13 @@ void GameplayState::handleEvents(Game* game)
 					
 					if (ActionState::toPlay->getStrategy().compare("Human") == 0)
 					{
+						cout << "In Moderate CPU click 7 and space press is: " + to_string(spacePress);
 						ActionState::toPlay->setStrategy(new  ModerateCPU());
 						string userMessage = ActionState::toPlay->getName() + " status changed form Human to ModerateCPU.";
 						GameplayState::Instance()->updateStatus(userMessage);
 						cout << endl << userMessage << endl;
+						cout << "[After] In Moderate CPU click 7 and space press is: " + to_string(spacePress);
+
 					}
 					else if (ActionState::toPlay->getStrategy().compare("ModerateCPU") == 0)
 					{
@@ -256,6 +259,7 @@ void GameplayState::handleEvents(Game* game)
 						string userMessage = ActionState::toPlay->getName() + " status changed form ModerateCPU to GreedyCPU.";
 						GameplayState::Instance()->updateStatus(userMessage);
 						cout << endl << userMessage << endl;
+
 
 					}
 					else if (ActionState::toPlay->getStrategy().compare("GreedyCPU") == 0)
@@ -265,6 +269,8 @@ void GameplayState::handleEvents(Game* game)
 						GameplayState::Instance()->updateStatus(userMessage);
 						cout << endl << userMessage << endl;
 					}
+				break;
+
 			case SDLK_SPACE:
 				spacePress = true;
 				if (ActionState::toPlay->getStrategy().compare("GreedyCPU") == 0 || ActionState::toPlay->getStrategy().compare("ModerateCPU") == 0)
