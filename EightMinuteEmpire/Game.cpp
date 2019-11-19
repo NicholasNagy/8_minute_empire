@@ -147,9 +147,20 @@ PhaseObserver* Game::phaseObserver()
 	return mPhaseObserver;
 }
 
+StatsObserver* Game::statsObserver()
+{
+	return mStatsObserver;
+}
+
 void Game::setPhaseObserver(PhaseObserver* po)
 {
 	mPhaseObserver = po;
+}
+
+void Game::setStatsObserver(StatsObserver* so)
+{
+	mStatsObserver = so;
+
 }
 
 std::vector<Player*>& Game::players()

@@ -34,14 +34,17 @@ class StatsObserver : public Observer
 private:
 	// we need the game as a subject so when it notifies the StatsObserver of a change
 	// the StatsObserver will call gmae.getState() and display the changes.
-	Observable* observableGameplayState;
-	
+	static Observable* observableGameplayState;
+	std::string statistics; // Stores all the game statistics
+
 public:
 	StatsObserver();
 	StatsObserver(Observable* gameplayState); // the passed game will set the subject data member
 	~StatsObserver();
 	void setObservableGameplayState(Observable* gameplayState);
 	void update();
+	std::string getStatistics() { return statistics; }; // Display the current changes in the UI
+
 };
 
 

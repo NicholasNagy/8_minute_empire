@@ -189,6 +189,21 @@ void Player::Ignore()
 	strategy->Ignore();
 }
 
+void Player::updateListOfOwnedCountries(Game* game)
+{
+	int numCountriesInMap = SingletonClass::instance()->getNumCountries();
+	listOfOwnedCountries.clear();
+	for (int i = 0; i < numCountriesInMap; i++) {
+		
+		Country* country = SingletonClass::instance()->getCountry(i); // get the country at postion i
+
+		// if the owner of the country is this player, add it to the list of owned countries
+		if (country->getCountryOwner() == this) {
+			listOfOwnedCountries.push_back(country);
+		}
+	}
+}
+
 Holdings* Player::getHoldings(GraphWorld::Country* country)
 {
 	return mHoldings.at(country->getID());

@@ -33,3 +33,31 @@ void Observable::notify()
 	}
 	
 }
+
+
+void Observable::startNewStatus(string newStatus)
+{
+	status.clear();
+	status.push_back(newStatus);
+	notify();
+}
+
+string Observable::getStatus()
+{
+	stringstream ss;
+
+	for (string s : status)
+		ss << s << "\n";
+
+	return ss.str();
+}
+
+void Observable::updateStatus(string addStatus)
+{
+	status.push_back(addStatus);
+
+	if (status.size() > 4)
+		status.pop_front();
+
+	notify();
+}

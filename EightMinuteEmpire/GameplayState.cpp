@@ -76,9 +76,17 @@ void GameplayState::init(Game* game)
 	PhaseObserver* phaseObserver = new PhaseObserver(GameplayState::Instance());
 	game->setPhaseObserver(phaseObserver);
 
+	// Set the statsObserver to observer the GameplayState
+	StatsObserver* statsObserver = new StatsObserver(GameplayState::Instance());
+	game->setStatsObserver(statsObserver);
+
 	// start a new gameplay status
 	startNewStatus(gameMessages);
-	
+
+
+	// loop over all the players and update their list of owned countries after the end of each turn.
+	for (Player* player : game->players()) { player->updateListOfOwnedCountries(game); }
+	updateStatistics(game->players());
 
 	Hand* hand = new Hand(game->deck()); cout << "\n------------------------------------------------------------\n";
 	game->setHand(hand);
@@ -289,18 +297,26 @@ void GameplayState::getHoveredCountry()
 void GameplayState::handleCardSelection(Game* game, int position)
 {
 	ActionState::toPlay->pickCard(game, position);
-	//int selectedActionID = ActionState::toPlay->getHand()->getAction()->getID();
-	//startNewStatus(ActionState::toPlay->getName() + " Has Selected Handslot " + to_string(position)  + "\n");
 	ActionState::toPlay->playCard(game);
+	ActionState::toPlay->updateGoodsPoints(ActionState::toPlay->getHand()->getGood());
+
 
 }
 
 
 void GameplayState::nextMove(Game* game)
 {
+
+	
+	
 	ActionState::inActionState = false;
 	bool cpu = false;
 	ActionState::toPlay->computeScore();
+
+	// loop over all the players and update their list of owned countries after the end of each turn.
+	for (Player* player : game->players()) { player->updateListOfOwnedCountries(game); }
+	updateStatistics(game->players());
+	
 	gameMessages.clear();
 	ActionState::toPlay->setHand(nullptr);
 	ActionState::toPlay->setCardToPlay(ActionState::toPlay->getCardsToPlay() - 1);
@@ -393,6 +409,53 @@ Player* GameplayState::computeFinalScore(Game* game)
 
 }
 
+// updates the statistics data member which is realized from the observable interface.
+// It also calls the notify() method.
+void GameplayState::updateStatistics(vector<Player*> players)
+{
+	string statsBarGraph;
+
+
+	for (Player* p : players) {
+
+
+		statsBarGraph = statsBarGraph + p->getName() + "\n";
+
+		if (p->getCardsToPlay() == 0)
+			statsBarGraph = statsBarGraph + "Congrats on finishing your turn" + "\n";
+
+		statsBarGraph = statsBarGraph + "Owned Countries IDs: ";
+		for (GraphWorld::Country* country : p->getListOfOwnedCountries())
+		{
+			statsBarGraph = statsBarGraph + to_string(country->getID()) + ",";
+		}
+		statsBarGraph = statsBarGraph + "\n";
+		statsBarGraph = statsBarGraph + "Coins " + to_string(p->getMoney()) + "\n";
+		statsBarGraph = statsBarGraph + "Cards " + to_string(p->getCardsToPlay()) + "\n";
+		statsBarGraph = statsBarGraph + "Cities Left " + to_string(p->getNumCities()) + "\n";
+		statsBarGraph = statsBarGraph + "Armies Left " + to_string(p->getArmies()) + "\n";
+		statsBarGraph = statsBarGraph + drawSingleColumn("Owned Countries", p->getNumOfOwnedCountries());
+		statsBarGraph = statsBarGraph + drawSingleColumn("Owned Goods", p->getNumOfGoods());
+		statsBarGraph = statsBarGraph + drawSingleColumn("Victory Points", p->getTotalVictoryPoints());
+	
+		statsBarGraph = statsBarGraph + "\n";
+	}
+
+
+	setStatitics(statsBarGraph);
+	notify();
+}
+
+string GameplayState::drawSingleColumn(string colName, int colSize)
+{
+	string col = colName + " ";
+	for (int i = 0; i < colSize; i++)
+		col = col + "=";
+	col = col + "\n";
+	return col;
+}
+
+
 void GameplayState::draw(Game* game)
 {
 	SDL_RenderClear(renderer);
@@ -423,8 +486,11 @@ void GameplayState::update(Game* game)
 	std::stringstream ss;
 	for (Player* p : game->players())
 		ss << *p;
-	playerInfoLabel->setLabelText(renderer, screen, ss.str(), ui.getFont("unispace bd"));
+	//playerInfoLabel->setLabelText(renderer, screen, ss.str(), ui.getFont("unispace bd"));
 	ss.clear();
+
+	playerInfoLabel->setLabelText(renderer, screen, game->statsObserver()->getStatistics() , ui.getFont("unispace bd"));
+
 
 	//Hovered country
 	if (hoveredCountry)

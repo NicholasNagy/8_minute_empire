@@ -82,8 +82,16 @@ public:
 	void BuildCity(GraphWorld::Country* country);
 	void DestroyArmy(Player* player, GraphWorld::Country* country);
 	void Ignore();
+	void updateListOfOwnedCountries(Game* game);
+
+	// Used in the game statistics.
+	vector<GraphWorld::Country*> &getListOfOwnedCountries() { return listOfOwnedCountries; };
+	int getNumOfOwnedCountries() { return listOfOwnedCountries.size(); };
+	int getNumOfGoods() { return goodsVictoryPoints; };
+	int getTotalVictoryPoints() { return totalVictoryPoints; };
 
 private:
+	
 	std::unordered_map<int, Holdings*> mHoldings;  // How much the player holds on each country (key is the country id, could use country pointers as keys as well)
 	std::vector<GraphWorld::Country*> mCountriesWithCities;
 	std::string name;
@@ -104,5 +112,6 @@ private:
 	const static int totalNumberOfCountries = 30;
 	int* ownedCountries; //Pointer to an array of Countries
 	int* ownedCities; //Pointer to an array of built cities
+	vector<GraphWorld::Country*> listOfOwnedCountries;
 };
 
