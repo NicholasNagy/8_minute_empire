@@ -12,7 +12,8 @@
 #include "ImGui/imgui_sdl.h"
 #include "Cards.h"
 #include "PlayerStrategies.h" 
-#include "Singleton.h"
+
+using GraphWorld::Map;
 
 GameSetupState GameSetupState::mGameSetupState;
 SDL_Renderer* GameSetupState::renderer = nullptr;
@@ -336,14 +337,14 @@ bool GameSetupState::initMapLoader(Game* game)
 	if (mapLoader)
 	{
 		std::cout << *mapLoader << std::endl;
-		SingletonClass::instance(&mapLoader->getMapName(), mapLoader->getNumCountries(), mapLoader->getNumContinents());
+		Map::instance(&mapLoader->getMapName(), mapLoader->getNumCountries(), mapLoader->getNumContinents());
 		GraphWorld::TileMap* tileMap = new GraphWorld::TileMap();
-		SingletonClass::instance()->setTileMap(tileMap);
+		Map::instance()->setTileMap(tileMap);
 		game->setMapLoader(mapLoader);
 
 		if (mapLoader->load(tileMap, MAP_HEIGHT, MAP_WIDTH))
 		{
-			SingletonClass::instance()->printMap();
+			Map::instance()->printMap();
 			std::cout << "Map Successfully loaded." << std::endl;
 			mapLoaded = true;
 			return true;

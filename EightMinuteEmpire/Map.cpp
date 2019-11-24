@@ -62,6 +62,8 @@ namespace GraphWorld
 		}
 	};
 
+	Map* Map::_instance;
+
 	Map::Map(string* mapName, int numCountries, int numContinents)
 	{
 
@@ -75,6 +77,19 @@ namespace GraphWorld
 		{
 			arrayOfCountries[i] = new Node();
 		}
+	}
+
+	Map* Map::instance()
+	{
+		if (!_instance)
+			_instance = new Map(new string("No Name"), 0, 0);
+		return _instance;
+	}
+	Map* Map::instance(string* mapName, int numCountries, int numContinents)
+	{
+		if (!_instance)
+			_instance = new Map(mapName, numCountries, numContinents);
+		return _instance;
 	}
 
 	void Map::addNode(Country* country)

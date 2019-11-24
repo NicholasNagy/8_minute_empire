@@ -2,7 +2,8 @@
 #include "Map.h"
 #include "Player.h"
 #include <sstream>
-#include "Singleton.h"
+
+using GraphWorld::Map;
 
 PlaceNewArmiesState PlaceNewArmiesState::mPlaceNewArmiesState;
 MoveArmiesState MoveArmiesState::mMoveArmiesState;
@@ -143,11 +144,11 @@ void PlaceNewArmiesState::getSelectedCountry(Game* game)
 
 	if (cursor.x < MAP_WIDTH * GRID_CELL_SIZE)
 	{
-		type = SingletonClass::instance()->getTileMap()->tiles[typeRow][typeCol];
+		type = Map::instance()->getTileMap()->tiles[typeRow][typeCol];
 		GraphWorld::Country* clickedON = nullptr;
-		if (type < SingletonClass::instance()->getNumCountries() && type >= 0)
+		if (type < Map::instance()->getNumCountries() && type >= 0)
 		{
-			clickedON = SingletonClass::instance()->getCountry(type);
+			clickedON = Map::instance()->getCountry(type);
 			if (ActionState::toPlay->getHoldings(clickedON)->numCities() == 0 && !clickedON->isStartCountry())
 			{
 				string userMessage = "Cannot place a New Army here. No owned city. Please select another country";
@@ -253,13 +254,13 @@ void MoveArmiesState::getSelectedCountry(Game* game)
 
 	if (cursor.x < MAP_WIDTH * GRID_CELL_SIZE)
 	{
-		type = SingletonClass::instance()->getTileMap()->tiles[typeRow][typeCol];
+		type = Map::instance()->getTileMap()->tiles[typeRow][typeCol];
 
-		if (type < SingletonClass::instance()->getNumCountries() && type >= 0)
+		if (type < Map::instance()->getNumCountries() && type >= 0)
 		{
 			if (srcCountry)
 			{
-				destCountry = SingletonClass::instance()->getCountry(type);
+				destCountry = Map::instance()->getCountry(type);
 				string userMessage = "SELECTED ARMY MOVE FROM {COUNTRY " + to_string(srcCountry->getID())
 					+ "} TO {COUNTRY " + to_string(destCountry->getID()) + "}";
 				GameplayState::Instance()->updateStatus(userMessage);
@@ -271,7 +272,7 @@ void MoveArmiesState::getSelectedCountry(Game* game)
 
 			}
 			else
-				srcCountry = SingletonClass::instance()->getCountry(type);
+				srcCountry = Map::instance()->getCountry(type);
 
 			//Check if the player has any armies on this country 
 			if (ActionState::toPlay->getHoldings(srcCountry)->numArmies() > 0)
@@ -388,11 +389,11 @@ void BuildCityState::getSelectedCountry(Game* game)
 
 	if (cursor.x < MAP_WIDTH * GRID_CELL_SIZE)
 	{
-		type = SingletonClass::instance()->getTileMap()->tiles[typeRow][typeCol];
+		type = Map::instance()->getTileMap()->tiles[typeRow][typeCol];
 		GraphWorld::Country* clickedON = nullptr;
-		if (type < SingletonClass::instance()->getNumCountries() && type >= 0)
+		if (type < Map::instance()->getNumCountries() && type >= 0)
 		{
-			clickedON = SingletonClass::instance()->getCountry(type);
+			clickedON = Map::instance()->getCountry(type);
 			selectedCountries.push_back(clickedON);
 
 			string userMessage = "SELECTED TO BUILD A CITY ON {COUNTRY " + to_string(clickedON->getID()) + "}";
@@ -424,9 +425,9 @@ void DestroyArmyState::init(Game* game)
 	bool hasArmiesOnCountry = false;
 	vector<Player*> otherPlayers;
 	std::cout << "\nCountries with enemy armies: " << std::endl;
-	for (int i = 0; i < SingletonClass::instance()->getNumCountries(); ++i)
+	for (int i = 0; i < Map::instance()->getNumCountries(); ++i)
 	{
-			GraphWorld::Country* c = SingletonClass::instance()->getCountry(i);
+			GraphWorld::Country* c = Map::instance()->getCountry(i);
 			
 			auto it = c->occupyingPlayers().begin();
 			for (int i = 0; i < c->occupyingPlayers().size(); ++i)
@@ -542,11 +543,11 @@ void DestroyArmyState::getSelectedCountry(Game* game)
 
 	if (cursor.x < MAP_WIDTH * GRID_CELL_SIZE)
 	{
-		type = SingletonClass::instance()->getTileMap()->tiles[typeRow][typeCol];
+		type = Map::instance()->getTileMap()->tiles[typeRow][typeCol];
 		GraphWorld::Country* clickedON = nullptr;
-		if (type < SingletonClass::instance()->getNumCountries() && type >= 0)
+		if (type < Map::instance()->getNumCountries() && type >= 0)
 		{
-			clickedON = SingletonClass::instance()->getCountry(type);
+			clickedON = Map::instance()->getCountry(type);
 			//If the clicked country has opposing armies on it
 			if (opposingArmies.count(clickedON))
 			{
