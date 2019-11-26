@@ -35,6 +35,11 @@ Action* Card::getAction()
 	return action;
 }
 
+int Card::getGood()
+{
+	return *good;
+}
+
 
 
 //############################### Deck Class ###############################
@@ -67,19 +72,19 @@ Deck::Deck()
 
 	// Instantiate 5 cards with MoveArmies Action with land & water movement
 	for (int i = 25; i < 30; i++) {
-		int good = dist3(rng); // ranges betweeb (1,3)
+		int good = dist3(rng); // ranges between (1,3)
 		int multiplicity = dist3(rng); // ranges between (1,3)
 		cardsDeck->at(i) = new Card(good, Action(1, multiplicity, true));
 	}
 
 	// Instantiate 5 cards with BuildCity Action
-	for (int i = 30; i < 35; i++) {
+	for (int i = 30; i < 31; i++) {
 		int good = dist3(rng); // ranges betweeb (1,3)
 		cardsDeck->at(i) = new Card(good, Action(2));
 	}
 
 	// Instantiate 4 cards with DestoyArmy Action
-	for (int i = 35; i < 39; i++) {
+	for (int i = 31; i < 39; i++) {
 		int good = dist3(rng); // ranges betweeb (1,3)
 		int multiplicity = dist3(rng); // ranges between (1,3)
 		cardsDeck->at(i) = new Card(good, Action(3, multiplicity));
@@ -97,7 +102,7 @@ Deck::Deck()
 	cardsDeck->at(40) = new Card(good, Action(5, multiplicity, false, 0, 1, 1, true));
 
 	// Instantiate 1 cards with Ignore Action
-	good = dist3(rng); // ranges betweeb (1,3)
+	good = dist3(rng); // ranges between (1,3)
 	multiplicity = dist3(rng); // ranges between (1,3)
 	cardsDeck->at(41) = new Card(good, Action(6, multiplicity));
 	
@@ -186,7 +191,7 @@ int Hand::getCardCostAtPosition(int postion) {
 	
 	// Postion of the slot has to be between 1 and 6
 	if (postion < 1 || postion > 6) {
-		cout << "Error: please enter a postion between 1 to 6";
+		cout << "\nError: please enter a postion between 1 to 6";
 		return -1;
 	}
 
@@ -213,7 +218,7 @@ Card* Hand::getCardAtPosition(int postion, Deck* deck) {
 
 	// Postion of the slot has to be between 1 and 6
 	if (postion < 1 || postion > 6) {
-		cout << "Error: please enter a postion between 1 to 6";
+		cout << "\nError: please enter a postion between 1 to 6";
 		return nullptr;
 	}
 
@@ -221,7 +226,6 @@ Card* Hand::getCardAtPosition(int postion, Deck* deck) {
 	moveCards(postion, deck);
 	return cardptr;
 }
-
 
 // After a card is taken from the handslot in the hand, move the cards in the successor handslots backward
 // and draw another card from the deck which will be placed at the end of the Hand (the 6th handslot). 
@@ -239,4 +243,15 @@ void Hand::moveCards(int postionOfTheRemovedCard, Deck* deck) {
 
 	// Todo: delete the card at the postion so no memorey leak happens
 	// delete cardsHand->at(postionInVector);
+}
+
+vector<Card* > Hand::cardsInHand()
+{
+	return *cardsHand;
+}
+
+ostream& operator<<(ostream& os, const Card& card)
+{
+	return os << "Card: Goods = " << *card.good << ", " <<
+				  card.action->actionString(false);
 }

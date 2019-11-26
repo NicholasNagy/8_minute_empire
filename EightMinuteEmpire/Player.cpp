@@ -1,8 +1,10 @@
 #include "Player.h"
 #include <random>
 #include <ctime>
-
-
+#include <string>
+#include <typeinfo>
+#include "PlayerStrategies.h"
+#include "Singleton.h"
 
 Holdings::Holdings() : mNumArmies(0), mNumCities(0){}
 
@@ -20,6 +22,25 @@ int Holdings::numCities()
 	return mNumCities;
 }
 
+int Holdings::addArmies(int n)
+{
+	return mNumArmies += n;
+}
+
+int Holdings::addCities(int n)
+{
+	return mNumCities += n;
+}
+
+int Holdings::removeArmies(int n)
+{
+	mNumArmies -= n;
+	if (mNumArmies < 0)
+		mNumArmies = 0;
+
+	return mNumArmies;
+}
+
 Player::Player()
 {
 	name = "Default";
@@ -32,6 +53,22 @@ Player::Player()
 	mArmies = 14;
 	mCities = 3;
 	hand = nullptr;
+}
+
+Player::Player(PlayerStrategies* newStrategy)
+{
+	strategy = newStrategy;
+	name = "Default";
+	money = new int(20);
+	//totalNumberOfCountries = 30;
+	ownedCities = nullptr;
+	ownedCountries = nullptr;
+	srand(time(NULL));
+	age = new int(rand() % 100 + 1);
+	mArmies = 14;
+	mCities = 3;
+	hand = nullptr;
+
 }
 
 Player::Player(std::string* name, int age)
@@ -115,65 +152,17 @@ void Player::setCoinPurse(int amount)
 	*money = amount;
 }
 
-void Player::PlaceNewArmies(int numberOfArmies,GraphWorld::Country* country) {
+void Player::PlaceNewArmies(int numberOfArmies,GraphWorld::Country* country)
+{
 
-	string messageFail = "Cannot place a new army on country " + to_string(country->getID());
-
-	if (mArmies == 0)
-	{
-		cout << "No more armies left to place.\n";
-		return;
-	}
-
-	Holdings* playerHoldings = mHoldings.at(country->getID());
-
-	//Check if the player has a city on the country or it is a starting country
-
-	if ( playerHoldings->mNumCities == 0 && !country->isStartCountry() )
-	{
-		cout << messageFail << endl;
-		return;
-	}
-	playerHoldings->mNumArmies += numberOfArmies;
-	cout << "Added " << numberOfArmies << " Army to Country: " << country->getID() << " For player: " << this->getName() << endl;
-	country->updateOccupyingPlayerScore(playerHoldings->mNumArmies + playerHoldings->mNumCities, this);
-	mArmies -= numberOfArmies;
+	strategy->PlaceNewArmies(numberOfArmies, country);
 
 }
 
-void Player::MoveArmies(GraphWorld::Map* map, GraphWorld::Country* start, GraphWorld::Country* destination)
+void Player::MoveArmies(GraphWorld::Country* start, GraphWorld::Country* destination)
 {
-
-	Holdings* holdingsOnStartCountry = mHoldings.at(start->getID());
-
-	//Check if the player has armies on the starting country
-	if (holdingsOnStartCountry->mNumArmies == 0)
-	{
-		cout << "\nNo armies to move." << endl;
-		return;
-	}
+	strategy->MoveArmies(start, destination);
 	
-	//Check if the start and destination countries are adjacent to each other
-	if (!map->getAdjacentList(start)->isAdjacent(destination))
-	{
-		cout << "Cannot move armies there." << endl;
-		return;
-	}
-	
-	//Check if the move requires naval
-	if (start->isNavalCountry() && destination->isNavalCountry())
-	{
-		cout << "Cannot move armies there. Requires Naval movement." << endl;
-		return;
-	}
-
-	//Move armies
-	Holdings* holdingsOnDestCountry = mHoldings.at(destination->getID());
-	holdingsOnStartCountry->mNumArmies -= 1;
-	holdingsOnDestCountry->mNumArmies += 1;
-	cout << "Moved " << 1  << " Army from Country: " << start->getID() << " to Country: " << destination->getID() << endl;
-	start->updateOccupyingPlayerScore(holdingsOnStartCountry->mNumArmies + holdingsOnStartCountry->mNumCities, this);
-	destination->updateOccupyingPlayerScore(holdingsOnDestCountry->mNumArmies + holdingsOnDestCountry->mNumCities, this);
 }
 
 bool isValidMovement(int startPosition, int endPosition) {
@@ -183,36 +172,36 @@ bool isValidMovement(int startPosition, int endPosition) {
 
 void Player::BuildCity(GraphWorld::Country* country) 
 {
-	if (mCities == 0)
-	{
-		cout << "No more cities left to place.\n";
-		return;
-	}
+	strategy->BuildCity(country);
 
-
-	Holdings* countryHoldings = getHoldings(country);
-	countryHoldings->mNumCities++;
-	cout << "Built " << 1 << " City on Country: " << country->getID() << endl;
-	country->updateOccupyingPlayerScore(countryHoldings->mNumArmies + countryHoldings->mNumCities, this);
-	mCities--;
 }
 
 
 void Player::DestroyArmy(Player* playerToDestroy, GraphWorld::Country* country)
 {
-	Holdings* countryHoldings = playerToDestroy->getHoldings(country);
-	int armies = countryHoldings->mNumArmies;
 
-	if (armies != 0)
-	{
-		playerToDestroy->getHoldings(country)->mNumArmies--;
-	cout << "Destroyed " << 1 << " Army on Country: " << country->getID() << endl;
-	country->updateOccupyingPlayerScore(countryHoldings->mNumArmies + countryHoldings->mNumCities, playerToDestroy);
-	}
-	else
-		cout << playerToDestroy <<" Has no armies to Destroy on this Country!\n" << endl;
-
+	strategy->DestroyArmy(playerToDestroy, country);
 	
+}
+
+void Player::Ignore()
+{
+	strategy->Ignore();
+}
+
+void Player::updateListOfOwnedCountries(Game* game)
+{
+	int numCountriesInMap = SingletonClass::instance()->getNumCountries();
+	listOfOwnedCountries.clear();
+	for (int i = 0; i < numCountriesInMap; i++) {
+		
+		Country* country = SingletonClass::instance()->getCountry(i); // get the country at postion i
+
+		// if the owner of the country is this player, add it to the list of owned countries
+		if (country->getCountryOwner() == this) {
+			listOfOwnedCountries.push_back(country);
+		}
+	}
 }
 
 Holdings* Player::getHoldings(GraphWorld::Country* country)
@@ -225,14 +214,14 @@ std::unordered_map<int, Holdings*>& Player::holdings()
 	return mHoldings;
 }
 
-int Player::computeScore(GraphWorld::Map* map)
+int Player::computeScore()
 {
 
 	GraphWorld::Country* country;
 	Player* countryOwner;
-	for (int i = 0; i < map->getNumCountries(); i++)
+	for (int i = 0; i < SingletonClass::instance()->getNumCountries(); i++)
 	{
-		country = map->getCountry(i);
+		country = SingletonClass::instance()->getCountry(i);
 		countryOwner = country->getCountryOwner();
 	auto it = country->occupyingPlayers().begin(); // Top element is the highest points, if tied with second there is no country owner
 	auto it2 = it;
@@ -290,6 +279,13 @@ void Player::setCardToPlay(int n)
 	cardsToPlay = n;
 }
 
+string Player::getStrategy()
+{
+	string s = typeid(*strategy).name();
+	return s.substr(6);
+}
+
+
 void Player::setHand(Card* h)
 {
 	hand = h;
@@ -322,12 +318,43 @@ int Player::getNumCities()
 
 int Player::setArmies(int n )
 {
+	if (n < 0)
+		mArmies = 0;
+
 	return mArmies = n;
+}
+
+int Player::getArmies()
+{
+	return mArmies;
 }
 
 int Player::setCities(int n)
 {
+	if (n < 0)
+		mCities = 0;
+
 	return mCities = n;
+}
+
+std::vector<GraphWorld::Country*>& Player::countriesWithCities()
+{
+	return mCountriesWithCities;
+}
+
+void Player::setStrategy(PlayerStrategies* newStrategy)
+{
+	strategy = newStrategy;
+}
+
+void Player::pickCard(Game* game, int position)
+{
+	strategy->pickCard(game, position);
+}
+
+void Player::playCard(Game* game)
+{
+	strategy->playCard(game);	
 }
 
 int Player::sumVictoryPoints()
@@ -344,7 +371,10 @@ std::ostream& operator<<(std::ostream& s, const Holdings& holdings)
 
 std::ostream& operator<<(std::ostream& s, const Player& player)
 {
-	return  s << "--" << player.name << "--\n" <<
+
+	string strategy = typeid(*player.strategy).name();
+
+		return  s << "--" << player.name << " (" << strategy.substr(6) << ")--\n" <<
 		"Coins: " << *player.money << std::endl <<
 		"Cards Left to play: " << player.cardsToPlay << std::endl <<
 		"Armies Left: " << player.mArmies << endl <<

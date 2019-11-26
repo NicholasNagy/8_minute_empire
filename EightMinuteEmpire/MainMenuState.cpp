@@ -19,8 +19,6 @@ void MainMenuState::init(Game* game)
 	ImGui::CreateContext();
 	ImGuiSDL::Initialize(renderer, WINDOW_X_SMALL, WINDOW_Y);
 	logoTexture = TextureLoader::loadTexutre("assets/logo.png", renderer);
-
-	
 }
 
 void MainMenuState::clean(Game* game)
@@ -81,6 +79,7 @@ void MainMenuState::handleEvents(Game* game)
 void MainMenuState::update(Game* game)
 {
 }
+
 
 void MainMenuState::draw(Game* game)
 {

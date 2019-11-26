@@ -1,5 +1,5 @@
 #include "Action.h"
-#include <iostream>
+#include <sstream>
 
 using namespace std;
 
@@ -95,8 +95,9 @@ Action::~Action() {
 
 
 
-void Action::printAction() {
+std::string Action::actionString(bool printToConsole) {
 
+	std::stringstream ss;
 	int actionID = *id;
 
 	if (actionID != 4 && actionID != 5) {
@@ -104,20 +105,30 @@ void Action::printAction() {
 		switch (actionID)
 		{
 		case 0:
-			cout << "Action = PlaceNewArmies with " << *multiplicity << " armies. ";
-			return;
+			ss << "PlaceNewArmies with " << *multiplicity << " armies. ";
+			if (printToConsole)
+			cout << ss.str();
+			return ss.str();
 		case 1:
-			cout << "Action = MoveArmies with " << *multiplicity << " armies and Water movement is " << *isWaterMovementAllowed;
-			return;
+			ss << "MoveArmies with " << *multiplicity << " armies and Water movement is " << *isWaterMovementAllowed;
+			if (printToConsole)
+			cout << ss.str();
+			return ss.str();
 		case 2:
-			cout << "Action = BuildCity";
-			return;
+			ss << "BuildCity";
+			if (printToConsole)
+			cout << ss.str();
+			return ss.str();
 		case 3:
-			cout << "Action = DestroyArmy ";
-			return;
+			ss << "DestroyArmy ";
+			if (printToConsole)
+			cout << ss.str();
+			return ss.str();
 		case 6:
-			cout << "Action = Ignore ";
-			return;
+			ss << "Ignore ";
+			if (printToConsole)
+			cout << ss.str();
+			return ss.str();
 		}
 	}
 	else {
@@ -125,53 +136,64 @@ void Action::printAction() {
 		switch (*id)
 		{
 		case 4:
-			cout << "Action = AND ";
+			ss << "AND ";
 			break;
 		case 5:
-			cout << "Action = OR ";
+			ss << "OR ";
 			break;
 		}
 
-		cout << " First Action = ";
+		ss << " 1st Action = ";
 		switch (*firstActionID)
 		{
 		case 0:
-			cout << "PlaceNewArmies with " << *multiplicity << " armies. ";
+			ss << "PlaceNewArmies with " << *multiplicity << " armies. ";
 			break;
 		case 1:
-			cout << "MoveArmies with " << *multiplicity << " armies and Water movement is " << *isWaterMovementAllowed;
+			ss << "MoveArmies with " << *multiplicity << " armies and Water movement is " << *isWaterMovementAllowed;
 			break;
 		case 2:
-			cout << "BuildCity ";
+			ss << "BuildCity ";
 			break;
 		case 3:
-			cout << "DestroyArmy ";
+			ss << "DestroyArmy ";
 			break;
 		case 6:
-			cout << "Ignore ";
+			ss << "Ignore ";
 			break;
 		}
 
-		cout << ", Second Action = ";
+		ss << ", 2nd Action = ";
 		switch (*secondActionID)
 		{
 		case 0:
-			cout << "PlaceNewArmies with " << *secondActionMultiplicity << " armies. ";
-			break;
+			ss << "PlaceNewArmies with " << *secondActionMultiplicity << " armies. ";
+			if(printToConsole)
+			cout << ss.str();
+			return ss.str();
 		case 1:
-			cout << "MoveArmies with " << *secondActionMultiplicity << " armies and Water movement is " << *secondActionIsWaterMovementAllowed;
-			break;
+			ss << "MoveArmies with " << *secondActionMultiplicity << " armies and Water movement is " << *secondActionIsWaterMovementAllowed;
+			if (printToConsole)
+			cout << ss.str();
+			return ss.str();
 		case 2:
-			cout << "BuildCity ";
-			break;
+			ss << "BuildCity ";
+			if (printToConsole)
+			cout << ss.str();
+			return ss.str();
 		case 3:
-			cout << "DestroyArmy ";
-			break;
+			ss << "DestroyArmy ";
+			if (printToConsole)
+			cout << ss.str();
+			return ss.str();
 		case 6:
-			cout << "Ignore ";
-			break;
+			ss << "Ignore ";
+			if (printToConsole)
+			cout << ss.str();
+			return ss.str();
 		}
 
 	}
+
 }
 

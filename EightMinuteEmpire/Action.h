@@ -19,7 +19,7 @@ public:
 	int getSecondActionID() { return *secondActionID; }
 	int getSecondActionMultiplicity() { return *secondActionMultiplicity; }
 	bool getSecondActionIsWaterMovementAllowed() { return *secondActionIsWaterMovementAllowed; }
-	void printAction();
+	std::string actionString(bool printToConsole);
 
 private:
 	int* id;

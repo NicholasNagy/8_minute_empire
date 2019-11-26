@@ -10,36 +10,28 @@
 #include "Bid.h"
 #include "GameOverlay.h"
 #include "Action.h"
+#include "ActionState.h"
+#include "PlayerStrategies.h"
+#include "Singleton.h"
 
 GameplayState GameplayState::mGameplayState;
+SDL_Event GameplayState::event;
 SDL_Renderer* GameplayState::renderer = nullptr;
 
 SDL_Texture* texture = nullptr;
 SDL_Surface* screen;
-SDL_Rect cursor;
-SDL_Rect cursorShadow = { cursor.x, cursor.y, GRID_CELL_SIZE, GRID_CELL_SIZE };
+SDL_Rect mouse;
+SDL_Rect cursorShadow = { mouse.x, mouse.y, GRID_CELL_SIZE, GRID_CELL_SIZE };
 SDL_Color cursorShadowColor = { 107, 107, 107, 107 };
 bool mouseActive = false;
 bool mouseHover = false;
-bool mouseClick = false;
 bool bid = false;
 
-
-GraphWorld::Map* gameMap;
 GraphWorld::Country* hoveredCountry = nullptr;
-GraphWorld::Country* srcCountry = nullptr;
-GraphWorld::Country* destCountry = nullptr;
 GraphWorld::Country* startingCountry = nullptr;
-
-std::vector<GraphWorld::Country*> selectedCountries; //the countries selected by the use
-int selectedAction = -1;  // the action id;
  
 int numCountries;
 int numPlayers;
-Player* toPlay;
-
-bool destroyArmyAction = false;
-Player* toDestroy;
 
 GameOverlay ui;
 Label* countryHoverLabel;
@@ -48,10 +40,14 @@ Label* gameMessagesLabel;
 std::string gameMessages;
 Label* cardsLabel;
 
-int playerMove;  //The current player's turn
 
+int playerMove;  //The current player's turn
+Game* nextM;
+
+bool spacePress = false;
 void GameplayState::init(Game* game)
 {
+	nextM = game;
 	std::cout << "\nGame Started\n\n-------------------------------------------------\n\n";
 	numPlayers = game->players().size();
 
@@ -72,15 +68,35 @@ void GameplayState::init(Game* game)
 	game->deck()->shuffleDeck();
 	game->deck()->printDeck();
 	
-	toPlay = game->players().at(playerMove);
-	gameMessages =  toPlay->getName() + " turn to move. Select a card by pressing (1-6) on the keyboard. 'Enter' to confirm move.\n";
+	
+	ActionState::toPlay = game->players().at(playerMove);
+	gameMessages = ActionState::toPlay->getName() + " (" + ActionState::toPlay->getStrategy() + ") turn to move.";
+
+	// Set the phaseObserver to observer the GameplayState
+	PhaseObserver* phaseObserver = new PhaseObserver(GameplayState::Instance());
+	game->setPhaseObserver(phaseObserver);
+
+	// Set the statsObserver to observer the GameplayState
+	StatsObserver* statsObserver = new StatsObserver(GameplayState::Instance());
+	game->setStatsObserver(statsObserver);
+
+	// start a new gameplay status
+	startNewStatus(gameMessages);
+	updateStatus("Press Space to engage card selection. '7' to change Strategy type");
+
+	// loop over all the players and update their list of owned countries after the end of each turn.
+	for (Player* player : game->players()) { player->updateListOfOwnedCountries(game); }
+	updateStatistics(game->players());
 
 	Hand* hand = new Hand(game->deck()); cout << "\n------------------------------------------------------------\n";
 	game->setHand(hand);
 
 	hand->printHand();
 	cout << "\n------------------------------------------------------------\n";
-	cout << endl <<gameMessages;
+	cout << endl <<gameMessages <<endl;
+
+
+	
 }
 
 void GameplayState::initWindow(Game* game)
@@ -99,12 +115,11 @@ void GameplayState::initWindow(Game* game)
 
 void GameplayState::initMap(Game* game)
 {
-	gameMap = game->getMap();
 	string path = game->getMapLoader()->getTileSetPath();
 	texture = TextureLoader::loadTexutre(path.c_str(), renderer);
-	numCountries = gameMap->getNumCountries();
-	gameMap->getTileMap()->drawTileMap(renderer, texture);
-	startingCountry = gameMap->getStartingCountry();
+	numCountries = SingletonClass::instance()->getNumCountries();
+	SingletonClass::instance()->getTileMap()->drawTileMap(renderer, texture);
+	startingCountry = SingletonClass::instance()->getStartingCountry();
 	initPlayerHoldings(game);
 }
 
@@ -118,11 +133,11 @@ void GameplayState::initUI(Game* game)
 	string bidding = "Biding initiated in console!";
 	ui.addFonts("assets/Fonts/unispace bd.ttf", "unispace bd", 9);
 	ui.addFonts("assets/Fonts/arial.ttf", "arial", 22);
-	ui.addFonts("assets/Fonts/ARIALN.TTF", "arialN", 26);
+	ui.addFonts("assets/Fonts/BRITANIC.TTF", "BRITANIC", 22);
 
 
 	SDL_Color black = { 0,0,0,0 };
-	SDL_Color r = {3,2,23,0 };
+	SDL_Color r = {100,0,0,0 };
 
 	countryHoverLabel = new Label(bidding, "arial", 0, 0, black);
 	countryHoverLabel->setLabelText(renderer,screen, bidding, ui.getFont("arial"));
@@ -132,11 +147,11 @@ void GameplayState::initUI(Game* game)
 	playerInfoLabel->setLabelText(renderer,screen, "", ui.getFont("unispace bd"));
 	playerInfoLabel->drawLabel(renderer);
 
-	gameMessagesLabel = new Label("", "arialN", 5, 585, black);
-	gameMessagesLabel->setLabelText(renderer, screen, "", ui.getFont("arialN"));
+	gameMessagesLabel = new Label("", "arialN", 5, 545, black);
+	gameMessagesLabel->setLabelText(renderer, screen, "", ui.getFont("BRITANIC"));
 	gameMessagesLabel->drawLabel(renderer);
 
-	cardsLabel = new Label("", "unispace bd", 1035, 565, r);
+	cardsLabel = new Label("", "unispace bd", 1025, 555, r);
 	cardsLabel->setLabelText(renderer, screen, "", ui.getFont("unispace bd"));
 	cardsLabel->drawLabel(renderer);
 
@@ -151,12 +166,13 @@ void GameplayState::initUI(Game* game)
 void GameplayState::pause()
 {
 
-	printf("Game paused");
+	printf("\nInitiated Card Action State");
 }
 
 void GameplayState::resume()
 {
-	printf("Game resumed");
+	printf("\nGameplay State Resumed");
+	nextMove(nextM);
 }
 
 void GameplayState::clean(Game* game)
@@ -169,36 +185,15 @@ void GameplayState::clean(Game* game)
 
 void GameplayState::handleEvents(Game* game)
 {
-
-	SDL_Event event;
-	SDL_PollEvent(&event);
+	SDL_WaitEvent(&event);
 	switch (event.type)
 	{
 	case SDL_QUIT:
 		game->setRunning(false);
 		break;
-	case SDL_MOUSEBUTTONDOWN:
-		cursor.x = (event.motion.x / GRID_CELL_SIZE) * GRID_CELL_SIZE;
-		cursor.y = (event.motion.y / GRID_CELL_SIZE) * GRID_CELL_SIZE;
-
-		if (bid)
-		{
-			if (selectedAction ==3)
-				destroyArmyAction = true;
-
-			if (selectedAction >= 0 && selectedAction != 1)
-			{
-				getClickedCountry(false);
-			}
-			else if (selectedAction == 1)
-			{
-				getClickedCountry(true);
-			}
-		}
-		break;
 	case SDL_MOUSEMOTION:
-		cursor.x = cursorShadow.x = (event.motion.x / GRID_CELL_SIZE) * GRID_CELL_SIZE;
-		cursor.y = cursorShadow.y = (event.motion.y / GRID_CELL_SIZE) * GRID_CELL_SIZE;
+		mouse.x = cursorShadow.x = (event.motion.x / GRID_CELL_SIZE) * GRID_CELL_SIZE;
+		mouse.y = cursorShadow.y = (event.motion.y / GRID_CELL_SIZE) * GRID_CELL_SIZE;
 		//std::cout << "x: " << cursor.x << " y: " << cursor.y << std::endl;
 		if (!mouseActive)
 			mouseActive = true;
@@ -212,154 +207,85 @@ void GameplayState::handleEvents(Game* game)
 			mouseHover = false;
 		break;
 
+
 	case SDL_KEYDOWN:
 		{
-
 			switch (event.key.keysym.sym)
 			{
 
 			case SDLK_1:
-				if (!destroyArmyAction)
-				{
-					 cout << " -- Selected Handslot 1 -- \n";
-					 if (toPlay->getMoney() >= game->hand()->getCardCostAtPosition(1))
-					 {
-						 toPlay->setHand(game->hand()->getCardAtPosition(1, game->deck()));
-						 toPlay->setCoinPurse(toPlay->getMoney() - game->hand()->getCardCostAtPosition(1));
-						 toPlay->getHand()->printCard();
-						 selectedAction = toPlay->getHand()->getAction()->getID();
-					 }
-					 else
-						 cout << "\nCannot afford the cost of this card. Please select another card.\n";
-				}
-				else if (numPlayers <= 5)
-				{
-					toDestroy = game->players().at(0);
-					cout << "Selected Player " << 1 << endl;
-				}
+			if (!ActionState::inActionState && spacePress)
+				handleCardSelection(game, 1);		
 				break;
 
 			case SDLK_2:
-				if (!destroyArmyAction)
-				{
-					cout << "-- Selected Handslot 2 -- \n";
-					if (toPlay->getMoney() >= game->hand()->getCardCostAtPosition(2))
-					{
-						toPlay->setHand(game->hand()->getCardAtPosition(2, game->deck()));
-						toPlay->setCoinPurse(toPlay->getMoney() - game->hand()->getCardCostAtPosition(2));
-						selectedAction = toPlay->getHand()->getAction()->getID();
-						toPlay->getHand()->printCard();
-					}
-					else
-						cout << "\nCannot afford the cost of this card. Please select another card.\n";
+				if (!ActionState::inActionState && spacePress)
+				handleCardSelection(game, 2);
 
-				}
-				else if (numPlayers <= 5)
-				{
-					toDestroy = game->players().at(1);
-					cout << "Selected Player " << 2 << endl;
-				}
-					
 				break;
 			case SDLK_3:
-				if (!destroyArmyAction)
-				{
-					cout << "-- Selected Handslot 3 -- \n";
-					if (toPlay->getMoney() >= game->hand()->getCardCostAtPosition(3))
-					{
-					toPlay->setHand(game->hand()->getCardAtPosition(3, game->deck()));
-					toPlay->setCoinPurse(toPlay->getMoney() - game->hand()->getCardCostAtPosition(3));
-					selectedAction = toPlay->getHand()->getAction()->getID();
-					toPlay->getHand()->printCard();
-					}
-					else
-						cout << "\nCannot afford the cost of this card. Please select another card.\n";
-					
-				}
-				else if (numPlayers <= 5 && numPlayers >=3 )
-				{
-					toDestroy = game->players().at(2);
-					cout << "Selected Player " << 3 << endl;
-				}
-					
+				if (!ActionState::inActionState && spacePress)
+				handleCardSelection(game, 3);				
 				break;
 			case SDLK_4:
-				if (!destroyArmyAction)
-				{
-					cout << "-- Selected Handslot 4 -- \n";
-					if (toPlay->getMoney() >= game->hand()->getCardCostAtPosition(4))
-					{
-						toPlay->setHand(game->hand()->getCardAtPosition(4, game->deck()));
-						toPlay->setCoinPurse(toPlay->getMoney() - game->hand()->getCardCostAtPosition(4));
-						toPlay->getHand()->printCard();
-						selectedAction = toPlay->getHand()->getAction()->getID();
-					}
-					else
-						cout << "\nCannot afford the cost of this card. Please select another card.\n";
-
-				}
-				else if (numPlayers == 4 || numPlayers == 5)
-				{
-					toDestroy = game->players().at(3);
-					cout << "Selected Player " << 4 << endl;
-				}
-
+				if (!ActionState::inActionState && spacePress)
+				handleCardSelection(game, 4);
 				break;
 
 			case SDLK_5:
-				if (!destroyArmyAction)
-				{
-					cout << "-- Selected Handslot 5 -- \n";
-					if (toPlay->getMoney() >= game->hand()->getCardCostAtPosition(5))
-					{
-						toPlay->setHand(game->hand()->getCardAtPosition(5, game->deck()));
-						toPlay->setCoinPurse(toPlay->getMoney() - game->hand()->getCardCostAtPosition(5));
-						toPlay->getHand()->printCard();
-						selectedAction = toPlay->getHand()->getAction()->getID();
-					}
-					else
-						cout << "\nCannot afford the cost of this card. Please select another card.\n";
-
-				}
-				else if (numPlayers == 5)
-				{
-				toDestroy = game->players().at(4);
-				cout << "Selected Player " << 5 << endl;
-				}
+				if (!ActionState::inActionState && spacePress)
+				handleCardSelection(game, 5);
 				break;
 			case SDLK_6:
-				if (!destroyArmyAction)
-				{
-					cout << "-- Selected Handslot 6 -- \n";
-					if (toPlay->getMoney() >= game->hand()->getCardCostAtPosition(6))
-					{
-						toPlay->setHand(game->hand()->getCardAtPosition(6, game->deck()));
-						toPlay->setCoinPurse(toPlay->getMoney() - game->hand()->getCardCostAtPosition(6));
-						toPlay->getHand()->printCard();
-						selectedAction = toPlay->getHand()->getAction()->getID();
-					}
-					else
-						cout << "\nCannot afford the cost of this card. Please select another card.\n";
-				}
+				if (!ActionState::inActionState && spacePress)
+				handleCardSelection(game, 6);			
 				break;
-			case SDLK_RETURN:
+			case SDLK_7:
+				if (!ActionState::inActionState)
+					
+					if (ActionState::toPlay->getStrategy().compare("Human") == 0)
+					{
+						ActionState::toPlay->setStrategy(new  ModerateCPU());
+						string userMessage = ActionState::toPlay->getName() + " status changed form Human to ModerateCPU.";
+						updateStatus(userMessage);
+						updateStatus("Press Space to engage card selection.");
+						cout << endl << userMessage << endl;
 
-				if (selectedAction >= 0)
-				{
-					handlePlayerAction(game);
-					nextMove(game);
-				}
+					}
+					else if (ActionState::toPlay->getStrategy().compare("ModerateCPU") == 0)
+					{
+						ActionState::toPlay->setStrategy(new  GreedyCPU());
+						string userMessage = ActionState::toPlay->getName() + " status changed form ModerateCPU to GreedyCPU.";
+						updateStatus(userMessage);
+						updateStatus("Press Space to engage card selection.");
+						cout << endl << userMessage << endl;
 
+
+					}
+					else if (ActionState::toPlay->getStrategy().compare("GreedyCPU") == 0)
+					{
+						ActionState::toPlay->setStrategy(new  Human());
+						string userMessage = ActionState::toPlay->getName() + " status changed form GreedyCPU to Human.";
+						updateStatus(userMessage);
+						updateStatus("Press Space to engage card selection.");
+						cout << endl << userMessage << endl;
+					}
+				break;
+
+			case SDLK_SPACE:
+				spacePress = true;
+				if (ActionState::toPlay->getStrategy().compare("GreedyCPU") == 0 || ActionState::toPlay->getStrategy().compare("ModerateCPU") == 0)
+					handleCardSelection(game, 0);
+				updateStatus("Engaged Card Selection. Pick a card by pressing 1-6 on the keyboard");
 				break;
 			default:
 				break;
 			}
+		
 		}
-
-	default:
-		break;
+		default:
+			break;	
 	}
-
 }
 
 void GameplayState::getHoveredCountry()
@@ -367,192 +293,86 @@ void GameplayState::getHoveredCountry()
 	static int typeCol;
 	static int typeRow;
 	static int type;
-	typeCol = cursor.x / GRID_CELL_SIZE;
-	typeRow = cursor.y / GRID_CELL_SIZE;
+	typeCol = mouse.x / GRID_CELL_SIZE;
+	typeRow = mouse.y / GRID_CELL_SIZE;
 
-	if (cursor.x < MAP_WIDTH * GRID_CELL_SIZE)
+	if (mouse.x < MAP_WIDTH * GRID_CELL_SIZE)
 	{
-		type = gameMap->getTileMap()->tiles[typeRow][typeCol];
+		type = SingletonClass::instance()->getTileMap()->tiles[typeRow][typeCol];
 		if (type < numCountries && type >= 0)
-			hoveredCountry = gameMap->getCountry(type);
+			hoveredCountry = SingletonClass::instance()->getCountry(type);
 	}
 }
 
-void GameplayState::getClickedCountry(bool armyMove)
+void GameplayState::handleCardSelection(Game* game, int position)
 {
-	//Find out type of tile clicked
-	static int typeCol;
-	static int typeRow;
-	static int type;
-
-	typeCol = cursor.x / GRID_CELL_SIZE;
-	typeRow = cursor.y / GRID_CELL_SIZE;
-
-	if (cursor.x < MAP_WIDTH * GRID_CELL_SIZE)
-	{
-		type = gameMap->getTileMap()->tiles[typeRow][typeCol];
-		GraphWorld::Country* clickedON = nullptr;
-		if (type < numCountries && type >= 0)
-			clickedON = gameMap->getCountry(type);
-
-		if (!armyMove)
-		{		
-			selectedCountries.push_back(clickedON);
-			std::cout << "\nSelected Country: " << clickedON->getID() << std::endl;			
-		}
-		else
-		{
-			switch (selectedCountries.size())
-			{
-			case 0:
-				selectedCountries.push_back(clickedON);
-				std::cout << "\nSelected Country To Move From: " << clickedON->getID() << std::endl;
-				break;
-			case 1:
-				selectedCountries.push_back(clickedON);
-				std::cout << "\nSelected Country To Move To: " << clickedON->getID() << std::endl;
-				break;
-			case 2:
-				selectedCountries.at(1) = clickedON;
-				std::cout << "\nSelected Country To Move To: " << clickedON->getID() << std::endl;
-				break;
-			}			
-		}
-	}
-}
-
-void GameplayState::handlePlayerAction(Game* game)
-{
-
-	switch (selectedAction)
-	{
-	case 0:
-		handlePlaceNewArmies(game);
-		break;
-	case 1:
-		handleMoveArmies(game);
-		break;
-	case 2:
-		handleBuildCity(game);
-		break;
-	case 3:
-		handleDestroyArmy(game);
-		break;
-	case 4: //and
-		handleAndOrAction(game);
-		break;
-	case 5:  //or
-		handleAndOrAction(game);
-		break;
-	case 6:
-		handleIgnore(game);
-		break;
-	default:
-		break;
-	}
+	ActionState::toPlay->pickCard(game, position);
+	ActionState::toPlay->updateGoodsPoints(ActionState::toPlay->getHand()->getGood());
+	ActionState::toPlay->playCard(game);
 
 }
-
-void GameplayState::handlePlaceNewArmies(Game* game)
-{
-
-
-		for (GraphWorld::Country* c : selectedCountries)
-		{
-			toPlay->PlaceNewArmies(1, c);
-		
-		}
-		
-	
-
-}
-
-void GameplayState::handleMoveArmies(Game* game)
-{
-
-	if (selectedCountries.size() == 2)
-	{
-		toPlay->MoveArmies(gameMap, selectedCountries[0], selectedCountries[1]);
-	}
-
-
-}
-
-void GameplayState::handleBuildCity(Game* game)
-{
-	if (selectedCountries[0])
-	{
-		toPlay->BuildCity(selectedCountries.back());
-	}
-
-
-}
-
-void GameplayState::handleDestroyArmy(Game* game)
-{
-	if(toDestroy)
-	toPlay->DestroyArmy(toDestroy, selectedCountries.back());
-}
-
-void GameplayState::handleAndOrAction(Game* game)
-{
-}
-
-void GameplayState::handleIgnore(Game* game)
-{
-	cout << "\nCard Ignored\n";
-}
-
-
-
 
 
 void GameplayState::nextMove(Game* game)
 {
-	toPlay->computeScore(gameMap);
-	selectedAction = -1;
-	selectedCountries.clear();
-	destroyArmyAction = false;
+
+	
+	
+	ActionState::inActionState = false;
+	spacePress = false;
+	ActionState::toPlay->computeScore();
+
+	// loop over all the players and update their list of owned countries after the end of each turn.
+	for (Player* player : game->players()) { player->updateListOfOwnedCountries(game); }
+	updateStatistics(game->players());
+	
 	gameMessages.clear();
-	toPlay->setHand(nullptr);
-	toPlay->setCardToPlay(toPlay->getCardsToPlay() - 1); 
+	ActionState::toPlay->setHand(nullptr);
+	ActionState::toPlay->setCardToPlay(ActionState::toPlay->getCardsToPlay() - 1);
 
 	if (game->players().at(numPlayers - 1)->getCardsToPlay() == 0)
 	{
-
-		cout << "Game Over!" << endl;
+		cout << "\nGame Over!" << endl;
 		computeFinalScore(game);
 		return;
 	}
-
 
 	playerMove++;
 	if (playerMove == numPlayers)
 		playerMove = 0;
 
-	toPlay = game->players().at(playerMove);
+	ActionState::toPlay = game->players().at(playerMove);
 	gameMessages.clear();
+
 	cout << "\nNext Hand..." << endl << gameMessages << endl;
 	game->hand()->printHand();
 	cout << "------------------------------------------------------------\n";
-	gameMessages = toPlay->getName() + " turn to move. Select a card by pressing (1-6) on the keyboard. 'Enter' to confirm move.\n";
-	cout << gameMessages;
+
+	if (ActionState::toPlay->getStrategy().compare("GreedyCPU") == 0 || ActionState::toPlay->getStrategy().compare("ModerateCPU") == 0)
+	{
+
+		gameMessages = ActionState::toPlay->getName() + " (" + ActionState::toPlay->getStrategy() + ") turn to move.";;
+		startNewStatus(gameMessages);
+	}
+	else
+		gameMessages = ActionState::toPlay->getName() + " turn to move.";
+	cout << gameMessages << endl;
+		startNewStatus(gameMessages);
+
+		updateStatus("Press Space to engage card selection. '7' to change Strategy type");
 }
 
 void GameplayState::placeStartingArmies(Game* game)
 {
 	for ( Player* p: game->players() )
 	{
-
+		ActionState::toPlay = p;
 		startingCountry->updateOccupyingPlayerScore(3, p);
 		p->holdings().emplace(startingCountry->getID(), new Holdings());	
 		p->PlaceNewArmies(3, startingCountry);
 
 	}
 	cout << "\n------------------------------------------------------------\n";
-	
-
-
 }
 
 void GameplayState::initPlayerHoldings(Game* game)
@@ -561,13 +381,10 @@ void GameplayState::initPlayerHoldings(Game* game)
 	{
 		for (Player* p : game->players())
 		{
-			gameMap->getCountry(i)->updateOccupyingPlayerScore(0, p);
+			SingletonClass::instance()->getCountry(i)->updateOccupyingPlayerScore(0, p);
 			p->holdings().emplace(i, new Holdings());
-
 		}
-
 	}
-
 }
 
 Player* GameplayState::computeFinalScore(Game* game)
@@ -588,8 +405,7 @@ Player* GameplayState::computeFinalScore(Game* game)
 			{
 				gameMessages = "Game Over -" + game->players().at(i)->getName() + " won!\n";
 				return game->players().at(i);
-			}
-				
+			}				
 		}		
 	}
 	else
@@ -597,15 +413,61 @@ Player* GameplayState::computeFinalScore(Game* game)
 		gameMessages = "Game Over - TIE GAME !";
 		return nullptr;
 	}
-	
 
-	
 }
+
+// updates the statistics data member which is realized from the observable interface.
+// It also calls the notify() method.
+void GameplayState::updateStatistics(vector<Player*> players)
+{
+	string statsBarGraph;
+
+
+	for (Player* p : players) {
+
+
+		statsBarGraph = statsBarGraph + p->getName() + " (" + p->getStrategy() + ")" "\n";
+
+		if (p->getCardsToPlay() == 0)
+			statsBarGraph = statsBarGraph + "Congrats on finishing your turn" + "\n";
+
+		statsBarGraph = statsBarGraph + "Owned Countries IDs: ";
+		for (GraphWorld::Country* country : p->getListOfOwnedCountries())
+		{
+			statsBarGraph = statsBarGraph + to_string(country->getID()) + ",";
+		}
+		statsBarGraph = statsBarGraph + "\n";
+		statsBarGraph = statsBarGraph + "Coins " + to_string(p->getMoney()) + "\n";
+		statsBarGraph = statsBarGraph + "Cards " + to_string(p->getCardsToPlay()) + "\n";
+		statsBarGraph = statsBarGraph + "Cities Left " + to_string(p->getNumCities()) + "\n";
+		statsBarGraph = statsBarGraph + "Armies Left " + to_string(p->getArmies()) + "\n";
+		statsBarGraph = statsBarGraph + drawSingleColumn("Owned Countries", p->getNumOfOwnedCountries());
+		statsBarGraph = statsBarGraph + drawSingleColumn("Owned Goods", p->getNumOfGoods());
+		statsBarGraph = statsBarGraph + drawSingleColumn("Victory Points", p->getTotalVictoryPoints());
+	
+		statsBarGraph = statsBarGraph + "\n";
+	}
+
+
+	setStatitics(statsBarGraph);
+	notify();
+}
+
+string GameplayState::drawSingleColumn(string colName, int colSize)
+{
+	string col = colName + " ";
+	for (int i = 0; i < colSize; i++)
+		col = col + "=";
+	col = col + "\n";
+	return col;
+}
+
 
 void GameplayState::draw(Game* game)
 {
 	SDL_RenderClear(renderer);
-	gameMap->getTileMap()->drawTileMap(renderer, texture);
+	SingletonClass::instance()->getTileMap()->drawTileMap(renderer, texture);
+
 	if (mouseActive && mouseHover)
 	{
 		SDL_SetRenderDrawColor(renderer, cursorShadowColor.r, cursorShadowColor.g, cursorShadowColor.b, cursorShadowColor.a);
@@ -622,31 +484,48 @@ void GameplayState::draw(Game* game)
 
 void GameplayState::update(Game* game)
 {
-
-	std::stringstream ss;
 	countryHoverLabel->destroyLabelTexture();
 	playerInfoLabel->destroyLabelTexture();
 	gameMessagesLabel->destroyLabelTexture();
 	cardsLabel->destroyLabelTexture();
 
+	//Player stats
+	std::stringstream ss;
 	for (Player* p : game->players())
 		ss << *p;
-
-	playerInfoLabel->setLabelText(renderer, screen, ss.str(), ui.getFont("unispace bd"));
-
+	//playerInfoLabel->setLabelText(renderer, screen, ss.str(), ui.getFont("unispace bd"));
 	ss.clear();
+
+	playerInfoLabel->setLabelText(renderer, screen, game->statsObserver()->getStatistics() , ui.getFont("unispace bd"));
+
+
+	//Hovered country
 	if (hoveredCountry)
 	{
 		std::stringstream ss;
-		ss << *hoveredCountry << *toPlay->getHoldings(hoveredCountry);
+		ss << *hoveredCountry << *ActionState::toPlay->getHoldings(hoveredCountry);
 		countryHoverLabel->setLabelText(renderer, screen, ss.str(), ui.getFont("arial"));
 
 	}
-	ss.clear();
-	gameMessagesLabel->setLabelText(renderer, screen, gameMessages, ui.getFont("arialN"));
 
-	cardsLabel->setLabelText(renderer, screen, "1\n2\n3\n4\n5\n6\n", ui.getFont("unispace bd"));
+	//Displaying Cards
+	stringstream cards;
+	int pos = 0;
+	cards << "---------------CARDS IN HAND--------------" << endl;
+	for (Card* card : game->hand()->cardsInHand())
+	{
+		cards << (pos + 1) << ".G=" << game->hand()->cardsInHand().at(pos)->getGood() << " " << 
+			  game->hand()->cardsInHand().at(pos)->getAction()->actionString(false) << endl;
+		pos++;
+	}
+	cards << "------------------------------------------";
+	cardsLabel->setLabelText(renderer, screen, cards.str(), ui.getFont("unispace bd"));
 
 
+	//cout << "\nObservable status: " << GameplayState::Instance()->getStatus() << "\nObserver Status: " << game->phaseObserver()->getStatus() << endl;
+
+	//Displaying game messages
+	gameMessagesLabel->setLabelText(renderer, screen, game->phaseObserver()->getStatus(), ui.getFont("BRITANIC"));
 
 }
+

@@ -2,6 +2,7 @@
 #include "Game.h"
 #include "GameState.h"
 
+
 /*To learn the GUI SDL2 and inspiration for the game state stack architecture I used these as references
 
 https://gamedevelopment.tutsplus.com/articles/how-to-build-a-jrpg-a-primer-for-game-developers--gamedev-6676#state
@@ -18,7 +19,7 @@ int GRID_CELL_SIZE = 32;
 int MAP_WIDTH = 32;
 int MAP_HEIGHT = 20;
 
-Game::Game() : mIsRunning(false), window(nullptr), map(nullptr) {}
+Game::Game() : mIsRunning(false), window(nullptr) {}
 
 Game::~Game()
 {
@@ -26,13 +27,14 @@ Game::~Game()
 
 void Game::init(const char* title, int initialX, int initialY, int width, int height, Uint32 flags)
 {
-
+	
 	SDL_Init(SDL_INIT_EVERYTHING);
 	window = SDL_CreateWindow(title, initialX, initialY, width, height, flags);
 	if (window)
 		mIsRunning = true;
 	else
 		mIsRunning = false;
+
 
 }
 
@@ -120,11 +122,6 @@ void Game::pushState(GameState* state)
 
 }
 
-void Game::setMap(GraphWorld::Map* map)
-{
-	this->map = map;
-}
-
 void Game::setDeck(Deck* d)
 {
 	mDeck = d;
@@ -145,14 +142,30 @@ Hand* Game::hand()
 	return mHand;
 }
 
+PhaseObserver* Game::phaseObserver()
+{
+	return mPhaseObserver;
+}
+
+StatsObserver* Game::statsObserver()
+{
+	return mStatsObserver;
+}
+
+void Game::setPhaseObserver(PhaseObserver* po)
+{
+	mPhaseObserver = po;
+}
+
+void Game::setStatsObserver(StatsObserver* so)
+{
+	mStatsObserver = so;
+
+}
+
 std::vector<Player*>& Game::players()
 {
 	return mPlayers;
-}
-
-GraphWorld::Map* Game::getMap()
-{
-	return map;
 }
 
 MapLoader* Game::getMapLoader()

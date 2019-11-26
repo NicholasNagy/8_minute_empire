@@ -108,6 +108,24 @@
     <ClCompile Include="Action.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ActionState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObservers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerStrategies.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Observable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Observer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Singleton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map.h">
@@ -175,6 +193,24 @@
     </ClInclude>
     <ClInclude Include="Action.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ActionState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObservers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerStrategies.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Observable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Observer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Singleton.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

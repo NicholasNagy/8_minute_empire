@@ -26,6 +26,7 @@ private:
 	static SDL_Renderer* renderer;
 	static std::vector<bool> players; //holds player before the game starts
 	static std::vector<int> ages; //holds player ages
+	static std::vector<int> strategies;
 	static bool mapLoaded;
 	static void handleMapPicker(Game* game);
 	static void handlePlayerPicker(Game* game);
