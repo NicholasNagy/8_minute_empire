@@ -4,21 +4,25 @@
 #include <algorithm>
 #include <iostream>
 #include <vector>  
-#include <random>
 #include <chrono>   
+#include <random>
+#include "Cardsfactory.h"
 
 using namespace std;
 
 
-Card::Card() {
+Card::Card()
+{
 	good = nullptr;
 	action = nullptr;
 }
 
-Card::Card(const int myGood, const Action& myAction) {
+Card::Card(const int myGood, const Action& myAction)
+{
 	good = new int(myGood);
 	action = new Action(myAction);
 }
+
 
 Card::Card(const Card& c) {
 	good = new int(*(c.good));
@@ -49,62 +53,37 @@ int Card::getGood()
 // Create the deck object by filling the vector with 42 cards.
 Deck::Deck()
 {
-
-	std::random_device dev;
-	std::mt19937 rng(dev());
-	std::uniform_int_distribution<std::mt19937::result_type> dist3(1, 3); // random number between 1 - 3 [1, 3]
-
+	CardsFactory* factory = new CardsFactory();
 	// Instantiate the cardsDeck vector with new cards that have random actions and goods
 
 	// Instantiate 15 cards with PlaceNewArmies Action
-	for (int i = 0; i < 15; i++) {
-		int good = dist3(rng); // ranges betweeb (1,3)
-		int multiplicity = dist3(rng); // ranges between (1,3)
-		cardsDeck->at(i) = new Card(good , Action(0, multiplicity, false));
-	}
+	for (int i = 0; i < 15; i++)
+		cardsDeck->at(i) = factory->makeCard("PlaceNewArmiesCard");
 
 	// Instantiate 10 cards with MoveArmies Action with land movement only
-	for (int i = 15; i < 25; i++) {
-		int good = dist3(rng); // ranges betweeb (1,3)
-		int multiplicity = dist3(rng); // ranges between (1,3)
-		cardsDeck->at(i) = new Card(good, Action(1, multiplicity, false));
-	}
+	for (int i = 15; i < 25; i++)
+		cardsDeck->at(i) = factory->makeCard("MoveArmiesLandCard");
 
 	// Instantiate 5 cards with MoveArmies Action with land & water movement
-	for (int i = 25; i < 30; i++) {
-		int good = dist3(rng); // ranges between (1,3)
-		int multiplicity = dist3(rng); // ranges between (1,3)
-		cardsDeck->at(i) = new Card(good, Action(1, multiplicity, true));
-	}
+	for (int i = 25; i < 30; i++)
+		cardsDeck->at(i) = factory->makeCard("MoveArmiesLandWaterCard");
 
 	// Instantiate 5 cards with BuildCity Action
-	for (int i = 30; i < 31; i++) {
-		int good = dist3(rng); // ranges betweeb (1,3)
-		cardsDeck->at(i) = new Card(good, Action(2));
-	}
+	for (int i = 30; i < 31; i++)
+		cardsDeck->at(i) = factory->makeCard("BuildCityCard");
 
 	// Instantiate 4 cards with DestoyArmy Action
-	for (int i = 31; i < 39; i++) {
-		int good = dist3(rng); // ranges betweeb (1,3)
-		int multiplicity = dist3(rng); // ranges between (1,3)
-		cardsDeck->at(i) = new Card(good, Action(3, multiplicity));
-	}
+	for (int i = 31; i < 39; i++)
+		cardsDeck->at(i) = factory->makeCard("DestroyArmyCard");
 
 	// Instantiate 1 cards with AND Action
-	int good = dist3(rng); // ranges betweeb (1,3)
-	int multiplicity = dist3(rng); // ranges between (1,3)
-	int s_Multiplicity = dist3(rng); // ranges between (1,3)
-	cardsDeck->at(39) = new Card(good, Action(4, multiplicity, false, 0, 2, 1, false));
+	cardsDeck->at(39) = factory->makeCard("AndActionCard");
 
 	// Instantiate 1 cards with Ignore Action
-	good = dist3(rng); // ranges betweeb (1,3)
-	multiplicity = dist3(rng); // ranges between (1,3)
-	cardsDeck->at(40) = new Card(good, Action(5, multiplicity, false, 0, 1, 1, true));
+	cardsDeck->at(40) = factory->makeCard("Ignore1Card");
 
 	// Instantiate 1 cards with Ignore Action
-	good = dist3(rng); // ranges between (1,3)
-	multiplicity = dist3(rng); // ranges between (1,3)
-	cardsDeck->at(41) = new Card(good, Action(6, multiplicity));
+	cardsDeck->at(41) = factory->makeCard("Ignore2Card");
 	
 
 	cout << "Deck of cards is now instantiated and has: " << cardsDeck->size() << " cards\n";

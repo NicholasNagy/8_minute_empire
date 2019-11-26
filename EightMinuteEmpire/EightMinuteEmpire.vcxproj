@@ -132,9 +132,11 @@
     <ClCompile Include="BidDriver.cpp" />
     <ClCompile Include="Cards.cpp" />
     <ClCompile Include="CardsDriver.cpp" />
+    <ClCompile Include="Cardsfactory.cpp" />
     <ClCompile Include="driver.cpp" />
     <ClCompile Include="g.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameCard.cpp" />
     <ClCompile Include="GameObservers.cpp" />
     <ClCompile Include="GameOverlay.cpp" />
     <ClCompile Include="GameplayState.cpp" />
@@ -163,7 +165,9 @@
     <ClInclude Include="ActionState.h" />
     <ClInclude Include="Bid.h" />
     <ClInclude Include="Cards.h" />
+    <ClInclude Include="Cardsfactory.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameCard.h" />
     <ClInclude Include="GameObservers.h" />
     <ClInclude Include="GameOverlay.h" />
     <ClInclude Include="GameplayState.h" />
