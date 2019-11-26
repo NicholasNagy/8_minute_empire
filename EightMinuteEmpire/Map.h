@@ -39,9 +39,12 @@ namespace GraphWorld
 		NodePtr* arrayOfCountries;
 		TileMap* tileMap;
 		Country* startingCountry;
+		static Map* _instance;
+		Map(string* mapName, int numCountries, int numContinents);
 
 		public:
-			Map(string* mapName, int numCountries, int numContinents);
+			static Map* instance();
+			static Map* instance(string* mapName, int numCountries, int numContinents);
 			void addNode(Country* country);
 			void addEdge(Country* currentCountry, Country* adjacentCountry, bool requiresNaval);
 			Country* getCountry(int id);

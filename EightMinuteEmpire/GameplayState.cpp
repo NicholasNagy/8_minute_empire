@@ -12,7 +12,8 @@
 #include "Action.h"
 #include "ActionState.h"
 #include "PlayerStrategies.h"
-#include "Singleton.h"
+
+using GraphWorld::Map;
 
 GameplayState GameplayState::mGameplayState;
 SDL_Event GameplayState::event;
@@ -117,9 +118,9 @@ void GameplayState::initMap(Game* game)
 {
 	string path = game->getMapLoader()->getTileSetPath();
 	texture = TextureLoader::loadTexutre(path.c_str(), renderer);
-	numCountries = SingletonClass::instance()->getNumCountries();
-	SingletonClass::instance()->getTileMap()->drawTileMap(renderer, texture);
-	startingCountry = SingletonClass::instance()->getStartingCountry();
+	numCountries = Map::instance()->getNumCountries();
+	Map::instance()->getTileMap()->drawTileMap(renderer, texture);
+	startingCountry = Map::instance()->getStartingCountry();
 	initPlayerHoldings(game);
 }
 
@@ -299,9 +300,9 @@ void GameplayState::getHoveredCountry()
 
 	if (mouse.x < MAP_WIDTH * GRID_CELL_SIZE)
 	{
-		type = SingletonClass::instance()->getTileMap()->tiles[typeRow][typeCol];
+		type = Map::instance()->getTileMap()->tiles[typeRow][typeCol];
 		if (type < numCountries && type >= 0)
-			hoveredCountry = SingletonClass::instance()->getCountry(type);
+			hoveredCountry = Map::instance()->getCountry(type);
 	}
 }
 
@@ -382,7 +383,7 @@ void GameplayState::initPlayerHoldings(Game* game)
 	{
 		for (Player* p : game->players())
 		{
-			SingletonClass::instance()->getCountry(i)->updateOccupyingPlayerScore(0, p);
+			Map::instance()->getCountry(i)->updateOccupyingPlayerScore(0, p);
 			p->holdings().emplace(i, new Holdings());
 		}
 	}
@@ -467,7 +468,7 @@ string GameplayState::drawSingleColumn(string colName, int colSize)
 void GameplayState::draw(Game* game)
 {
 	SDL_RenderClear(renderer);
-	SingletonClass::instance()->getTileMap()->drawTileMap(renderer, texture);
+	Map::instance()->getTileMap()->drawTileMap(renderer, texture);
 
 	if (mouseActive && mouseHover)
 	{

@@ -1,6 +1,7 @@
 #include "PlayerStrategies.h"
 #include <sstream>
-#include "Singleton.h"
+
+using GraphWorld::Map;
 
 std::unordered_map<GraphWorld::Country*, vector<Player*>> opposingArmiesToDestroy;
 Player* selectedPlayerToDestroyArmies = nullptr;
@@ -150,7 +151,7 @@ GraphWorld::Country* dest = nullptr;
 	{
 	//If no cities have been built, place on starting country.
 
-		GraphWorld::Country* toPlaceOn = SingletonClass::instance()->getStartingCountry();
+		GraphWorld::Country* toPlaceOn = Map::instance()->getStartingCountry();
 		if (!ActionState::toPlay->countriesWithCities().empty())
 		{
 			for (GraphWorld::Country* c : ActionState::toPlay->countriesWithCities())
@@ -168,11 +169,11 @@ GraphWorld::Country* dest = nullptr;
 
 	GraphWorld::Country* GreedyCPU::determineCountryForCityBuild(Game* game)
 	{
-		GraphWorld::Country* toBuildOn = SingletonClass::instance()->getStartingCountry();
-		std::string continent = SingletonClass::instance()->getStartingCountry()->getContinent();
-		for (int i = 0; i < SingletonClass::instance()->getNumCountries(); ++i)
+		GraphWorld::Country* toBuildOn = Map::instance()->getStartingCountry();
+		std::string continent = Map::instance()->getStartingCountry()->getContinent();
+		for (int i = 0; i < Map::instance()->getNumCountries(); ++i)
 		{
-			GraphWorld::Country* c = SingletonClass::instance()->getCountry(i);
+			GraphWorld::Country* c = Map::instance()->getCountry(i);
 			if (continent.compare(c->getContinent()) == 0)
 			{
 				if (!c->getCountryOwner())
@@ -199,9 +200,9 @@ GraphWorld::Country* dest = nullptr;
 			bool hasArmiesOnCountry = false;
 			GraphWorld::Country* toDestroy = nullptr;
 			vector<Player*> otherPlayers;
-			for (int i = 0; i < SingletonClass::instance()->getNumCountries(); ++i)
+			for (int i = 0; i < Map::instance()->getNumCountries(); ++i)
 			{
-				GraphWorld::Country* c = SingletonClass::instance()->getCountry(i);
+				GraphWorld::Country* c = Map::instance()->getCountry(i);
 				if (c->getCountryOwner() == ActionState::toPlay)
 					continue;
 
@@ -363,7 +364,7 @@ GraphWorld::Country* dest = nullptr;
 
 	GraphWorld::Country* ModerateCPU::determineCountryForArmyPlacement(Game* game)
 	{
-		GraphWorld::Country* toPlaceOn = SingletonClass::instance()->getStartingCountry();
+		GraphWorld::Country* toPlaceOn = Map::instance()->getStartingCountry();
 		if (!ActionState::toPlay->countriesWithCities().empty())
 		{
 			for (GraphWorld::Country* c : ActionState::toPlay->countriesWithCities())
@@ -381,11 +382,11 @@ GraphWorld::Country* dest = nullptr;
 
 	GraphWorld::Country* ModerateCPU::determineCountryForCityBuild(Game* game)
 	{
-		GraphWorld::Country* toBuildOn = SingletonClass::instance()->getStartingCountry();
-		std::string continent = SingletonClass::instance()->getStartingCountry()->getContinent();
-		for (int i = 0; i < SingletonClass::instance()->getNumCountries(); ++i)
+		GraphWorld::Country* toBuildOn = Map::instance()->getStartingCountry();
+		std::string continent = Map::instance()->getStartingCountry()->getContinent();
+		for (int i = 0; i < Map::instance()->getNumCountries(); ++i)
 		{
-			GraphWorld::Country* c = SingletonClass::instance()->getCountry(i);
+			GraphWorld::Country* c = Map::instance()->getCountry(i);
 			if (continent.compare(c->getContinent()) == 0)
 			{
 				if (!c->getCountryOwner())
@@ -412,9 +413,9 @@ GraphWorld::Country* dest = nullptr;
 		GraphWorld::Country* toDestroy = nullptr;
 		vector<Player*> otherPlayers;
 		std::cout << "\nCountries with enemy armies: " << std::endl;
-		for (int i = 0; i < SingletonClass::instance()->getNumCountries(); ++i)
+		for (int i = 0; i < Map::instance()->getNumCountries(); ++i)
 		{
-			GraphWorld::Country* c = SingletonClass::instance()->getCountry(i);
+			GraphWorld::Country* c = Map::instance()->getCountry(i);
 			if (c->getCountryOwner() == ActionState::toPlay)
 				continue;
 
@@ -519,7 +520,7 @@ GraphWorld::Country* dest = nullptr;
 		}
 
 		//Check if the start and destination countries are adjacent to each other
-		if (!SingletonClass::instance()->getAdjacentList(srcCountry)->isAdjacent(destCountry))
+		if (!Map::instance()->getAdjacentList(srcCountry)->isAdjacent(destCountry))
 		{
 			cout << "Cannot move armies there." << endl;
 			return;

@@ -7,7 +7,8 @@
 #include<vector>
 #include <regex>
 #include <sstream>
-#include "Singleton.h"
+
+using GraphWorld::Map;
 
 bool MapLoader::isStartingCountrySet = false;
 std::vector<std::string> MapLoader::Parser::vContinents;
@@ -233,7 +234,7 @@ void MapLoader::selectMap()
 	 using namespace std;
 
 	 
-	 string tileMapPath = tileMapDir + SingletonClass::instance()->getMapName() + ".txt";
+	 string tileMapPath = tileMapDir + Map::instance()->getMapName() + ".txt";
 	 bool tileMapFileExits = fileExists(tileMapPath);
 
 	 if (!tileMapFileExits)
@@ -242,7 +243,7 @@ void MapLoader::selectMap()
 		 return false;
 	 }
 
-	 string tileSetPath = tileMapDir + SingletonClass::instance()->getMapName() + "Set.png";
+	 string tileSetPath = tileMapDir + Map::instance()->getMapName() + "Set.png";
 	 bool tileSetFileExists = fileExists(tileSetPath);
 
 	 if (!tileSetFileExists)
@@ -254,7 +255,7 @@ void MapLoader::selectMap()
 		 this->setTileSetPath(&tileSetPath);
 		 fstream tileMapFile;
 		 tileMapFile.open(tileMapPath);
-		 cout << "Loading tile map for: " << SingletonClass::instance()->getMapName() << endl;
+		 cout << "Loading tile map for: " << Map::instance()->getMapName() << endl;
 		 std::string tile;
 		 int tileID = 0;
 
@@ -355,7 +356,7 @@ bool MapLoader::Parser::processCountries(std::ifstream& inputMapFile)
 		 if (line.compare("<eme_countries>") == 0)
 		 {
 			 //Start processing country lines
-			 for (int i = 0; i < SingletonClass::instance()->getNumCountries(); i++)
+			 for (int i = 0; i < Map::instance()->getNumCountries(); i++)
 			 {
 				 n++;
 				 getline(inputMapFile, line);
@@ -372,7 +373,7 @@ bool MapLoader::Parser::processCountries(std::ifstream& inputMapFile)
 					 if (std::regex_search(line, adjacentCountiresMatch, adjacencyIdentifier))
 					 {
 
-						 adjs = processAdjacency(adjacentCountiresMatch[0].str(), SingletonClass::instance()->getNumCountries());
+						 adjs = processAdjacency(adjacentCountiresMatch[0].str(), Map::instance()->getNumCountries());
 						 if (adjs.empty())
 							 return false;
 						 adjacentCountries.push_back(adjs);
@@ -425,7 +426,7 @@ bool MapLoader::Parser::processCountries(std::ifstream& inputMapFile)
 	 // Getting continent of the country 
 	 std::regex_search(countryAttributes, continentMatch, continentID);
 	 continent = continentMatch[0].str().substr(1);
-	 if (!validateContinent(continent, SingletonClass::instance()->getNumContinents()))
+	 if (!validateContinent(continent, Map::instance()->getNumContinents()))
 		 return false;
 
 	 //Getting naval status
@@ -445,9 +446,9 @@ bool MapLoader::Parser::processCountries(std::ifstream& inputMapFile)
 	 }
 
 	 GraphWorld::Country* country= new GraphWorld::Country(GraphWorld::Country(stoi(countryMatch[0].str()), startCountry, navalCountry, &continentMatch[0].str().substr(1)));
-	 SingletonClass::instance()->addNode(country);
+	 Map::instance()->addNode(country);
 	 if (startCountry)	
-		 SingletonClass::instance()->setStartingCountry(country);
+		 Map::instance()->setStartingCountry(country);
 	 return true;
  }
 
@@ -529,7 +530,7 @@ bool MapLoader::Parser::processCountries(std::ifstream& inputMapFile)
 	 std::string message = "Invalid adjacency list for country ";
 	 for (auto vec : adjacentCountries) 
 	 {		 
-		 isNaval = SingletonClass::instance()->getCountry(i)->isNavalCountry();
+		 isNaval = Map::instance()->getCountry(i)->isNavalCountry();
 
 		 for (auto c1 : vec) 
 		 {		
@@ -583,9 +584,9 @@ bool MapLoader::Parser::processCountries(std::ifstream& inputMapFile)
 			 temp = removeNavalSymbol(adjacentCountries[i][j]);
 			 //Check if the the adjacent country is naval (has a plus symbol next to it)
 			 //And that the node country is also a naval country
-			 if (adjacentCountries[i][j].find('+') != std::string::npos && SingletonClass::instance()->getCountry(i)->isNavalCountry() && SingletonClass::instance()->getCountry(temp)->isNavalCountry())
+			 if (adjacentCountries[i][j].find('+') != std::string::npos && Map::instance()->getCountry(i)->isNavalCountry() && Map::instance()->getCountry(temp)->isNavalCountry())
 				 naval = true;
-			 SingletonClass::instance()->addEdge(SingletonClass::instance()->getCountry(i), SingletonClass::instance()->getCountry( temp), naval);
+			 Map::instance()->addEdge(Map::instance()->getCountry(i), Map::instance()->getCountry( temp), naval);
 			naval = false;
 		 }
 	 }

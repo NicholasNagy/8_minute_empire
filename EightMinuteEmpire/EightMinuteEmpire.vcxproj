@@ -156,7 +156,6 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerDriver.cpp" />
     <ClCompile Include="PlayerStrategies.cpp" />
-    <ClCompile Include="Singleton.cpp" />
     <ClCompile Include="TextureLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -186,7 +185,6 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerStrategies.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="Singleton.h" />
     <ClInclude Include="TextureLoader.h" />
   </ItemGroup>
   <ItemGroup>
