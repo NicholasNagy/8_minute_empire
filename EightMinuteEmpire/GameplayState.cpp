@@ -276,7 +276,8 @@ void GameplayState::handleEvents(Game* game)
 				spacePress = true;
 				if (ActionState::toPlay->getStrategy().compare("GreedyCPU") == 0 || ActionState::toPlay->getStrategy().compare("ModerateCPU") == 0)
 					handleCardSelection(game, 0);
-				updateStatus("Engaged Card Selection. Pick a card by pressing 1-6 on the keyboard");
+				else
+					updateStatus("Engaged Card Selection. Pick a card by pressing 1-6 on the keyboard");
 				break;
 			default:
 				break;
