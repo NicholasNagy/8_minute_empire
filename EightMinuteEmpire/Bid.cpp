@@ -126,6 +126,7 @@ Bid Bid::handleCPUBidding(Player* player, int bidLimit)
 	std::uniform_int_distribution<int> uni(0, (bidLimit/2));
 
 	int bidAmount = uni(rng);
+	cout << "\n" << player->getName() << "(" <<player->getStrategy() << ") has bid." << endl;
 	return Bid(player, bidAmount);
 }
 

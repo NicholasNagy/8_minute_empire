@@ -4,6 +4,7 @@
 #include "SDL_image.h"
 #include <iostream>
 #include <vector>
+#include <random>
 #include "Game.h"
 #include "MapLoader.h"
 #include "Map.h"
@@ -18,7 +19,7 @@ using GraphWorld::Map;
 GameSetupState GameSetupState::mGameSetupState;
 SDL_Renderer* GameSetupState::renderer = nullptr;
 std::vector<bool> GameSetupState::players = { true, true, false, false, false };
-std::vector<int> GameSetupState::strategies = { 0, 0, 0, 0, 0 };  // 0 = human, 1 = moderate cpu , 2 = greedy cpu
+std::vector<int> GameSetupState::strategies = { 0, 0, 0, 0, 0 };  
 std::vector<int> GameSetupState::ages = { 18, 18, 18, 18, 18 };
 bool GameSetupState::mapLoaded = false;
 
@@ -161,6 +162,13 @@ void GameSetupState::handlePlayerPicker(Game* game)
 	ImVec2 windowPos(305, 20);
 	ImGui::SetWindowPos(windowPos);
 
+	bool isTournamentMode = game->isTournamentMode();
+	static int initalRadioSelection;
+	if (!isTournamentMode)
+		initalRadioSelection = 0;  // 0 for human player
+	else
+		initalRadioSelection = 1; // 1 for moderate cpu
+		
 	ImGui::Columns(3, "mixed");
 	ImGui::Separator();
 
@@ -171,10 +179,11 @@ void GameSetupState::handlePlayerPicker(Game* game)
 	ImGui::PopStyleColor(3);
 	static int age1 = ages[0];
 	ImGui::SliderInt("age1", &age1, 0, 100);
-	static int e1 = 0;
-	ImGui::RadioButton("Human", &e1, 0);
-	ImGui::RadioButton("Moderate CPU", &e1, 1); 
-	ImGui::RadioButton("Greedy CPU", &e1, 2);
+	static int e1 = initalRadioSelection;
+	if (!isTournamentMode)
+		ImGui::RadioButton("Human", &e1, 0);
+		ImGui::RadioButton("Moderate CPU", &e1, 1);
+		ImGui::RadioButton("Greedy CPU", &e1, 2);
 	ImGui::Text("");
 	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Player 1 playing");
 	ImGui::NextColumn();
@@ -187,7 +196,8 @@ void GameSetupState::handlePlayerPicker(Game* game)
 	ImGui::PopStyleColor(3);
 	static int age2 = ages[1];
 	ImGui::SliderInt("age2", &age2, 0, 100);
-	static int e2 = 0;
+	static int e2 = initalRadioSelection;
+	if(!isTournamentMode)
 	ImGui::RadioButton("Human ", &e2, 0);
 	ImGui::RadioButton("Moderate CPU ", &e2, 1);
 	ImGui::RadioButton("Greedy CPU ", &e2, 2);
@@ -202,7 +212,8 @@ void GameSetupState::handlePlayerPicker(Game* game)
 	static int age3 = ages[2];
 	ImGui::PopStyleColor(3);
 	ImGui::SliderInt("age3", &age3, 0, 100);
-	static int e3 = 0;
+	static int e3 = initalRadioSelection;
+	if (!isTournamentMode)
 	ImGui::RadioButton("Human  ", &e3, 0);
 	ImGui::RadioButton("Moderate CPU  ", &e3, 1);
 	ImGui::RadioButton("Greedy CPU  ", &e3, 2);
@@ -229,7 +240,8 @@ void GameSetupState::handlePlayerPicker(Game* game)
 	ImGui::PopStyleColor(3);
 	static int age4 = ages[3];
 	ImGui::SliderInt("age4", &age4, 0, 100);
-	static int e4 = 0;
+	static int e4 = initalRadioSelection;
+	if (!isTournamentMode)
 	ImGui::RadioButton("Human   ", &e4, 0);
 	ImGui::RadioButton("Moderate CPU   ", &e4, 1);
 	ImGui::RadioButton("Greedy CPU   ", &e4, 2);
@@ -244,7 +256,7 @@ void GameSetupState::handlePlayerPicker(Game* game)
 	else
 		ImGui::TextDisabled("Player 4 NOT playing");
 	ImGui::NextColumn();
-	if(!game->isTournamentMode())
+	if(!isTournamentMode)
 	{
 		ImGui::Button("Player 5");
 		static int age5 = ages[4];
