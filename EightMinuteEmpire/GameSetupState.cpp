@@ -244,48 +244,50 @@ void GameSetupState::handlePlayerPicker(Game* game)
 	else
 		ImGui::TextDisabled("Player 4 NOT playing");
 	ImGui::NextColumn();
-
-
-	ImGui::Button("Player 5");
-	static int age5 = ages[4];
-	ImGui::SliderInt("age5", &age5, 0, 100);
-	static int e5 = 0;
-	ImGui::RadioButton("Human    ", &e5, 0);
-	ImGui::RadioButton("Moderate CPU    ", &e5, 1);
-	ImGui::RadioButton("Greedy CPU    ", &e5, 2);
-	static bool status5 = players[4];
-	if (ImGui::Button("Add/Remove Player 5"))
+	if(!game->isTournamentMode())
 	{
-		status5 = !status5;
-		players[4] = status5;
+		ImGui::Button("Player 5");
+		static int age5 = ages[4];
+		ImGui::SliderInt("age5", &age5, 0, 100);
+		static int e5 = 0;
+		ImGui::RadioButton("Human    ", &e5, 0);
+		ImGui::RadioButton("Moderate CPU    ", &e5, 1);
+		ImGui::RadioButton("Greedy CPU    ", &e5, 2);
+		static bool status5 = players[4];
+		if (ImGui::Button("Add/Remove Player 5"))
+		{
+			status5 = !status5;
+			players[4] = status5;
+		}
+		if (status5 & 1)
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Player 5 added.");
+		else
+			ImGui::TextDisabled("Player 5 NOT playing");
+		ImGui::NextColumn();
 
-
+	ages[4] = age5;
+	strategies[4] = e5;
 	}
-	if (status5 & 1)
-		ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Player 5 added.");
-	else
-		ImGui::TextDisabled("Player 5 NOT playing");
-	ImGui::NextColumn();
 
 	ImGui::Columns(1);
 	ImGui::Separator();
+
 	ages[0] = age1;
 	ages[1] = age2;
 	ages[2] = age3;
 	ages[3] = age4;
-	ages[4] = age5;
 
 	strategies[0] = e1;
 	strategies[1] = e2;
 	strategies[2] = e3;
 	strategies[3] = e4;
-	strategies[4] = e5;
 
 	ImGui::End();
 }
 
 void GameSetupState::handleGameStart(Game* game)
 {
+	std::string buttonText = game->isTournamentMode() ? "START TOURNAMENT!" : "START GAME!";
 	bool select = false;
 	ImGui::Begin("Start Game", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
 	ImVec2 windowSize(200, 66);
@@ -297,7 +299,7 @@ void GameSetupState::handleGameStart(Game* game)
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(7.0f, 0.7f, 0.7f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(7.0f, 0.8f, 0.8f));
 	ImVec2 buttonSize(190, 50);
-	if (ImGui::Button("START GAME!", buttonSize))
+	if (ImGui::Button(buttonText.c_str(), buttonSize))
 	{
 		if (mapLoaded)
 			select = true;

@@ -98,7 +98,7 @@ void MainMenuState::handleButtons(Game* game)
 {
 	bool select = false;
 	ImGui::Begin("Eight Minute Empire", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove);
-	ImVec2 windowSize(250, 120);
+	ImVec2 windowSize(250, 175);
 	ImGui::SetWindowSize(windowSize);
 	ImVec2 windowPos(275, 325);
 	ImGui::SetWindowPos(windowPos);
@@ -109,13 +109,23 @@ void MainMenuState::handleButtons(Game* game)
 	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(3 / 7.0f, 0.6f, 0.6f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(3 / 7.0f, 0.7f, 0.7f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(3 / 7.0f, 0.8f, 0.8f));
-	if (ImGui::Button("NEW GAME", buttonSize))
+	if (ImGui::Button("NORMAL MODE", buttonSize))
 		select = true;
 	ImGui::PopStyleColor(3);
 
 	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(7.0f, 0.6f, 0.6f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(7.0f, 0.7f, 0.7f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(7.0f, 0.8f, 0.8f));
+	if (ImGui::Button("TOURNAMENT MODE", buttonSize))
+	{
+		game->setTournamentMode(true);
+		select = true;
+	}
+	ImGui::PopStyleColor(3);
+
+	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(7.0f, 7.6f, 0.6f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(7.0f, 4.6f, 0.7f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(7.0f, 4.7f, 0.8f));
 	if (ImGui::Button("QUIT", buttonSize))
 		game->setRunning(false);
 	ImGui::PopStyleColor(3);

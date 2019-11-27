@@ -50,8 +50,11 @@ public:
 	void setMapLoader(MapLoader*);
 	SDL_Window* getWindow();
 	void setWindow(SDL_Window*);
+	void setTournamentMode(bool b);
+	bool isTournamentMode();
 
 private:
+	bool mIsTournamentMode;
 	bool mIsRunning;
 	SDL_Window* window;
 	std::vector<GameState*> states;

@@ -188,3 +188,13 @@ void Game::setWindow(SDL_Window* win)
 {
 	window = win;
 }
+
+void Game::setTournamentMode(bool b)
+{
+	mIsTournamentMode = b;
+}
+
+bool Game::isTournamentMode()
+{
+	return mIsTournamentMode;
+}
