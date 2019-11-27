@@ -4,12 +4,20 @@
 #include <sstream>
 #include <algorithm>
 #include <conio.h>
+#include <random>
+#include <ctime>
 
 const int TWO_PLAYER_COIN_PURSE = 14;
 const int THREE_PLAYER_COIN_PURSE = 11;
 const int FOUR_PLAYER_COIN_PURSE = 9;
 const int FIVE_PLAYER_COIN_PURSE = 8;
 
+
+Bid::Bid()
+{
+	player = nullptr;
+	this->amount = new int(0);
+}
 
 Bid::Bid(Player* p, int amountBid)
 {
@@ -50,43 +58,12 @@ int Bid::initiateBidding(Game* game)
 
 	for (auto i = 0; i < numPlayers; i++)
 	{
-		cout << endl << players.at(i)->getName() << " enter the amount you wish to bid: " << endl;
-
-		int x;
-		string in;
-
-		while ((x = _getch()))
-		{
-			if (isdigit(x))
-			{
-				cout << '*';
-				x = x - '0';
-				in += to_string(x);
-				// cout << x;
-				continue;
-			}
-			if (x == '\b' && in.size() > 0)
-			{
-				in.pop_back();
-				cout << '\b';
-				cout << " ";
-				cout << '\b';
-				continue;
-			}
-			if (x == '\r' && in.size() > 0)
-			{
-				if ((stoi(in) < 0) || (stoi(in) > bidLimit))
-				{
-					cout << "\nPlease enter a value between 0 and " << bidLimit << ".\n";
-					in.clear();
-					continue;
-				}
-				break;
-			}
-		}
-		cout << "\n" << players.at(i)->getName() << " has bid." << endl;
-		Bid bid(players.at(i), stoi(in));
-		bids.push_back(bid);
+		Bid bid;
+		if (players.at(i)->getStrategy().compare("Human") == 0)
+			bids.push_back(handleHumanBidding(players.at(i), bidLimit));
+		else
+			bids.push_back(handleCPUBidding(players.at(i), bidLimit));
+		
 	}
 	cout << "\nAll players have bid. The amounts were:\n";
 	for (Bid i : bids)
@@ -98,6 +75,58 @@ int Bid::initiateBidding(Game* game)
 		return 0;
 
 	return decideOrder(game, winner);
+}
+
+
+Bid Bid::handleHumanBidding(Player* player, const int bidLimit)
+{
+	cout << endl << player->getName() << " enter the amount you wish to bid: " << endl;
+	int x;
+	string in;
+
+	while ((x = _getch()))
+	{
+		if (isdigit(x))
+		{
+			cout << '*';
+			x = x - '0';
+			in += to_string(x);
+			// cout << x;
+			continue;
+		}
+		if (x == '\b' && in.size() > 0)
+		{
+			in.pop_back();
+			cout << '\b';
+			cout << " ";
+			cout << '\b';
+			continue;
+		}
+		if (x == '\r' && in.size() > 0)
+		{
+			if ((stoi(in) < 0) || (stoi(in) > bidLimit))
+			{
+				cout << "\nPlease enter a value between 0 and " << bidLimit << ".\n";
+				in.clear();
+				continue;
+			}
+			break;
+		}
+	}
+	cout << "\n" << player->getName() << " has bid." << endl;
+	Bid bid(player, stoi(in));
+
+	return bid;
+}
+
+Bid Bid::handleCPUBidding(Player* player, int bidLimit)
+{
+	std::random_device rd;
+	std::mt19937 rng(rd());
+	std::uniform_int_distribution<int> uni(0, (bidLimit/2));
+
+	int bidAmount = uni(rng);
+	return Bid(player, bidAmount);
 }
 
 Player* Bid::tallyBids(std::vector<Bid>* bids)
@@ -146,32 +175,43 @@ int Bid::decideOrder(Game* game, Player* winner)
 {
 
 	vector<Player*> players = game->players();
-
-	cout << winner->getName() << " please enter who goes first:\n\n";
-
-	int n = 1;
-	for (Player* p : players)
-	{
-		cout << n << ". " << p->getName() << ((p->getName().compare(winner->getName()) == 0) ? " (You)" : "") << endl;
-		n++;
-	}
-	cout << endl;
 	int firstPlayer;
-	cin >> firstPlayer;
-	while ((firstPlayer > players.size() || firstPlayer < 1) || (!cin))
+
+	if (winner->getStrategy().compare("Human") == 0)
 	{
-		if (!cin)
+		cout << winner->getName() << " please enter who goes first:\n\n";
+
+		int n = 1;
+		for (Player* p : players)
 		{
-			cin.clear();
-			cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-			cout << "Please enter a number: " << endl;
-			cin >> firstPlayer;
+			cout << n << ". " << p->getName() << ((p->getName().compare(winner->getName()) == 0) ? " (You)" : "") << endl;
+			n++;
 		}
-		else if (firstPlayer > players.size() || firstPlayer < 1)
+		cout << endl;
+		cin >> firstPlayer;
+		while ((firstPlayer > players.size() || firstPlayer < 1) || (!cin))
 		{
-			cout << "Please enter a number within: 1 and " << players.size() << endl;
-			cin >> firstPlayer;
+			if (!cin)
+			{
+				cin.clear();
+				cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+				cout << "Please enter a number: " << endl;
+				cin >> firstPlayer;
+			}
+			else if (firstPlayer > players.size() || firstPlayer < 1)
+			{
+				cout << "Please enter a number within: 1 and " << players.size() << endl;
+				cin >> firstPlayer;
+			}
 		}
+	}	
+	else
+	{
+		std::random_device rd;
+		std::mt19937 rng(rd());
+		std::uniform_int_distribution<int> uni(1, players.size());
+
+		firstPlayer = uni(rng);
 
 	}
 	firstPlayer -= 1;
