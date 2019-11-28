@@ -230,7 +230,7 @@ namespace GraphWorld
 
 	int Country::getID()
 	{
-		return *country_ID;
+ 		return *country_ID;
 	}
 
 	bool Country::isStartCountry()

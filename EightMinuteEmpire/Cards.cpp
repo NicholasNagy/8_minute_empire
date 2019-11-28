@@ -193,7 +193,7 @@ int Hand::getCardCostAtPosition(int postion) {
 
 // Get the Card at cetrain postion in the hand (between 1 and 6). This also moves the rest of the cards
 // backward in the hand and draws another card from the deck to be placed at the end of the hand.
-Card* Hand::getCardAtPosition(int postion, Deck* deck) {
+Card* Hand::getCardAtPosition(int postion, Deck* deck, bool MoveCards) {
 
 	// Postion of the slot has to be between 1 and 6
 	if (postion < 1 || postion > 6) {
@@ -202,6 +202,7 @@ Card* Hand::getCardAtPosition(int postion, Deck* deck) {
 	}
 
 	Card* cardptr = new Card(*(cardsHand->at(postion - 1))); // postion - 1 to because vector starts from 0
+	if (MoveCards)
 	moveCards(postion, deck);
 	return cardptr;
 }

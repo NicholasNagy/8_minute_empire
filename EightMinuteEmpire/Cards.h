@@ -56,7 +56,7 @@ class Hand
 		~Hand();
 		void printHand();
 		int getCardCostAtPosition(int postion);
-		Card* getCardAtPosition(int postion, Deck* deck);
+		Card* getCardAtPosition(int postion, Deck* deck, bool MoveCards = true);
 		void moveCards(int postionOfTheRemovedCard, Deck* deck);
 		vector<Card* > cardsInHand();
 };

@@ -36,6 +36,7 @@ private:
 	void initUI(Game* game);
 	void getHoveredCountry();
 	void handleCardSelection(Game* game, int position);
+	bool checkRemainingCards(Game* game);
 
 	void placeStartingArmies(Game* game);
 	void initPlayerHoldings(Game* game); // Initilizes each players'holdings to default values 0 cities and 0 armies)

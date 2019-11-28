@@ -4,6 +4,7 @@
 #include "Game.h"
 #include "MainMenuState.h"
 
+void limitFPS(Uint32 frameStart, const int frameDelay);
 
 int main(int argc, char* argv[])
 {
@@ -20,21 +21,26 @@ int main(int argc, char* argv[])
 	game.changeState(MainMenuState::Instance());
 		while (game.isRunning())
 		{
-			frameStart = SDL_GetTicks();
+
+		frameStart = SDL_GetTicks();
 
 				game.handleEvents();
 				game.update();
 				game.draw();
-	
-			frameTime = SDL_GetTicks() - frameStart;
-				
-			if (frameDelay > frameTime)
-				SDL_Delay(frameDelay - frameTime);
 
-
+		// limitFPS(frameStart, frameDelay);
+		
 		}
 
 		game.clean();
 
 	return 0;
+}
+
+void limitFPS(Uint32 frameStart, const int frameDelay)
+{
+	int fTime = SDL_GetTicks() - frameStart;
+
+			if (frameDelay > fTime)
+				SDL_Delay(frameDelay - fTime);
 }

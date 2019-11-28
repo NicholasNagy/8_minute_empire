@@ -51,13 +51,14 @@ GraphWorld::Country* dest = nullptr;
 		int cardPos = 1;
 		int selectedCardPos = 1;
 		vector<int> playableCards;
+		std::cout << std::endl << "NUMARMIES LEFT: " << toPlay->getNumArmies() << endl;
 		for (Card* card : game->hand()->cardsInHand())
 		{
 
 			switch (card->getAction()->getID())
 			{
 			case 0:  //Place New Armies
-				if (game->hand()->getCardCostAtPosition(cardPos) <= toPlay->getMoney() && toPlay->getNumArmies() > 0)
+				if (game->hand()->getCardCostAtPosition(cardPos) <= toPlay->getMoney() && toPlay->getNumArmies() >= game->hand()->getCardAtPosition(cardPos, game->deck(), false)->getAction()->getMultiplicity())
 					playableCards.push_back(cardPos);
 				break;
 			case 1: //Move Armies
@@ -412,12 +413,9 @@ GraphWorld::Country* dest = nullptr;
 		bool hasArmiesOnCountry = false;
 		GraphWorld::Country* toDestroy = nullptr;
 		vector<Player*> otherPlayers;
-		std::cout << "\nCountries with enemy armies: " << std::endl;
 		for (int i = 0; i < Map::instance()->getNumCountries(); ++i)
 		{
 			GraphWorld::Country* c = Map::instance()->getCountry(i);
-			if (c->getCountryOwner() == ActionState::toPlay)
-				continue;
 
 			auto it = c->occupyingPlayers().begin();
 			for (int i = 0; i < c->occupyingPlayers().size(); ++i)

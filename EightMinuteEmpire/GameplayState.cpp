@@ -46,6 +46,7 @@ int playerMove;  //The current player's turn
 Game* nextM;
 
 bool spacePress = false;
+bool gameEnd = false;
 void GameplayState::init(Game* game)
 {
 	nextM = game;
@@ -242,8 +243,7 @@ void GameplayState::handleEvents(Game* game)
 				handleCardSelection(game, 6);			
 				break;
 			case SDLK_7:
-				if (!ActionState::inActionState)
-					
+				if (!ActionState::inActionState && !gameEnd)
 					if (ActionState::toPlay->getStrategy().compare("Human") == 0)
 					{
 						ActionState::toPlay->setStrategy(new  ModerateCPU());
@@ -274,11 +274,14 @@ void GameplayState::handleEvents(Game* game)
 				break;
 
 			case SDLK_SPACE:
-				spacePress = true;
-				if (ActionState::toPlay->getStrategy().compare("GreedyCPU") == 0 || ActionState::toPlay->getStrategy().compare("ModerateCPU") == 0)
-					handleCardSelection(game, 0);
-				else
-					updateStatus("Engaged Card Selection. Pick a card by pressing 1-6 on the keyboard");
+				if (!gameEnd)
+				{			
+					spacePress = true;
+					if (ActionState::toPlay->getStrategy().compare("GreedyCPU") == 0 || ActionState::toPlay->getStrategy().compare("ModerateCPU") == 0)
+						handleCardSelection(game, 0);
+					else
+						updateStatus("Engaged Card Selection. Pick a card by pressing 1-6 on the keyboard");
+				}
 				break;
 			default:
 				break;
@@ -314,31 +317,26 @@ void GameplayState::handleCardSelection(Game* game, int position)
 
 }
 
-
 void GameplayState::nextMove(Game* game)
 {
 
-	
-	
 	ActionState::inActionState = false;
 	spacePress = false;
 	ActionState::toPlay->computeScore();
-
-	// loop over all the players and update their list of owned countries after the end of each turn.
-	for (Player* player : game->players()) { player->updateListOfOwnedCountries(game); }
-	updateStatistics(game->players());
-	
 	gameMessages.clear();
+
+
 	ActionState::toPlay->setHand(nullptr);
 	ActionState::toPlay->setCardToPlay(ActionState::toPlay->getCardsToPlay() - 1);
 
-	if (game->players().at(numPlayers - 1)->getCardsToPlay() == 0)
-	{
-		cout << "\nGame Over!" << endl;
-		computeFinalScore(game);
-		return;
-	}
+	// loop over all the players and update their list of owned countries after the end of each turn.
+	for (Player* player : game->players()) { player->updateListOfOwnedCountries(game); }
+		updateStatistics(game->players());
 
+		//if there are no more remaining cards the game will end
+		if (!checkRemainingCards(game))
+			return;
+	
 	playerMove++;
 	if (playerMove == numPlayers)
 		playerMove = 0;
@@ -358,11 +356,33 @@ void GameplayState::nextMove(Game* game)
 	}
 	else
 		gameMessages = ActionState::toPlay->getName() + " turn to move.";
-	cout << gameMessages << endl;
+		cout << gameMessages << endl;
 		startNewStatus(gameMessages);
 
 		updateStatus("Press Space to engage card selection. '7' to change Strategy type");
 }
+
+
+bool GameplayState::checkRemainingCards(Game* game)
+{
+	int count = 0;
+	for (Player* p : game->players())
+	{
+		if (p->getCardsToPlay() == 0)
+			count++;
+	}
+	//If all players have no more cards to player, compute score and end the game
+	if (count == numPlayers)
+	{
+		computeFinalScore(game);
+		gameEnd = true;
+		return false;
+
+	}
+	return true;
+}
+
+
 
 void GameplayState::placeStartingArmies(Game* game)
 {
@@ -406,6 +426,8 @@ Player* GameplayState::computeFinalScore(Game* game)
 			if (game->players().at(i)->getVictoryPoints() == playerScores.at(0))
 			{
 				gameMessages = "Game Over -" + game->players().at(i)->getName() + " won!\n";
+				cout << endl << gameMessages << endl;
+				startNewStatus(gameMessages);
 				return game->players().at(i);
 			}				
 		}		
@@ -413,6 +435,8 @@ Player* GameplayState::computeFinalScore(Game* game)
 	else
 	{
 		gameMessages = "Game Over - TIE GAME !";
+		cout << endl << gameMessages << endl;
+		startNewStatus(gameMessages);
 		return nullptr;
 	}
 
