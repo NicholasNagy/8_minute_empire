@@ -198,3 +198,15 @@ bool Game::isTournamentMode()
 {
 	return mIsTournamentMode;
 }
+
+bool Game::isAutoCpuMove()
+{
+	return mIsAutoCpuMove;
+}
+
+void Game::setIsAutoCpuMove(bool b)
+{
+	mIsAutoCpuMove = b;
+}
+
+

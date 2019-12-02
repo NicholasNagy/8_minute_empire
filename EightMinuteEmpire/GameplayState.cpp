@@ -4,6 +4,8 @@
 #include "SDL_ttf.h"
 #include <iostream>
 #include <sstream>
+#include <chrono>
+#include <thread>
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_sdl.h"
 #include "Map.h"
@@ -98,7 +100,8 @@ void GameplayState::init(Game* game)
 	cout << "\n------------------------------------------------------------\n";
 	cout << endl <<gameMessages <<endl;
 
-
+	if (game->isAutoCpuMove())
+		handleCardSelection(game, 0);
 	
 }
 
@@ -275,10 +278,10 @@ void GameplayState::handleEvents(Game* game)
 				break;
 
 			case SDLK_SPACE:
-				if (!gameEnd)
+				if (!gameEnd && !game->isAutoCpuMove())
 				{			
 					spacePress = true;
-					if (ActionState::toPlay->getStrategy().compare("GreedyCPU") == 0 || ActionState::toPlay->getStrategy().compare("ModerateCPU") == 0)
+					if (ActionState::toPlay->getStrategy().compare("Human") != 0)
 						handleCardSelection(game, 0);
 					else
 						updateStatus("Engaged Card Selection. Pick a card by pressing 1-6 on the keyboard");
@@ -349,19 +352,29 @@ void GameplayState::nextMove(Game* game)
 	game->hand()->printHand();
 	cout << "------------------------------------------------------------\n";
 
-	if (ActionState::toPlay->getStrategy().compare("GreedyCPU") == 0 || ActionState::toPlay->getStrategy().compare("ModerateCPU") == 0)
+
+// Messy code follows here, will need a rewrite
+	if (ActionState::toPlay->getStrategy().compare("Human") !=0 && !game->isAutoCpuMove())
 	{
 
 		gameMessages = ActionState::toPlay->getName() + " (" + ActionState::toPlay->getStrategy() + ") turn to move.";;
 		startNewStatus(gameMessages);
 	}
-	else
+	else if (ActionState::toPlay->getStrategy().compare("Human"))
 		gameMessages = ActionState::toPlay->getName() + " turn to move.";
+
 		cout << gameMessages << endl;
-		startNewStatus(gameMessages);
+		startNewStatus(gameMessages);		
 
-		updateStatus("Press Space to engage card selection. '7' to change Strategy type");
-
+		if (game->isAutoCpuMove())
+		{
+			game->handleEvents();
+			game->update();
+			game->draw();
+			handleCardSelection(game, 0);
+		}
+		else 
+			updateStatus("Press Space to engage card selection. '7' to change Strategy type");
 }
 
 
@@ -378,6 +391,7 @@ bool GameplayState::checkRemainingCards(Game* game)
 	{
 		computeFinalScore(game);
 		gameEnd = true;
+
 		game->pushState(GameEngine::Instance());
 		return false;
 

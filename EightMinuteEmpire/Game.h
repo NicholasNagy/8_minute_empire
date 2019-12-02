@@ -52,9 +52,12 @@ public:
 	void setWindow(SDL_Window*);
 	void setTournamentMode(bool b);
 	bool isTournamentMode();
+	void setIsAutoCpuMove(bool b);
+	bool isAutoCpuMove();
 
 private:
 	bool mIsTournamentMode;
+	bool mIsAutoCpuMove;
 	bool mIsRunning;
 	SDL_Window* window;
 	std::vector<GameState*> states;

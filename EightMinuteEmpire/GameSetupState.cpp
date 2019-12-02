@@ -153,10 +153,23 @@ void GameSetupState::handleMapPicker(Game* game)
 
 }
 
+static void HelpMarker(const char* desc)
+{
+	ImGui::TextDisabled("(?)");
+	if (ImGui::IsItemHovered())
+	{
+		ImGui::BeginTooltip();
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+		ImGui::TextUnformatted(desc);
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
+	}
+}
+
 void GameSetupState::handlePlayerPicker(Game* game)
 {
 	ImGui::Begin("Choose Players", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
-	ImVec2 windowSize(490, 500);
+	ImVec2 windowSize(492, 500);
 	ImGui::SetWindowSize(windowSize);
 	ImVec2 windowPos(305, 20);
 	ImGui::SetWindowPos(windowPos);
@@ -283,6 +296,17 @@ void GameSetupState::handlePlayerPicker(Game* game)
 	ImGui::Columns(1);
 	ImGui::Separator();
 
+	if (game->isTournamentMode())
+	{
+		static bool autoplay = true;
+		ImGui::Text("Game Settings: ");
+		ImGui::Checkbox("Autoplay CPU Moves", &autoplay);  ImGui::SameLine();
+		HelpMarker("Uncheck this to manually engage cpu actions before every turn.");
+		game->setIsAutoCpuMove(autoplay);
+	}
+
+
+
 	ages[0] = age1;
 	ages[1] = age2;
 	ages[2] = age3;
@@ -293,15 +317,17 @@ void GameSetupState::handlePlayerPicker(Game* game)
 	strategies[2] = e3;
 	strategies[3] = e4;
 
+
 	ImGui::End();
 }
 
 void GameSetupState::handleGameStart(Game* game)
 {
+
 	std::string buttonText = game->isTournamentMode() ? "START TOURNAMENT!" : "START GAME!";
 	bool select = false;
 	ImGui::Begin("Start Game", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
-	ImVec2 windowSize(200, 66);
+	ImVec2 windowSize(202, 66);
 	ImGui::SetWindowSize(windowSize);
 	ImVec2 windowPos(595, 520);
 	ImGui::SetWindowPos(windowPos);
@@ -332,14 +358,11 @@ void GameSetupState::handleGameStart(Game* game)
 			if (!p->getHand())
 				std::cout << p->getName() << " - Hand: " << "Empty" << endl;
 		}
-
-
 		game->changeState(GameplayState::Instance());
-
-
 	}
 
 }
+
 
 bool GameSetupState::initMapLoader(Game* game)
 {
