@@ -198,45 +198,43 @@ GraphWorld::Country* dest = nullptr;
 	GraphWorld::Country* GreedyCPU::determineArmiesToDestroy(Game* game)
 	{
 
-			bool hasArmiesOnCountry = false;
-			GraphWorld::Country* toDestroy = nullptr;
-			vector<Player*> otherPlayers;
-			for (int i = 0; i < Map::instance()->getNumCountries(); ++i)
-			{
-				GraphWorld::Country* c = Map::instance()->getCountry(i);
-				if (c->getCountryOwner() == ActionState::toPlay)
-					continue;
+		bool hasArmiesOnCountry = false;
+		GraphWorld::Country* toDestroy = nullptr;
+		vector<Player*> otherPlayers;
+		for (int i = 0; i < Map::instance()->getNumCountries(); ++i)
+		{
+			GraphWorld::Country* c = Map::instance()->getCountry(i);
 
-				auto it = c->occupyingPlayers().begin();
-				for (int i = 0; i < c->occupyingPlayers().size(); ++i)
+			auto it = c->occupyingPlayers().begin();
+			for (int i = 0; i < c->occupyingPlayers().size(); ++i)
+			{
+
+				if (ActionState::toPlay != it->second)
 				{
-				
-					if (ActionState::toPlay != it->second)
+					if (it->second->getHoldings(c)->numArmies() > 0)
 					{
-						if (it->second->getHoldings(c)->numArmies() > 0)
-						{
-							hasArmiesOnCountry = true;
-							otherPlayers.push_back(it->second);
-						}
+						hasArmiesOnCountry = true;
+						otherPlayers.push_back(it->second);
 					}
-					++it;
 				}
-				if (hasArmiesOnCountry)
-				{
-					opposingArmiesToDestroy.try_emplace(c, otherPlayers);
-					otherPlayers.clear();
-				}
-				hasArmiesOnCountry = false;
+				++it;
 			}
-
-			for (unordered_map<GraphWorld::Country*, vector<Player*> >::const_iterator it = opposingArmiesToDestroy.begin(); it != opposingArmiesToDestroy.end(); ++it)
+			if (hasArmiesOnCountry)
 			{
-				selectedPlayerToDestroyArmies = it->second[0];
-				toDestroy = it->first;
+				opposingArmiesToDestroy.try_emplace(c, otherPlayers);
+				otherPlayers.clear();
 			}
+			hasArmiesOnCountry = false;
+		}
 
 
-			return toDestroy;
+		for (unordered_map<GraphWorld::Country*, vector<Player*> >::const_iterator it = opposingArmiesToDestroy.begin(); it != opposingArmiesToDestroy.end(); ++it)
+		{
+			selectedPlayerToDestroyArmies = it->second[0];
+			toDestroy = it->first;
+		}
+
+		return toDestroy;
 	}
 
 
