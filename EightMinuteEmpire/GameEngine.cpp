@@ -73,7 +73,6 @@ void GameEngine::handleEvents(Game* game)
 
 void GameEngine::draw(Game* game)
 {
-	SDL_RenderClear(renderer);
 	ImGui::Render();
 	ImGuiSDL::Render(ImGui::GetDrawData());
 	SDL_RenderPresent(GameplayState::renderer);
@@ -119,4 +118,5 @@ void GameEngine::ResultsTable(Game* game)
 		ImGui::Columns(1);
 		ImGui::Separator();
 		ImGui::End();
+
 }

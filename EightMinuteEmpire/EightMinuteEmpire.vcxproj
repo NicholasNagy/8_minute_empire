@@ -134,6 +134,7 @@
     <ClCompile Include="CardsDriver.cpp" />
     <ClCompile Include="Cardsfactory.cpp" />
     <ClCompile Include="driver.cpp" />
+    <ClCompile Include="FactoryDriver.cpp" />
     <ClCompile Include="g.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameCard.cpp" />
