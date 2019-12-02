@@ -51,7 +51,7 @@ GraphWorld::Country* dest = nullptr;
 		int cardPos = 1;
 		int selectedCardPos = 1;
 		vector<int> playableCards;
-		std::cout << std::endl << "NUMARMIES LEFT: " << toPlay->getNumArmies() << endl;
+
 		for (Card* card : game->hand()->cardsInHand())
 		{
 

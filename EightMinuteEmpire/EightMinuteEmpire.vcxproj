@@ -137,6 +137,7 @@
     <ClCompile Include="g.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameCard.cpp" />
+    <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="GameObservers.cpp" />
     <ClCompile Include="GameOverlay.cpp" />
     <ClCompile Include="GameplayState.cpp" />
@@ -168,6 +169,7 @@
     <ClInclude Include="Cardsfactory.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameCard.h" />
+    <ClInclude Include="GameEngine.h" />
     <ClInclude Include="GameObservers.h" />
     <ClInclude Include="GameOverlay.h" />
     <ClInclude Include="GameplayState.h" />

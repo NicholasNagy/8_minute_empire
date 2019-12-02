@@ -12,6 +12,7 @@
 #include "Action.h"
 #include "ActionState.h"
 #include "PlayerStrategies.h"
+#include "GameEngine.h"
 
 using GraphWorld::Map;
 
@@ -168,7 +169,7 @@ void GameplayState::initUI(Game* game)
 void GameplayState::pause()
 {
 
-	printf("\nInitiated Card Action State");
+	printf("\nGamePlay Paused");
 }
 
 void GameplayState::resume()
@@ -331,7 +332,7 @@ void GameplayState::nextMove(Game* game)
 
 	// loop over all the players and update their list of owned countries after the end of each turn.
 	for (Player* player : game->players()) { player->updateListOfOwnedCountries(game); }
-		updateStatistics(game->players());
+	updateStatistics(game->players());
 
 		//if there are no more remaining cards the game will end
 		if (!checkRemainingCards(game))
@@ -360,6 +361,7 @@ void GameplayState::nextMove(Game* game)
 		startNewStatus(gameMessages);
 
 		updateStatus("Press Space to engage card selection. '7' to change Strategy type");
+
 }
 
 
@@ -376,6 +378,7 @@ bool GameplayState::checkRemainingCards(Game* game)
 	{
 		computeFinalScore(game);
 		gameEnd = true;
+		game->pushState(GameEngine::Instance());
 		return false;
 
 	}
@@ -506,6 +509,7 @@ void GameplayState::draw(Game* game)
 	cardsLabel->drawLabel(renderer);
 	SDL_RenderPresent(renderer);
 
+
 }
 
 void GameplayState::update(Game* game)
@@ -552,6 +556,8 @@ void GameplayState::update(Game* game)
 
 	//Displaying game messages
 	gameMessagesLabel->setLabelText(renderer, screen, game->phaseObserver()->getStatus(), ui.getFont("BRITANIC"));
+
+
 
 }
 
